@@ -1,0 +1,26 @@
+# dependencies
+node_modules
+
+# build output
+dist
+dist-ssr
+.output
+.nitro
+.vinxi
+.vercel
+
+# generated
+src/routeTree.gen.ts
+.tanstack
+__unconfig*
+
+# env — never commit real credentials, .env.example is the tracked template
+.env
+.env.*
+!.env.example
+
+# editor / OS
+.DS_Store
+Thumbs.db
+*.local
+*.log

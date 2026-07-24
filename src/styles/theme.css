@@ -1,0 +1,159 @@
+/* OctetoHaret design tokens — CLAUDE.md §7.2.
+   This file is the single source of colour truth. Never hardcode a hex in a
+   component; add a token here instead. */
+
+/* ── Brand palette ────────────────────────────────────────────────────────
+   WARNING: these hexes are approximations sampled from Instagram screenshots
+   (CLAUDE.md §7.2, §15.1). Before launch, pull the exact values from the logo
+   SVG / Canva file and replace them here. Everything downstream — including
+   the shadcn/ui bridge below — derives from this block, so each colour stays
+   a one-line fix. */
+
+/* `static` emits every variable below even when no utility references it yet.
+   Tailwind v4 tree-shakes unused @theme variables by default, which would make
+   a raw `var(--color-signal)` in a stylesheet or SVG resolve to nothing — the
+   exact pattern §7.2 asks for. Eight custom properties is a cheap trade. */
+@theme static {
+  --color-ink: #0a0c09; /* base background, faintly green-tinted black */
+  --color-carbon: #141811; /* elevated surface */
+  --color-slate: #232a20; /* borders, dividers */
+  --color-sage: #7c8a6b; /* kraft backdrop — non-tech canvas */
+  --color-paper: #e9e4d6; /* cutout edges, cards, body text on dark */
+  --color-signal: #63f06a; /* interactive ONLY */
+  --color-gold: #efb428; /* awards, sponsors, emphasis */
+  --color-violet: #8b5cf6; /* logo gradient only — do not build UI on it */
+
+  /* ── Typography — CLAUDE.md §7.6 ────────────────────────────────────────
+     Three families maximum. TODO: self-host these and add @font-face rules
+     with `font-display: swap`. No Google Fonts network request; install via
+     Fontsource so the files ship in the bundle. Until then they fall back to
+     the system stack. Do not add Inter (§7.6), and do not reintroduce Geist —
+     `shadcn init` adds it by default and it would be a fourth family. */
+
+  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Martian Mono', ui-monospace, monospace;
+}
+
+/* ── shadcn/ui bridge ─────────────────────────────────────────────────────
+   shadcn components are written against these semantic tokens, so they have
+   to exist. The values below are still shadcn's stock neutral greyscale.
+
+   TODO — before any UI is built, map these onto the brand palette above
+   (e.g. --primary and --ring to --color-signal, --border to --color-slate).
+   This was deliberately NOT guessed at scaffold time: §7.3 splits the site
+   into an ink-ground tech half and a sage-ground non-tech half rather than a
+   light/dark toggle, so which of :root / .dark each branch corresponds to is
+   a design decision, not a mechanical one. See the README. */
+
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-display);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}

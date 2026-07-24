@@ -1,0 +1,48 @@
+/* Stylesheet entry point. Design tokens live in ./theme.css (CLAUDE.md §7.2).
+   `source('../')` points Tailwind at src/ so it scans routes and components
+   for class names from this file's location in src/styles/. */
+@import 'tailwindcss' source('../');
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import './theme.css';
+
+@custom-variant dark (&:is(.dark *));
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+/* CLAUDE.md §7.7 — honoured globally so no individual animation can forget it. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", ".output", ".nitro", "dist"],
+  "compilerOptions": {
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    /* No `baseUrl` — deprecated in TS 6, removed in TS 7. Paths resolve
+       relative to this file. Vite 8 reads them via resolve.tsconfigPaths. */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+
+    /* Deliberately disabled. The TanStack Start docs warn that
+       `verbatimModuleSyntax` can leak server bundles into the client bundle.
+       This project keeps ALLOWED_ADMIN_EMAILS and the session secret
+       server-side only (CLAUDE.md §9) — do not turn this on. */
+    "verbatimModuleSyntax": false,
+
+    /* Linting */
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  }
+}
