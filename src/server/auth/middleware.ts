@@ -1,51 +1,26 @@
 import { createMiddleware } from '@tanstack/react-start'
-import { getRequest, getRequestUrl } from '@tanstack/react-start/server'
-
-import { type AdminSession, readAdminSession, touchAdminSession } from './session'
 
 /**
  * Authorization for server functions — CLAUDE.md §9.
  *
- * The route guard in `/admin` is for user experience. It is NOT a security
- * boundary: a server function is an endpoint reachable on its own, whether or
- * not the route that normally calls it was ever loaded. So every mutating
- * server function re-verifies here, and never trusts the client.
- */
-
-export class UnauthorizedError extends Error {
-  readonly status = 403
-
-  constructor() {
-    // Deliberately uninformative. §9: leak nothing about whether an address
-    // exists or why access was refused.
-    super('Forbidden')
-    this.name = 'UnauthorizedError'
-  }
-}
-
-/**
- * Verifies the Origin header on anything that is not a read.
+ * The route guard in `/admin/_authed` is for user experience. It is NOT a
+ * security boundary: a server function is an endpoint reachable on its own,
+ * whether or not the route that normally calls it was ever loaded. So every
+ * server function behind the admin panel re-verifies here.
  *
- * `SameSite=Lax` already blocks most cross-site POSTs, but not one from a
- * sibling subdomain, so the origin is compared in full — scheme, host and
- * port. Comparing the host alone would let `http://` pass a check meant for
- * `https://`.
+ * IMPORTANT — why the imports are dynamic:
+ *
+ * `.middleware([adminMiddleware])` is part of a builder chain evaluated at
+ * module scope, so this module is reachable from the client build even though
+ * the handler bodies are not. A top-level `@tanstack/react-start/server`
+ * import here therefore fails import protection. The `.server()` callbacks
+ * below ARE stripped client-side, so reaching for the guards from inside them
+ * keeps the server code where it belongs.
  */
+
 export const csrfMiddleware = createMiddleware().server(async ({ next }) => {
-  const request = getRequest()
-
-  if (request.method !== 'GET' && request.method !== 'HEAD') {
-    const origin = request.headers.get('origin')
-    const expected = getRequestUrl({
-      xForwardedHost: true,
-      xForwardedProto: true,
-    }).origin
-
-    if (!origin || safeOrigin(origin) !== expected) {
-      throw new UnauthorizedError()
-    }
-  }
-
+  const { assertSameOrigin } = await import('./guards.server')
+  assertSameOrigin()
   return next()
 })
 
@@ -61,28 +36,9 @@ export const csrfMiddleware = createMiddleware().server(async ({ next }) => {
 export const adminMiddleware = createMiddleware({ type: 'function' })
   .middleware([csrfMiddleware])
   .server(async ({ next }) => {
+    const { requireAdmin } = await import('./guards.server')
     const admin = await requireAdmin()
     return next({ context: { admin } })
   })
 
-/**
- * Direct form, for a handler that needs the check without the middleware
- * chain. Throws rather than returning null so it cannot be ignored by accident.
- */
-export async function requireAdmin(): Promise<AdminSession> {
-  const admin = await readAdminSession()
-  if (!admin) throw new UnauthorizedError()
-
-  // Activity refreshes the window (§9).
-  await touchAdminSession()
-
-  return admin
-}
-
-function safeOrigin(value: string): string | null {
-  try {
-    return new URL(value).origin
-  } catch {
-    return null
-  }
-}
+export { UnauthorizedError } from './errors'

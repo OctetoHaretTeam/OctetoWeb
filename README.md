@@ -204,6 +204,12 @@ Authorised redirect URIs in the Google Cloud console, or admin sign-in fails.
   barrel is imported by route files, which are part of the client build;
   re-exporting server-only modules through it fails import protection. Import
   them directly from server-side code instead.
+- **Admin forms must import their Zod schema from `@/lib/forms/`, never from
+  `@/server/admin/`.** Admin forms validate on the client too, so whatever they
+  import ships to the browser. Importing a drizzle-zod schema pulled
+  drizzle-orm into the public bundle and added ~50 KB gzipped. The `lib/forms`
+  schemas are hand-written pure Zod, and a test parses a valid form value
+  through the drizzle-derived insert schema so the two cannot drift.
 - **Apply the §8 consent rules in the server function, not in the component.**
   A loader's return value is serialised into the HTML for hydration, so
   anything it returns is readable in view-source whether it renders or not.

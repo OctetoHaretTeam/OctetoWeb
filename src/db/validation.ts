@@ -2,6 +2,11 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import {
+  isoCountrySchema as isoCountry,
+  slugSchema as slug,
+  unprefixedPathSchema as unprefixedPath,
+} from '@/lib/forms/primitives'
+import {
   gallerySchema,
   imageSchema,
   performanceMetricsSchema,
@@ -36,28 +41,6 @@ import {
  * The server is the source of truth: these run again inside every mutating
  * server function, never on the client alone (§10).
  */
-
-/** lower-kebab, no leading/trailing/double dashes. Slugs are printed on merch. */
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-
-const slug = z
-  .string()
-  .min(1)
-  .max(96)
-  .regex(SLUG_PATTERN, 'Doar litere mici, cifre și cratime.')
-
-/** A site-relative path stored WITHOUT a locale prefix (§6, §11). */
-const unprefixedPath = z
-  .string()
-  .regex(/^\//, 'Calea trebuie să înceapă cu „/".')
-  .regex(
-    /^\/(?!(ro|en)(\/|$))/,
-    'Calea se păstrează fără prefix de limbă — prefixul se adaugă la redirecționare.',
-  )
-
-const isoCountry = z
-  .string()
-  .regex(/^[A-Z]{2}$/, 'Cod de țară ISO din două litere, cu majuscule.')
 
 // ─── season ──────────────────────────────────────────────────────────────────
 

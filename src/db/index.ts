@@ -1,5 +1,8 @@
 import { neon } from '@neondatabase/serverless'
-import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http'
+import {
+  type NeonHttpDatabase,
+  drizzle as drizzleNeon,
+} from 'drizzle-orm/neon-http'
 
 import { LOCAL_DB_PATH } from './local-path'
 import * as schema from './schema'
@@ -54,9 +57,21 @@ export async function closeDb(): Promise<void> {
   await localClient?.close()
 }
 
-export const db = databaseUrl
+/**
+ * Neon is the type callers see, even when PGlite is what is running.
+ *
+ * Without this the exported type is a union of two driver types, and TypeScript
+ * resolves overloaded builders like `.returning()` against the intersection —
+ * which reports "Expected 0 arguments" for a perfectly valid call. Pinning the
+ * type to the production driver keeps every call site typed against the thing
+ * that actually runs in production; the local driver implements the same query
+ * API, so the assertion holds for everything the app does with it.
+ */
+type Database = NeonHttpDatabase<typeof schema>
+
+export const db: Database = databaseUrl
   ? drizzleNeon(neon(databaseUrl), drizzleOptions)
-  : await createLocalDb()
+  : ((await createLocalDb()) as unknown as Database)
 
 /** True when running against the throwaway local database rather than Neon. */
 export const isLocalDb = !databaseUrl
