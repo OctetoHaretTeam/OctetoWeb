@@ -34,6 +34,8 @@ const NAV = [
   { to: '/admin', label: 'Panou' },
   { to: '/admin/team', label: 'Echipă' },
   { to: '/admin/news', label: 'Noutăți' },
+  { to: '/admin/seasons', label: 'Sezoane' },
+  { to: '/admin/sponsors', label: 'Sponsori' },
   { to: '/admin/qr-codes', label: 'Coduri QR' },
 ] as const
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 
 import { BilingualField } from '@/components/admin/bilingual-field'
+import { ImageField } from '@/components/admin/image-field'
 import { useDraftAutosave } from '@/components/admin/use-draft-autosave'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { newsFormSchema } from '@/lib/forms/entities'
+import type { ImageAsset } from '@/lib/schemas'
 
 /**
  * The news editor — CLAUDE.md §10. Romanian-only (§11).
@@ -31,6 +33,7 @@ export type NewsFormValues = {
   excerptEn: string
   bodyRo: string
   bodyEn: string
+  coverImage: ImageAsset | null
   authorMemberId: string
 }
 
@@ -43,6 +46,7 @@ export function emptyNewsForm(): NewsFormValues {
     excerptEn: '',
     bodyRo: '',
     bodyEn: '',
+    coverImage: null,
     authorMemberId: '',
   }
 }
@@ -64,7 +68,7 @@ export function toNewsSubmitValues(
     excerptEn: blankToNull(values.excerptEn),
     bodyRo: values.bodyRo,
     bodyEn: blankToNull(values.bodyEn),
-    coverImage: null,
+    coverImage: values.coverImage,
     gallery: [],
     publishedAt,
     authorMemberId: blankToNull(values.authorMemberId),
@@ -248,9 +252,13 @@ export function NewsForm({
         error={errors.bodyRo}
       />
 
-      <div className="border-border text-muted-foreground rounded-md border border-dashed px-3 py-4 text-sm">
-        Imaginea de copertă și galeria se adaugă odată cu Vercel Blob.
-      </div>
+      <ImageField
+        label="Imagine de copertă (opțional)"
+        folder="news"
+        value={values.coverImage}
+        onChange={(value) => set('coverImage', value)}
+        hint="Apare pe card și în previzualizarea la partajare."
+      />
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={saving}>

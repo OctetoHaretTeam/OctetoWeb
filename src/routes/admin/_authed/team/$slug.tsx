@@ -33,6 +33,7 @@ function EditMember() {
     descriptionRo: member.descriptionRo ?? '',
     descriptionEn: member.descriptionEn ?? '',
     instagramUrl: member.instagramUrl ?? '',
+    image: member.image,
     octetIndex: String(member.octetIndex),
     displayOrder: String(member.displayOrder),
     isActive: member.isActive,

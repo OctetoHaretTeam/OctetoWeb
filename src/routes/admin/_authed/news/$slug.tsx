@@ -40,6 +40,7 @@ function EditNews() {
     excerptEn: post.excerptEn ?? '',
     bodyRo: post.bodyRo,
     bodyEn: post.bodyEn ?? '',
+    coverImage: post.coverImage,
     authorMemberId: post.authorMemberId ?? '',
   }
 

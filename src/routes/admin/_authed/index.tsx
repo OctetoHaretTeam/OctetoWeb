@@ -15,16 +15,16 @@ export const Route = createFileRoute('/admin/_authed/')({
 const READY = [
   { to: '/admin/team', label: 'Echipă', note: 'Roster, ordine, consimțământ' },
   { to: '/admin/news', label: 'Noutăți', note: 'Ciorne și publicare' },
+  { to: '/admin/seasons', label: 'Sezoane', note: 'Arhiva și sezonul curent' },
+  { to: '/admin/sponsors', label: 'Sponsori', note: 'Zidul sponsorilor' },
   { to: '/admin/qr-codes', label: 'Coduri QR', note: 'Coduri pentru tipar' },
 ] as const
 
 const PENDING = [
   { label: 'Realizări', note: 'în lucru' },
-  { label: 'Sezoane', note: 'în lucru' },
   { label: 'Premii', note: 'în lucru' },
   { label: 'Informații', note: 'în lucru' },
-  { label: 'Sponsori', note: 'așteaptă încărcarea imaginilor' },
-  { label: 'Slide-uri acasă', note: 'așteaptă încărcarea imaginilor' },
+  { label: 'Slide-uri acasă', note: 'în lucru' },
 ]
 
 function Dashboard() {

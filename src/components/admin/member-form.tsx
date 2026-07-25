@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 
 import { BilingualField } from '@/components/admin/bilingual-field'
+import { ImageField } from '@/components/admin/image-field'
 import { useDraftAutosave } from '@/components/admin/use-draft-autosave'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,7 @@ import {
   teamMemberFormSchema,
   type TeamMemberFormInput,
 } from '@/lib/forms/team-member'
+import type { ImageAsset } from '@/lib/schemas'
 
 /**
  * The team member editor — CLAUDE.md §10. Romanian-only (§11).
@@ -41,6 +43,7 @@ export type MemberFormValues = {
   descriptionRo: string
   descriptionEn: string
   instagramUrl: string
+  image: ImageAsset | null
   octetIndex: string
   displayOrder: string
   isActive: boolean
@@ -66,6 +69,7 @@ export function emptyMemberForm(displayOrder: number): MemberFormValues {
     descriptionRo: '',
     descriptionEn: '',
     instagramUrl: '',
+    image: null,
     octetIndex: '0',
     displayOrder: String(displayOrder),
     isActive: true,
@@ -96,7 +100,7 @@ export function toSubmitValues(values: MemberFormValues) {
     isActive: values.isActive,
     photoConsent: values.photoConsent,
     fullNamePublic: values.fullNamePublic,
-    image: null,
+    image: values.image,
   }
 }
 
@@ -316,10 +320,13 @@ export function MemberForm({
           ) : null}
         </div>
 
-        <div className="border-border text-muted-foreground rounded-md border border-dashed px-3 py-4 text-sm">
-          Încărcarea fotografiei se adaugă odată cu Vercel Blob. Până atunci,
-          profilul afișează avatarul-substituent.
-        </div>
+        <ImageField
+          label="Fotografie"
+          folder="team"
+          value={values.image}
+          onChange={(value) => set('image', value)}
+          hint="Nu se afișează public decât dacă acordul de mai jos este pornit. Datele EXIF se elimină automat."
+        />
       </section>
 
       <section className="space-y-3">
