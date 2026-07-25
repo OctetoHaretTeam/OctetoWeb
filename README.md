@@ -195,6 +195,15 @@ Authorised redirect URIs in the Google Cloud console, or admin sign-in fails.
 - **Render bilingual database fields with `<LocalizedText>`**, never by reading
   `…En ?? …Ro` inline. The component is what guarantees the "available in
   Romanian only" note appears and that an empty block never renders.
+- **A route guard is not an authorization boundary.** `/admin/_authed`'s
+  `beforeLoad` only stops someone loading a screen that would fail anyway. A
+  server function is an endpoint reachable on its own, so every one that
+  touches admin data must use `adminMiddleware` from
+  `@/server/auth/middleware`.
+- **Do not re-export `./middleware` or `./session` from `@/server/auth`.** That
+  barrel is imported by route files, which are part of the client build;
+  re-exporting server-only modules through it fails import protection. Import
+  them directly from server-side code instead.
 - **Apply the §8 consent rules in the server function, not in the component.**
   A loader's return value is serialised into the HTML for hydration, so
   anything it returns is readable in view-source whether it renders or not.
