@@ -32,6 +32,9 @@ export const Route = createFileRoute('/admin/_authed')({
 
 const NAV = [
   { to: '/admin', label: 'Panou' },
+  { to: '/admin/team', label: 'Echipă' },
+  { to: '/admin/news', label: 'Noutăți' },
+  { to: '/admin/qr-codes', label: 'Coduri QR' },
 ] as const
 
 function AuthedLayout() {
