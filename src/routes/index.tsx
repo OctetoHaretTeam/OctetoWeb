@@ -1,12 +1,24 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-// Placeholder shell only. The real `/` resolves the locale from the `locale`
-// cookie, then Accept-Language, then `ro`, and redirects 302 to `/ro` | `/en`
-// (CLAUDE.md §11). No UI is built yet.
+import { DEFAULT_LOCALE } from '@/i18n/locale'
+import { resolveLocale } from '@/i18n/resolve-locale'
+
+/**
+ * Bare `/` — resolves the locale and redirects (CLAUDE.md §11).
+ *
+ * **302, not 301.** A permanent redirect would be cached by the browser
+ * effectively forever, which would pin a reader to whichever language they
+ * happened to arrive in first and make the switcher useless on the home page.
+ * Language preference has to stay changeable.
+ *
+ * There is no component: this route only ever redirects.
+ */
 export const Route = createFileRoute('/')({
-  component: Home,
+  beforeLoad: () => {
+    throw redirect({
+      to: '/$locale',
+      params: { locale: resolveLocale() ?? DEFAULT_LOCALE },
+      statusCode: 302,
+    })
+  },
 })
-
-function Home() {
-  return <main />
-}

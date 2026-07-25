@@ -4,6 +4,8 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { ReactNode } from 'react'
 
+import { LOCALE_TAGS } from '@/i18n/locale'
+import { useLocale } from '@/i18n/use-locale'
 import appCss from '@/styles/app.css?url'
 
 export const Route = createRootRoute({
@@ -19,10 +21,12 @@ export const Route = createRootRoute({
 })
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-  // `lang` is hardcoded to the default locale until locale routing lands
-  // (CLAUDE.md §11) — it must then be driven by the `/ro` | `/en` route param.
+  // Derived from the URL rather than route context, because the root renders
+  // above the `/$locale` route that owns the param (CLAUDE.md §11).
+  const locale = useLocale()
+
   return (
-    <html lang="ro">
+    <html lang={LOCALE_TAGS[locale]}>
       <head>
         <HeadContent />
       </head>

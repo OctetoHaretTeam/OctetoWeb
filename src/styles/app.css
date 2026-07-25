@@ -2,6 +2,22 @@
    `source('../')` points Tailwind at src/ so it scans routes and components
    for class names from this file's location in src/styles/. */
 @import 'tailwindcss' source('../');
+
+/* Self-hosted fonts — CLAUDE.md §7.6. Fontsource ships the woff2 files inside
+   node_modules, so these are bundled and served from our own origin: no
+   Google Fonts request, and `font-display: swap` is already set in each file.
+
+   The `wght` builds carry the weight axis only. Archivo also publishes a
+   `wdth` build with the width axis §7.6 mentions — switching this one line
+   enables it, at a cost of 106 KB (see the note in theme.css).
+
+   Each import declares latin, latin-ext and (per font) vietnamese or cyrillic
+   faces gated by `unicode-range`, so a RO or EN reader only ever downloads
+   latin and latin-ext. */
+@import '@fontsource-variable/archivo/wght.css';
+@import '@fontsource-variable/instrument-sans/wght.css';
+@import '@fontsource-variable/martian-mono/wght.css';
+
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import './theme.css';
@@ -37,12 +53,62 @@ body {
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
   }
-  html {
-    @apply font-sans;
+
+  /* Display face is opt-in via `font-display`, not applied to all headings —
+     §7.6 says to use it with restraint. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-body font-semibold;
+    text-wrap: balance;
   }
+
+  p {
+    text-wrap: pretty;
+  }
+
+}
+
+/* ── Focus ring — CLAUDE.md §7.7 ──────────────────────────────────────────
+   Two-tone on purpose. No single colour clears 3:1 on every ground this site
+   uses: signal against sage measures 2.49:1, and ink against the ink ground
+   is invisible. Drawing both means at least one always contrasts —
+
+     on ink   : signal ring 13.28:1
+     on carbon: signal ring 12.15:1
+     on sage  : ink ring     5.33:1
+     on paper : ink ring    15.46:1
+
+   DELIBERATELY UNLAYERED. shadcn's primitives carry their own
+   `focus-visible:ring-*` utilities, and utilities live in a cascade layer —
+   an unlayered rule beats every layered one regardless of specificity. Inside
+   `@layer base` this was silently overridden, leaving buttons with an ink ring
+   on the ink ground, i.e. no visible focus at all.
+
+   Never replace this with `outline: none` (§7.7). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px var(--color-signal);
+}
+
+/* A complete label style, including its own size.
+   It deliberately does NOT rely on being paired with `text-2xs`: that utility
+   also sets letter-spacing, and whichever Tailwind emits later wins, which
+   silently flattened the tracking difference between the two branches. */
+@utility branch-label {
+  font-family: var(--branch-label-font);
+  font-size: var(--text-2xs);
+  line-height: 1.45;
+  letter-spacing: var(--branch-label-tracking);
+  text-transform: uppercase;
 }

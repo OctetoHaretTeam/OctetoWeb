@@ -1,50 +1,247 @@
-/* OctetoHaret design tokens — CLAUDE.md §7.2.
-   This file is the single source of colour truth. Never hardcode a hex in a
-   component; add a token here instead. */
+/* OctetoHaret design tokens — CLAUDE.md §7.
+   This file is the single source of colour and type truth. Never hardcode a
+   hex or a font stack in a component; add a token here instead. */
 
 /* ── Brand palette ────────────────────────────────────────────────────────
    WARNING: these hexes are approximations sampled from Instagram screenshots
    (CLAUDE.md §7.2, §15.1). Before launch, pull the exact values from the logo
-   SVG / Canva file and replace them here. Everything downstream — including
-   the shadcn/ui bridge below — derives from this block, so each colour stays
-   a one-line fix. */
+   SVG / Canva file and replace them here. Everything downstream — the branch
+   grounds and the whole shadcn/ui bridge — derives from this block, so each
+   colour stays a one-line fix.
 
-/* `static` emits every variable below even when no utility references it yet.
+   `static` emits every variable below even when no utility references it yet.
    Tailwind v4 tree-shakes unused @theme variables by default, which would make
    a raw `var(--color-signal)` in a stylesheet or SVG resolve to nothing — the
-   exact pattern §7.2 asks for. Eight custom properties is a cheap trade. */
+   exact pattern §7.2 asks for. */
+
 @theme static {
   --color-ink: #0a0c09; /* base background, faintly green-tinted black */
   --color-carbon: #141811; /* elevated surface */
   --color-slate: #232a20; /* borders, dividers */
   --color-sage: #7c8a6b; /* kraft backdrop — non-tech canvas */
   --color-paper: #e9e4d6; /* cutout edges, cards, body text on dark */
-  --color-signal: #63f06a; /* interactive ONLY */
+  /* Interactive ONLY. Sampled by eye from a swatch, NOT read from a file —
+     replace with the exact value from the logo SVG. */
+  --color-signal: #5cb94a;
   --color-gold: #efb428; /* awards, sponsors, emphasis */
   --color-violet: #8b5cf6; /* logo gradient only — do not build UI on it */
 
   /* ── Typography — CLAUDE.md §7.6 ────────────────────────────────────────
-     Three families maximum. TODO: self-host these and add @font-face rules
-     with `font-display: swap`. No Google Fonts network request; install via
-     Fontsource so the files ship in the bundle. Until then they fall back to
-     the system stack. Do not add Inter (§7.6), and do not reintroduce Geist —
-     `shadcn init` adds it by default and it would be a fourth family. */
+     Three families, self-hosted via Fontsource (see src/styles/app.css), all
+     with `font-display: swap`. No Google Fonts network request. No Inter.
 
-  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Martian Mono', ui-monospace, monospace;
+     Archivo is loaded on the WEIGHT axis only. The width axis §7.6 mentions
+     is available by switching the import in app.css to `archivo/wdth.css`,
+     but it costs 106 KB more (171 KB vs 65 KB for latin + latin-ext) for a
+     face used sparingly — a bad trade against the §12 LCP budget. */
+
+  --font-display: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Martian Mono Variable', ui-monospace, monospace;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 850;
+
+  /* ── Type scale ────────────────────────────────────────────────────────
+     Designed at 390px first (§2). Tracking tightens as size grows, which is
+     what keeps large display type from looking loose; small mono labels get
+     positive tracking because Martian Mono is already wide and sets tightly
+     at caption sizes. */
+
+  --text-2xs: 0.6875rem; /* 11px — mono micro-labels */
+  --text-2xs--line-height: 1.45;
+  --text-2xs--letter-spacing: 0.06em;
+
+  --text-xs: 0.75rem; /* 12px — captions, metadata */
+  --text-xs--line-height: 1.5;
+  --text-xs--letter-spacing: 0.02em;
+
+  --text-sm: 0.875rem; /* 14px — secondary text */
+  --text-sm--line-height: 1.55;
+  --text-sm--letter-spacing: 0.01em;
+
+  --text-base: 1rem; /* 16px — body */
+  --text-base--line-height: 1.65;
+  --text-base--letter-spacing: 0em;
+
+  --text-lg: 1.125rem; /* 18px — lead paragraph */
+  --text-lg--line-height: 1.6;
+  --text-lg--letter-spacing: 0em;
+
+  --text-xl: 1.375rem; /* 22px — card titles */
+  --text-xl--line-height: 1.4;
+  --text-xl--letter-spacing: -0.005em;
+
+  --text-2xl: 1.75rem; /* 28px — section headings */
+  --text-2xl--line-height: 1.25;
+  --text-2xl--letter-spacing: -0.015em;
+
+  --text-3xl: 2.25rem; /* 36px — page titles */
+  --text-3xl--line-height: 1.15;
+  --text-3xl--letter-spacing: -0.02em;
+
+  --text-4xl: 3rem; /* 48px — hero, mobile */
+  --text-4xl--line-height: 1.05;
+  --text-4xl--letter-spacing: -0.025em;
+
+  --text-5xl: 4rem; /* 64px — hero, desktop */
+  --text-5xl--line-height: 1;
+  --text-5xl--letter-spacing: -0.03em;
+
+  /* Comfortable body measure — `max-w-measure`. */
+  --container-measure: 68ch;
+
+  --radius: 0.5rem;
+}
+
+/* ── Branch grounds — CLAUDE.md §7.3 ──────────────────────────────────────
+   The tech and non-tech halves swap ground, text, accent and type by
+   remapping these variables on an ancestor. Components read the `branch-*`
+   tokens and adapt without being duplicated or taking a `variant` prop.
+
+   ACCESSIBILITY, measured (WCAG 2.1, see the styleguide for the full table):
+
+     paper on ink    15.46:1   signal on ink   13.28:1   gold on ink   10.50:1
+     ink on sage      5.33:1   ink on paper    15.46:1   ink on gold   10.50:1
+
+   The load-bearing constraint is that sage is a MID-TONE, so no chromatic
+   accent clears 4.5:1 against it — signal manages 2.49:1 and gold only
+   1.97:1, and darkening gold to reach even 3:1 turns it brown. Therefore:
+
+     `--branch-accent` is a FILL, never a text colour.
+     `--branch-accent-text` is the colour that is safe to set text in.
+
+   On tech those are the same (signal reads on ink). On non-tech the accent
+   text colour falls back to ink, and gold carries emphasis as a fill behind
+   ink text — which measures 10.50:1 rather than 1.97:1. */
+
+/* Each block declares BOTH the branch tokens and the shadcn semantic tokens
+   that depend on them, pointing at brand colours directly.
+
+   They cannot be written once as `--primary: var(--branch-accent)` on :root.
+   A custom property is substituted where it is DECLARED, so that would resolve
+   to signal at :root and then inherit the resolved value — descendants never
+   re-evaluate it, and a button inside a non-tech section would stay green. */
+
+:root,
+[data-branch='tech'] {
+  --branch-ground: var(--color-ink);
+  --branch-surface: var(--color-carbon);
+  --branch-border: var(--color-slate);
+  --branch-text: var(--color-paper);
+  --branch-muted: var(--color-sage);
+  --branch-accent: var(--color-signal);
+  /* Safe as a text colour on this ground. */
+  --branch-accent-text: var(--color-signal);
+  /* Safe as text ON the accent fill. */
+  --branch-accent-contrast: var(--color-ink);
+  --branch-font: var(--font-body);
+  --branch-label-font: var(--font-mono);
+  --branch-label-tracking: 0.08em;
+
+  --background: var(--color-ink);
+  --foreground: var(--color-paper);
+  --card: var(--color-carbon);
+  --card-foreground: var(--color-paper);
+  --primary: var(--color-signal);
+  --primary-foreground: var(--color-ink);
+  --secondary: var(--color-carbon);
+  --secondary-foreground: var(--color-paper);
+  --muted: var(--color-carbon);
+  --muted-foreground: var(--color-sage);
+  --accent: var(--color-carbon);
+  --accent-foreground: var(--color-signal);
+  --border: var(--color-slate);
+  --input: var(--color-slate);
+  --ring: var(--color-signal);
+}
+
+[data-branch='non_tech'] {
+  --branch-ground: var(--color-sage);
+  --branch-surface: var(--color-paper);
+  --branch-border: var(--color-slate);
+  --branch-text: var(--color-ink);
+  --branch-muted: var(--color-carbon);
+  --branch-accent: var(--color-gold);
+  /* NOT gold: gold on sage is 1.97:1. Emphasis comes from the fill instead. */
+  --branch-accent-text: var(--color-ink);
+  --branch-accent-contrast: var(--color-ink);
+  --branch-font: var(--font-body);
+  /* Humanist sans throughout — no mono on the non-tech half (§7.3). */
+  --branch-label-font: var(--font-body);
+  --branch-label-tracking: 0.02em;
+
+  --background: var(--color-sage);
+  --foreground: var(--color-ink);
+  --card: var(--color-paper);
+  --card-foreground: var(--color-ink);
+  /* Gold as a fill with ink on it: 10.50:1. */
+  --primary: var(--color-gold);
+  --primary-foreground: var(--color-ink);
+  --secondary: var(--color-paper);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-paper);
+  --muted-foreground: var(--color-carbon);
+  --accent: var(--color-paper);
+  --accent-foreground: var(--color-ink);
+  --border: var(--color-slate);
+  --input: var(--color-slate);
+  /* Ink, not gold: the ring must clear 3:1 on sage, which gold does not. */
+  --ring: var(--color-ink);
+}
+
+@theme inline {
+  /* `inline` matters here: the utility emits `var(--branch-…)` rather than a
+     resolved value, so `bg-branch-ground` re-resolves inside a [data-branch]
+     ancestor. This is the mechanism that avoids duplicating components. */
+  --color-branch-ground: var(--branch-ground);
+  --color-branch-surface: var(--branch-surface);
+  --color-branch-border: var(--branch-border);
+  --color-branch-text: var(--branch-text);
+  --color-branch-muted: var(--branch-muted);
+  --color-branch-accent: var(--branch-accent);
+  --color-branch-accent-text: var(--branch-accent-text);
+  --color-branch-accent-contrast: var(--branch-accent-contrast);
+  --font-branch: var(--branch-font);
+  --font-branch-label: var(--branch-label-font);
 }
 
 /* ── shadcn/ui bridge ─────────────────────────────────────────────────────
-   shadcn components are written against these semantic tokens, so they have
-   to exist. The values below are still shadcn's stock neutral greyscale.
+   shadcn components are written against these semantic tokens. Mapping them
+   onto the branch tokens means every shadcn primitive picks up the branch
+   treatment automatically — a Button inside a non-tech section becomes gold
+   on paper with no variant prop and no second component.
 
-   TODO — before any UI is built, map these onto the brand palette above
-   (e.g. --primary and --ring to --color-signal, --border to --color-slate).
-   This was deliberately NOT guessed at scaffold time: §7.3 splits the site
-   into an ink-ground tech half and a sage-ground non-tech half rather than a
-   light/dark toggle, so which of :root / .dark each branch corresponds to is
-   a design decision, not a mechanical one. See the README. */
+   The site has no light/dark toggle; `:root` is the ink treatment because
+   that is the site's base (§7.1), and the non-tech half overrides it. */
+
+/* Branch-independent tokens. Popovers and the admin sidebar always sit on the
+   dark treatment regardless of which half of the site opened them. */
+:root {
+  --popover: var(--color-carbon);
+  --popover-foreground: var(--color-paper);
+  --destructive: oklch(0.62 0.21 25);
+
+  /* Charts are not designed yet — CLAUDE.md has no data-viz direction. These
+     are the brand hues at usable spacing, to be revisited when a chart exists. */
+  --chart-1: var(--color-signal);
+  --chart-2: var(--color-gold);
+  --chart-3: var(--color-sage);
+  --chart-4: var(--color-paper);
+  --chart-5: var(--color-violet);
+
+  --sidebar: var(--color-carbon);
+  --sidebar-foreground: var(--color-paper);
+  --sidebar-primary: var(--color-signal);
+  --sidebar-primary-foreground: var(--color-ink);
+  --sidebar-accent: var(--color-slate);
+  --sidebar-accent-foreground: var(--color-paper);
+  --sidebar-border: var(--color-slate);
+  --sidebar-ring: var(--color-signal);
+}
 
 @theme inline {
   --font-sans: var(--font-body);
@@ -87,73 +284,4 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-}
-
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 }

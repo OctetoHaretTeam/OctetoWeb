@@ -24,3 +24,6 @@ __unconfig*
 Thumbs.db
 *.local
 *.log
+
+# local development database (PGlite) — never committed
+.pglite

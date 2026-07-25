@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "award_unique_per_event_idx" ON "award" USING btree ("season_id","name_ro","event_name");
