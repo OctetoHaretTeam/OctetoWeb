@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
+import { HeroMark } from '@/components/hero-mark'
 import { getDictionary } from '@/i18n/dictionaries'
 import { formatCompact, formatDate, formatNumber, toIsoDate } from '@/i18n/format'
 import { bilingual, getLocalized } from '@/i18n/localized'
@@ -46,8 +47,13 @@ function Home() {
 
   return (
     <main>
-      <BranchTheme branch="tech" className="border-branch-border border-b">
-        <div className="mx-auto grid w-full max-w-6xl items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:py-16">
+      <BranchTheme
+        branch="tech"
+        className="border-branch-border relative overflow-hidden border-b"
+      >
+        <HeroMark />
+
+        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:py-20">
           <div className="space-y-5">
             <p className="branch-label text-branch-accent-text">
               {dictionary.site.teamNumber}
@@ -55,7 +61,12 @@ function Home() {
             <h1 className="font-display text-4xl font-black lg:text-5xl">
               {dictionary.site.name}
             </h1>
-            <p className="text-branch-muted max-w-measure text-lg">
+            {/*
+              `--branch-text`, not `--branch-muted`. Sage on ink is only
+              5.33:1 before anything sits behind it, and the watermark pushed
+              it under AA — this is a primary message, not metadata.
+            */}
+            <p className="text-branch-text max-w-measure text-lg">
               {dictionary.site.tagline}
             </p>
 
@@ -78,6 +89,8 @@ function Home() {
             </div>
           </div>
 
+          {/* A real hero slide takes the second column when one exists. The
+              watermark carries the space on its own when none does. */}
           {hero ? (
             <img
               src={hero.image.url}
@@ -86,26 +99,13 @@ function Home() {
               height={hero.image.height}
               fetchPriority="high"
               decoding="async"
-              className="w-full rounded-lg object-cover"
+              className="w-full rounded-lg object-cover lg:max-w-md"
             />
-          ) : (
-            /* No slides yet. The mark holds the space so the grid does not
-               collapse, and the box is reserved either way (§12). */
-            <img
-              src="/logo.webp"
-              alt=""
-              aria-hidden="true"
-              width={640}
-              height={640}
-              fetchPriority="high"
-              decoding="async"
-              className="mx-auto w-full max-w-sm rounded-lg"
-            />
-          )}
+          ) : null}
         </div>
 
         {heroCaption ? (
-          <p className="text-branch-muted mx-auto max-w-6xl px-4 pb-4 text-sm sm:px-6">
+          <p className="text-branch-muted relative mx-auto max-w-6xl px-4 pb-4 text-sm sm:px-6">
             {heroCaption.value}
           </p>
         ) : null}
