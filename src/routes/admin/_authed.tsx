@@ -34,8 +34,12 @@ const NAV = [
   { to: '/admin', label: 'Panou' },
   { to: '/admin/team', label: 'Echipă' },
   { to: '/admin/news', label: 'Noutăți' },
+  { to: '/admin/performance', label: 'Realizări' },
   { to: '/admin/seasons', label: 'Sezoane' },
+  { to: '/admin/awards', label: 'Premii' },
   { to: '/admin/sponsors', label: 'Sponsori' },
+  { to: '/admin/home-slides', label: 'Slide-uri' },
+  { to: '/admin/info', label: 'Informații' },
   { to: '/admin/qr-codes', label: 'Coduri QR' },
 ] as const
 

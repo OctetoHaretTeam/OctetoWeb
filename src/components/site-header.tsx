@@ -21,6 +21,7 @@ const NAV = [
   { to: '/$locale/news', key: 'news' },
   { to: '/$locale/seasons', key: 'seasons' },
   { to: '/$locale/sponsors', key: 'sponsors' },
+  { to: '/$locale/about', key: 'about' },
 ] as const
 
 export function SiteHeader() {
