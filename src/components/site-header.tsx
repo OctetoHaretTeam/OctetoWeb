@@ -16,6 +16,7 @@ import { useDictionary, useLocale } from '@/i18n/use-locale'
  * it to be visible and never hidden inside a menu.
  */
 const NAV = [
+  { to: '/$locale/performance', key: 'performance' },
   { to: '/$locale/team', key: 'team' },
   { to: '/$locale/news', key: 'news' },
   { to: '/$locale/seasons', key: 'seasons' },
