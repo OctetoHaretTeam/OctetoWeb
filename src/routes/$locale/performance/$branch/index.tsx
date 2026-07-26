@@ -3,7 +3,6 @@ import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { BranchTheme } from '@/components/branch-theme'
 import { PaperCutout } from '@/components/paper-cutout'
 import { getDictionary } from '@/i18n/dictionaries'
-import { formatDate, toIsoDate } from '@/i18n/format'
 import { bilingual, getLocalized } from '@/i18n/localized'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
@@ -11,11 +10,16 @@ import { BRANCH_SLUGS, branchFromSlug } from '@/lib/branch'
 import { getPerformanceEntries } from '@/server/performance'
 
 /**
- * A branch index — CLAUDE.md §4 and §7.3.
+ * A branch index — CLAUDE.md §4.
  *
- * The two halves are genuinely different here, not the same list recoloured:
- * tech is a spec table on a hairline grid, non-tech is a photo-led collage
- * whose covers use the `PaperCutout` — one of the three places §7.4 allows it.
+ * NOTE: §7.3 specifies different STRUCTURES per branch — a spec table on a
+ * hairline grid for tech, a photo-led collage for non-tech. The team asked for
+ * one structure with only the palette changing, having seen both, so this
+ * deliberately departs from that table. §7.3 is now out of date with the site.
+ *
+ * The collage is the surviving design, which means `PaperCutout` covers now
+ * appear on technical entries too — a wider use than the three places §7.4
+ * names.
  */
 export const Route = createFileRoute('/$locale/performance/$branch/')({
   loader: async ({ params }) => {
@@ -55,13 +59,6 @@ function BranchIndex() {
 
   return (
     <BranchTheme branch={branch} as="main" className="relative min-h-screen">
-      {branch === 'tech' ? (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:linear-gradient(var(--color-slate)_1px,transparent_1px),linear-gradient(90deg,var(--color-slate)_1px,transparent_1px)] [background-size:44px_44px]"
-        />
-      ) : null}
-
       <div className="relative mx-auto w-full max-w-5xl space-y-8 px-4 py-10 sm:px-6">
         <header className="space-y-2">
           <Link
@@ -78,61 +75,7 @@ function BranchIndex() {
           <div className="border-branch-border max-w-measure rounded-md border border-dashed p-6">
             <p className="text-branch-muted">{dictionary.empty.performance}</p>
           </div>
-        ) : branch === 'tech' ? (
-          /* Spec table — §7.3's structure for the technical half. */
-          <div className="border-branch-border overflow-x-auto rounded-md border">
-            <table className="w-full min-w-[32rem] border-collapse text-left">
-              <thead>
-                <tr className="branch-label text-branch-muted">
-                  <th scope="col" className="border-branch-border border-b px-3 py-2">
-                    {dictionary.nav.performance}
-                  </th>
-                  <th scope="col" className="border-branch-border border-b px-3 py-2">
-                    {dictionary.meta.date}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((entry) => {
-                  const title = getLocalized(bilingual(entry, 'title'), locale)
-                  const summary = getLocalized(bilingual(entry, 'summary'), locale)
-
-                  return (
-                    <tr key={entry.slug}>
-                      <td className="border-branch-border border-b px-3 py-3">
-                        <Link
-                          to="/$locale/performance/$branch/$slug"
-                          params={{
-                            locale,
-                            branch: BRANCH_SLUGS[branch],
-                            slug: entry.slug,
-                          }}
-                          className="font-semibold"
-                        >
-                          {title?.value}
-                        </Link>
-                        {summary ? (
-                          <p className="text-branch-muted mt-0.5 text-sm">
-                            {summary.value}
-                          </p>
-                        ) : null}
-                        <span className="text-branch-muted font-mono text-2xs uppercase">
-                          {entry.category}
-                        </span>
-                      </td>
-                      <td className="border-branch-border text-branch-muted border-b px-3 py-3 font-mono text-2xs">
-                        <time dateTime={toIsoDate(entry.date)}>
-                          {formatDate(entry.date, locale)}
-                        </time>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
         ) : (
-          /* Photo-led collage — the other of §7.3's two structures. */
           <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {entries.map((entry) => {
               const title = getLocalized(bilingual(entry, 'title'), locale)

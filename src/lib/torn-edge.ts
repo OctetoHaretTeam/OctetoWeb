@@ -185,3 +185,42 @@ function perimeter(t: number): { point: Point; normal: Point } {
   }
   return { point: { x: 0, y: 1 - (u - 0.75) * 4 }, normal: { x: -1, y: 0 } }
 }
+
+/**
+ * A torn edge as an SVG path, for a strip laid across the top of a section.
+ *
+ * Used instead of `clip-path` on the section itself because a percentage-based
+ * polygon scales with the element: the same tear would be a few pixels deep on
+ * a short section and enormous on a long one. A fixed-height strip keeps every
+ * tear on the page the same weight.
+ *
+ * The path fills DOWNWARD from the tear, so the strip is painted in the
+ * section's own colour and reads as that sheet lying over the one above it.
+ */
+export function tornEdgeSvgPath({
+  seed,
+  segments = 64,
+  amplitude = 3.2,
+  height = 10,
+}: {
+  seed: string
+  segments?: number
+  /** Peak deviation, in viewBox units. */
+  amplitude?: number
+  /** viewBox height. The path spans 0..100 horizontally. */
+  height?: number
+}): string {
+  const profile = makeTearProfile(hashSeed(seed))
+  const mid = height / 2
+  const commands: string[] = []
+
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments
+    const y = clamp(mid + profile(t) * amplitude, 0, height)
+    commands.push(`${i === 0 ? 'M' : 'L'}${round(t * 100)} ${round(y)}`)
+  }
+
+  // Close along the bottom so the fill sits below the tear.
+  commands.push(`L100 ${height}`, `L0 ${height}`, 'Z')
+  return commands.join(' ')
+}

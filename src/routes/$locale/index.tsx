@@ -3,6 +3,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
 import { HeroMark } from '@/components/hero-mark'
+import { TornSection } from '@/components/torn-section'
 import { getDictionary } from '@/i18n/dictionaries'
 import { formatCompact, formatDate, formatNumber, toIsoDate } from '@/i18n/format'
 import { bilingual, getLocalized } from '@/i18n/localized'
@@ -47,9 +48,11 @@ function Home() {
 
   return (
     <main>
-      <BranchTheme
+      <TornSection
         branch="tech"
-        className="border-branch-border relative overflow-hidden border-b"
+        seed="hero"
+        torn={false}
+        className="overflow-hidden"
       >
         <HeroMark />
 
@@ -109,11 +112,11 @@ function Home() {
             {heroCaption.value}
           </p>
         ) : null}
-      </BranchTheme>
+      </TornSection>
 
       {awards.length > 0 ? (
-        <BranchTheme branch="non_tech" className="border-branch-border border-b">
-          <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-10 sm:px-6">
+        <TornSection branch="non_tech" seed="awards">
+          <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-12 sm:px-6">
             <h2 className="branch-label text-branch-muted">
               {dictionary.meta.awards}
             </h2>
@@ -143,11 +146,11 @@ function Home() {
               })}
             </ul>
           </div>
-        </BranchTheme>
+        </TornSection>
       ) : null}
 
-      <BranchTheme branch="tech" className="border-branch-border border-b">
-        <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+      <TornSection branch="tech" seed="stats">
+        <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             <Stat label={dictionary.meta.seasons} value={stats.seasons} locale={locale} />
             <Stat label={dictionary.meta.awards} value={stats.awards} locale={locale} />
@@ -166,11 +169,11 @@ function Home() {
             <Stat label={dictionary.nav.sponsors} value={stats.sponsors} locale={locale} />
           </dl>
         </div>
-      </BranchTheme>
+      </TornSection>
 
       {news.length > 0 ? (
-        <BranchTheme branch="non_tech" className="border-branch-border border-b">
-          <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-10 sm:px-6">
+        <TornSection branch="non_tech" seed="news">
+          <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-12 sm:px-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 className="text-2xl font-semibold">{dictionary.nav.news}</h2>
               <Link
@@ -221,10 +224,10 @@ function Home() {
               })}
             </ul>
           </div>
-        </BranchTheme>
+        </TornSection>
       ) : null}
 
-      <BranchTheme branch="tech">
+      <TornSection branch="tech" seed="sponsors">
         <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-12 sm:px-6">
           {sponsors.length > 0 ? (
             <>
@@ -265,7 +268,7 @@ function Home() {
             </Link>
           </div>
         </div>
-      </BranchTheme>
+      </TornSection>
     </main>
   )
 }

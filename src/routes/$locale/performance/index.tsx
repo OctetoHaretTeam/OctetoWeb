@@ -11,10 +11,15 @@ import { tornSeamPolygon } from '@/lib/torn-edge'
 import { getPerformanceEntries } from '@/server/performance'
 
 /**
- * The performance overview — CLAUDE.md §4 and §7.3.
+ * The performance overview — CLAUDE.md §4.
+ *
+ * NOTE: §7.3 specifies different STRUCTURES per branch. The team asked for one
+ * structure with only the palette changing, so both halves are now identical
+ * in layout and differ only in ground, text and accent. §7.3 is out of date
+ * with the site on that point; the torn seam between the halves remains.
  *
  * The two branches meet along a torn edge, with the non-tech paper tearing
- * over the tech grid.
+ * over the tech half.
  *
  * **The seam turns with the layout.** Side by side it runs vertically; stacked
  * it runs horizontally, which is the direction a sheet of paper would actually
@@ -80,37 +85,26 @@ function PerformanceOverview() {
         <div className="grid lg:grid-cols-2">
           {/* ── Tech half ─────────────────────────────────────────────── */}
           <BranchTheme branch="tech" className="relative">
-            {/* Hairline grid — §7.3's structure for this half. */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:linear-gradient(var(--color-slate)_1px,transparent_1px),linear-gradient(90deg,var(--color-slate)_1px,transparent_1px)] [background-size:44px_44px]"
-            />
-
             <div className="relative mx-auto w-full max-w-xl space-y-4 px-4 py-12 sm:px-6 lg:ml-auto lg:mr-0 lg:py-20 lg:pr-16">
               <p className="branch-label text-branch-accent-text">
-                {dictionary.nav.performanceTech}
-              </p>
-              <h1 className="font-display text-3xl font-black lg:text-4xl">
                 {dictionary.nav.performance}
-              </h1>
-              <p className="text-branch-text max-w-measure">
-                {dictionary.nav.performanceTech}
               </p>
+              <h1 className="text-3xl font-semibold">
+                {dictionary.nav.performanceTech}
+              </h1>
 
-              <ul className="space-y-2 font-mono text-2xs uppercase">
+              <ul className="space-y-3">
                 {tech.slice(0, 3).map((entry) => {
                   const title = getLocalized(bilingual(entry, 'title'), locale)
+                  const summary = getLocalized(bilingual(entry, 'summary'), locale)
                   return (
-                    <li
-                      key={entry.slug}
-                      className="border-branch-border flex items-center justify-between gap-3 border-b pb-2"
-                    >
-                      <span className="truncate normal-case">
-                        {title?.value}
-                      </span>
-                      <span className="text-branch-muted shrink-0">
-                        {entry.category}
-                      </span>
+                    <li key={entry.slug}>
+                      <p className="font-semibold">{title?.value}</p>
+                      {summary ? (
+                        <p className="text-branch-muted text-sm">
+                          {summary.value}
+                        </p>
+                      ) : null}
                     </li>
                   )
                 })}
@@ -127,7 +121,7 @@ function PerformanceOverview() {
             </div>
           </BranchTheme>
 
-          {/* ── Non-tech half, torn over the grid ─────────────────────── */}
+          {/* ── Non-tech half, torn over the tech half ────────────────── */}
           <BranchTheme
             branch="non_tech"
             className={[
@@ -141,7 +135,7 @@ function PerformanceOverview() {
           >
             <div className="mx-auto w-full max-w-xl space-y-4 px-4 pt-16 pb-12 sm:px-6 lg:mr-auto lg:ml-0 lg:py-20 lg:pl-20">
               <p className="branch-label text-branch-muted">
-                {dictionary.nav.performanceNonTech}
+                {dictionary.nav.performance}
               </p>
               <h2 className="text-3xl font-semibold">
                 {dictionary.nav.performanceNonTech}
