@@ -117,9 +117,14 @@ export function SponsorForm({
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {}
       for (const issue of parsed.error.issues) {
-        const field = issue.path[0]
-        if (typeof field === 'string' && !fieldErrors[field]) {
-          fieldErrors[field] = issue.message
+        // Index by both the full path and its root, so a nested failure
+        // such as `image.alt.ro` is reachable as `image` by the field that
+        // renders it.
+        const full = issue.path.join('.')
+        if (full && !fieldErrors[full]) fieldErrors[full] = issue.message
+        const root = issue.path[0]
+        if (typeof root === 'string' && !fieldErrors[root]) {
+          fieldErrors[root] = issue.message
         }
       }
       if (!values.logo) fieldErrors.logo = 'Logo-ul este obligatoriu.'
@@ -229,6 +234,7 @@ export function SponsorForm({
         value={values.logo}
         onChange={(value) => set('logo', value)}
         hint="Se afișează pe zidul sponsorilor și pe pagina principală."
+        error={errors.logo}
       />
       {errors.logo ? (
         <p role="alert" className="text-destructive text-xs">
@@ -242,6 +248,7 @@ export function SponsorForm({
         value={values.logoDark}
         onChange={(value) => set('logoDark', value)}
         hint="Zidul sponsorilor stă pe fundal închis — încarcă o variantă dacă logo-ul principal nu se vede bine."
+        error={errors.logoDark}
       />
 
       <BilingualField

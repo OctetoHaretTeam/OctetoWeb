@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 
 import { BilingualField } from '@/components/admin/bilingual-field'
+import { GalleryField } from '@/components/admin/gallery-field'
 import { ImageField } from '@/components/admin/image-field'
 import { useDraftAutosave } from '@/components/admin/use-draft-autosave'
 import { Button } from '@/components/ui/button'
@@ -20,6 +21,7 @@ export type SeasonFormValues = {
   descriptionRo: string
   descriptionEn: string
   coverImage: ImageAsset | null
+  gallery: ImageAsset[]
   portfolioUrl: string
   isCurrent: boolean
   displayOrder: string
@@ -35,6 +37,7 @@ export function emptySeasonForm(displayOrder: number): SeasonFormValues {
     descriptionRo: '',
     descriptionEn: '',
     coverImage: null,
+    gallery: [],
     portfolioUrl: '',
     isCurrent: false,
     displayOrder: String(displayOrder),
@@ -56,7 +59,7 @@ export function toSeasonSubmitValues(values: SeasonFormValues) {
     descriptionRo: values.descriptionRo.trim(),
     descriptionEn: blankToNull(values.descriptionEn),
     coverImage: values.coverImage,
-    gallery: [],
+    gallery: values.gallery,
     portfolioUrl: blankToNull(values.portfolioUrl),
     isCurrent: values.isCurrent,
     displayOrder: Number.parseInt(values.displayOrder, 10),
@@ -97,9 +100,14 @@ export function SeasonForm({
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {}
       for (const issue of parsed.error.issues) {
-        const field = issue.path[0]
-        if (typeof field === 'string' && !fieldErrors[field]) {
-          fieldErrors[field] = issue.message
+        // Index by both the full path and its root, so a nested failure
+        // such as `image.alt.ro` is reachable as `image` by the field that
+        // renders it.
+        const full = issue.path.join('.')
+        if (full && !fieldErrors[full]) fieldErrors[full] = issue.message
+        const root = issue.path[0]
+        if (typeof root === 'string' && !fieldErrors[root]) {
+          fieldErrors[root] = issue.message
         }
       }
       setErrors(fieldErrors)
@@ -211,6 +219,17 @@ export function SeasonForm({
         folder="seasons"
         value={values.coverImage}
         onChange={(value) => set('coverImage', value)}
+        error={errors.coverImage}
+      />
+
+      <GalleryField
+        label="Galerie"
+        folder="seasons"
+        max={10}
+        value={values.gallery}
+        onChange={(value) => set('gallery', value)}
+        hint="Până la 10 imagini din sezon."
+        error={errors.gallery}
       />
 
       <div className="border-border flex items-start gap-3 rounded-md border px-3 py-3">

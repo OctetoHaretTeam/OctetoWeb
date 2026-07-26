@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 
 import { BilingualField } from '@/components/admin/bilingual-field'
+import { GalleryField } from '@/components/admin/gallery-field'
 import { ImageField } from '@/components/admin/image-field'
 import { useDraftAutosave } from '@/components/admin/use-draft-autosave'
 import { Button } from '@/components/ui/button'
@@ -34,6 +35,7 @@ export type NewsFormValues = {
   bodyRo: string
   bodyEn: string
   coverImage: ImageAsset | null
+  gallery: ImageAsset[]
   authorMemberId: string
 }
 
@@ -47,6 +49,7 @@ export function emptyNewsForm(): NewsFormValues {
     bodyRo: '',
     bodyEn: '',
     coverImage: null,
+    gallery: [],
     authorMemberId: '',
   }
 }
@@ -69,7 +72,7 @@ export function toNewsSubmitValues(
     bodyRo: values.bodyRo,
     bodyEn: blankToNull(values.bodyEn),
     coverImage: values.coverImage,
-    gallery: [],
+    gallery: values.gallery,
     publishedAt,
     authorMemberId: blankToNull(values.authorMemberId),
   }
@@ -122,9 +125,14 @@ export function NewsForm({
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {}
       for (const issue of parsed.error.issues) {
-        const field = issue.path[0]
-        if (typeof field === 'string' && !fieldErrors[field]) {
-          fieldErrors[field] = issue.message
+        // Index by both the full path and its root, so a nested failure
+        // such as `image.alt.ro` is reachable as `image` by the field that
+        // renders it.
+        const full = issue.path.join('.')
+        if (full && !fieldErrors[full]) fieldErrors[full] = issue.message
+        const root = issue.path[0]
+        if (typeof root === 'string' && !fieldErrors[root]) {
+          fieldErrors[root] = issue.message
         }
       }
       setErrors(fieldErrors)
@@ -258,6 +266,17 @@ export function NewsForm({
         value={values.coverImage}
         onChange={(value) => set('coverImage', value)}
         hint="Apare pe card și în previzualizarea la partajare."
+        error={errors.coverImage}
+      />
+
+      <GalleryField
+        label="Galerie"
+        folder="news"
+        max={5}
+        value={values.gallery}
+        onChange={(value) => set('gallery', value)}
+        hint="Până la 5 imagini, afișate în articol."
+        error={errors.gallery}
       />
 
       <div className="flex items-center gap-3">

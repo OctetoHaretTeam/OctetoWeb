@@ -21,8 +21,25 @@ export const altTextSchema = z.object({
  * CLS, which means every image must be able to reserve its exact box before it
  * loads. They are captured at upload time (§10).
  */
+/**
+ * An image URL is either absolute (Vercel Blob's CDN) or site-relative
+ * (`/uploads/…`, the local development store).
+ *
+ * A bare `z.url()` here rejected every locally stored image, which made it
+ * impossible to save any row with a picture attached — the failure surfaced as
+ * "URL invalid" on whichever field happened to be checked first.
+ */
+export const imageUrlSchema = z
+  .string()
+  .refine(
+    (value) =>
+      // Site-relative, but not protocol-relative: `//evil.example` is absolute.
+      /^\/(?!\/)/.test(value) || /^https?:\/\//.test(value),
+    'Adresa imaginii trebuie să fie o cale din site sau o adresă http(s).',
+  )
+
 export const imageSchema = z.object({
-  url: z.url(),
+  url: imageUrlSchema,
   alt: altTextSchema,
   width: z.int().positive(),
   height: z.int().positive(),
@@ -30,6 +47,13 @@ export const imageSchema = z.object({
 })
 
 export const gallerySchema = z.array(imageSchema)
+
+/** Galleries are capped per entity so a page cannot become a slideshow (§12). */
+export function galleryWithMax(max: number) {
+  return z
+    .array(imageSchema)
+    .max(max, `Maxim ${max} imagini.`)
+}
 
 /**
  * Optional metrics on a performance entry. Every field is optional — an entry

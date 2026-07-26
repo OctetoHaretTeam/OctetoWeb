@@ -30,6 +30,7 @@ export function ImageField({
   onChange,
   required = false,
   hint,
+  error: externalError,
 }: {
   label: string
   /** Blob folder, e.g. `team` or `sponsors`. */
@@ -38,14 +39,22 @@ export function ImageField({
   onChange: (value: ImageAsset | null) => void
   required?: boolean
   hint?: string
+  /** Validation message from the parent form, e.g. a missing alt text. */
+  error?: string
 }) {
   const id = useId().replace(/[^a-zA-Z0-9]/g, '')
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  // Alt text is required by §7.7 and starts empty after an upload, so it is
+  // the most likely reason a save is refused. Say so next to the field rather
+  // than letting the form fail with no visible cause.
+  const missingAlt = Boolean(value) && value!.alt.ro.trim().length === 0
+  const error = uploadError ?? (missingAlt ? 'Adaugă textul alternativ în română.' : externalError)
 
   async function handleFile(file: File | undefined) {
     if (!file) return
-    setError(null)
+    setUploadError(null)
     setBusy(true)
 
     try {
@@ -78,7 +87,7 @@ export function ImageField({
         height: processed.height,
       })
     } catch (caught) {
-      setError(messageFor(caught))
+      setUploadError(messageFor(caught))
     } finally {
       setBusy(false)
     }
@@ -118,6 +127,7 @@ export function ImageField({
                 id={`${id}-alt-ro`}
                 lang="ro"
                 value={value.alt.ro}
+                aria-invalid={missingAlt ? true : undefined}
                 onChange={(event) =>
                   onChange({
                     ...value,

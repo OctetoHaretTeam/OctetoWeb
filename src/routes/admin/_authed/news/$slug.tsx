@@ -41,6 +41,7 @@ function EditNews() {
     bodyRo: post.bodyRo,
     bodyEn: post.bodyEn ?? '',
     coverImage: post.coverImage,
+    gallery: post.gallery,
     authorMemberId: post.authorMemberId ?? '',
   }
 

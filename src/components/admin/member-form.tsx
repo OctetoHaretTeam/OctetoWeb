@@ -143,9 +143,14 @@ export function MemberForm({
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {}
       for (const issue of parsed.error.issues) {
-        const field = issue.path[0]
-        if (typeof field === 'string' && !fieldErrors[field]) {
-          fieldErrors[field] = issue.message
+        // Index by both the full path and its root, so a nested failure
+        // such as `image.alt.ro` is reachable as `image` by the field that
+        // renders it.
+        const full = issue.path.join('.')
+        if (full && !fieldErrors[full]) fieldErrors[full] = issue.message
+        const root = issue.path[0]
+        if (typeof root === 'string' && !fieldErrors[root]) {
+          fieldErrors[root] = issue.message
         }
       }
       setErrors(fieldErrors)
@@ -326,6 +331,7 @@ export function MemberForm({
           value={values.image}
           onChange={(value) => set('image', value)}
           hint="Nu se afișează public decât dacă acordul de mai jos este pornit. Datele EXIF se elimină automat."
+          error={errors.image}
         />
       </section>
 

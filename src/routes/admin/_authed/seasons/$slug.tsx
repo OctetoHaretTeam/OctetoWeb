@@ -34,6 +34,7 @@ function EditSeason() {
     descriptionRo: season.descriptionRo,
     descriptionEn: season.descriptionEn ?? '',
     coverImage: season.coverImage,
+    gallery: season.gallery,
     portfolioUrl: season.portfolioUrl ?? '',
     isCurrent: season.isCurrent,
     displayOrder: String(season.displayOrder),

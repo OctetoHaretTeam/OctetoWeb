@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
-import { gallerySchema, imageSchema, performanceMetricsSchema } from '@/lib/schemas'
+import {
+  galleryWithMax,
+  gallerySchema,
+  imageSchema,
+  performanceMetricsSchema,
+} from '@/lib/schemas'
 import { slugSchema, unprefixedPathSchema } from './primitives'
 
 /**
@@ -34,7 +39,8 @@ export const seasonFormSchema = z.object({
   descriptionRo: z.string().min(1, 'Descrierea în română este obligatorie.'),
   descriptionEn: nullableText,
   coverImage: imageSchema.nullable(),
-  gallery: gallerySchema,
+  /** Season galleries are the archive judges browse — §4. */
+  gallery: galleryWithMax(10),
   portfolioUrl: nullableUrl,
   isCurrent: z.boolean(),
   displayOrder: z.int(),
@@ -120,7 +126,7 @@ export const newsFormSchema = z.object({
   bodyRo: z.string().min(1, 'Textul în română este obligatoriu.'),
   bodyEn: nullableText,
   coverImage: imageSchema.nullable(),
-  gallery: gallerySchema,
+  gallery: galleryWithMax(5),
   /** Null means draft — §10. Never exposed on a public route. */
   publishedAt: z.date().nullable(),
   authorMemberId: z.uuid().nullable(),
