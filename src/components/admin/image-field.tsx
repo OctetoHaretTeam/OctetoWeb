@@ -1,5 +1,4 @@
 import { useId, useState } from 'react'
-import { upload } from '@vercel/blob/client'
 import { Trash2, Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -52,18 +51,28 @@ export function ImageField({
     try {
       const processed = await processImage(file)
 
-      const blob = await upload(
-        uploadPathname(folder, file.name),
-        processed.blob,
-        {
-          access: 'public',
-          handleUploadUrl: '/api/blob/upload',
-          contentType: 'image/webp',
-        },
+      const body = new FormData()
+      body.append(
+        'file',
+        new File([processed.blob], uploadPathname(folder, file.name), {
+          type: 'image/webp',
+        }),
       )
+      body.append('folder', folder)
+
+      const response = await fetch('/api/upload', { method: 'POST', body })
+
+      if (!response.ok) {
+        const detail = (await response.json().catch(() => null)) as {
+          error?: string
+        } | null
+        throw new UploadFailed(detail?.error ?? 'unknown')
+      }
+
+      const stored = (await response.json()) as { url: string }
 
       onChange({
-        url: blob.url,
+        url: stored.url,
         alt: { ro: value?.alt.ro ?? '', en: value?.alt.en },
         width: processed.width,
         height: processed.height,
@@ -185,7 +194,25 @@ export function ImageField({
   )
 }
 
+class UploadFailed extends Error {
+  constructor(readonly reason: string) {
+    super(reason)
+    this.name = 'UploadFailed'
+  }
+}
+
 function messageFor(caught: unknown): string {
+  if (caught instanceof UploadFailed) {
+    if (caught.reason === 'not-configured') {
+      return 'Stocarea imaginilor nu este configurată pe server.'
+    }
+    if (caught.reason === 'too-large') return 'Imaginea este prea mare.'
+    if (caught.reason === 'type-not-allowed') {
+      return 'Formatul procesat nu a fost acceptat de server.'
+    }
+    return 'Serverul nu a putut salva imaginea.'
+  }
+
   if (caught instanceof ImageProcessError) {
     switch (caught.reason) {
       case 'type-not-allowed':

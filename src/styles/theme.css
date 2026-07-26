@@ -20,11 +20,15 @@
   --color-slate: #232a20; /* borders, dividers */
   --color-sage: #7c8a6b; /* kraft backdrop — non-tech canvas */
   --color-paper: #e9e4d6; /* cutout edges, cards, body text on dark */
-  /* Interactive ONLY. Sampled by eye from a swatch, NOT read from a file —
-     replace with the exact value from the logo SVG. */
-  --color-signal: #5cb94a;
+  /* Interactive ONLY. Read by eye from the logo artwork (the octopus and the
+     scattered dots), NOT sampled from a file — still replace with the exact
+     value once the logo SVG or Canva file is available. */
+  --color-signal: #afd46a;
   --color-gold: #efb428; /* awards, sponsors, emphasis */
-  --color-violet: #8b5cf6; /* logo gradient only — do not build UI on it */
+  /* The soft lilac on "HARET" and the wordmark outline. CLAUDE.md calls this
+     token `violet`; the artwork is pinker and far less saturated than the
+     placeholder suggested. Logo only — do not build UI on it. */
+  --color-violet: #e0aad6;
 
   /* ── Typography — CLAUDE.md §7.6 ────────────────────────────────────────
      Three families, self-hosted via Fontsource (see src/styles/app.css), all

@@ -15,9 +15,9 @@ export const BRAND_PALETTE = {
   slate: '#232a20',
   sage: '#7c8a6b',
   paper: '#e9e4d6',
-  signal: '#5cb94a',
+  signal: '#afd46a',
   gold: '#efb428',
-  violet: '#8b5cf6',
+  violet: '#e0aad6',
 } as const
 
 export type BrandToken = keyof typeof BRAND_PALETTE
