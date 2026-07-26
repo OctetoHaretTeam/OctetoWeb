@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { PaperCutout } from '@/components/paper-cutout'
 import { getDictionary } from '@/i18n/dictionaries'
@@ -44,12 +44,26 @@ export function MemberPhoto({
    * image icon where their photograph should be.
    */
   const [failed, setFailed] = useState(false)
+  const imageRef = useRef<HTMLImageElement>(null)
+
+  /*
+   * `onError` alone is not enough. The page is server-rendered, so a broken
+   * image usually finishes failing BEFORE React hydrates — the handler is
+   * attached after the event has already fired, and the broken icon stays.
+   * Re-checking `naturalWidth` once mounted catches exactly that case.
+   */
+  useEffect(() => {
+    const node = imageRef.current
+    if (node?.complete && node.naturalWidth === 0) setFailed(true)
+  }, [image?.url])
+
   const showImage = image !== null && !failed
 
   return (
     <PaperCutout seed={seed} className={cn('aspect-square w-full', className)}>
       {showImage ? (
         <img
+          ref={imageRef}
           src={image.url}
           // Alt text is bilingual and falls back like any other field.
           alt={getLocalized(image.alt, locale)?.value ?? ''}
