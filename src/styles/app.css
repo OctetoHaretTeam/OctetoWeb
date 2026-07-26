@@ -112,3 +112,70 @@ body {
   letter-spacing: var(--branch-label-tracking);
   text-transform: uppercase;
 }
+
+/* ── Rendered markdown ────────────────────────────────────────────────────
+   Body text comes from the database as HTML rendered on the server. Raw HTML
+   is disabled in the renderer, so the only tags that can appear are the ones
+   markdown itself produces — which is why this list is short and closed. */
+@utility prose-body {
+  & p {
+    margin-block: 0 1rem;
+  }
+
+  & h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-semibold);
+    margin-block: 1.75rem 0.5rem;
+  }
+
+  & h3 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-semibold);
+    margin-block: 1.5rem 0.5rem;
+  }
+
+  & ul,
+  & ol {
+    margin-block: 0 1rem;
+    padding-inline-start: 1.25rem;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li {
+    margin-block: 0.25rem;
+  }
+
+  & a {
+    color: var(--branch-accent-text);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  & blockquote {
+    border-inline-start: 2px solid var(--branch-border);
+    padding-inline-start: 1rem;
+    font-style: italic;
+  }
+
+  & code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  & strong {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  & hr {
+    border: 0;
+    border-top: 1px solid var(--branch-border);
+    margin-block: 2rem;
+  }
+}
