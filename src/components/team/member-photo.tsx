@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { PaperCutout } from '@/components/paper-cutout'
 import { getDictionary } from '@/i18n/dictionaries'
 import { getLocalized } from '@/i18n/localized'
@@ -35,9 +37,18 @@ export function MemberPhoto({
 }) {
   const dictionary = getDictionary(locale)
 
+  /*
+   * A stored URL can outlive its file — a row edited before an upload
+   * finished, or storage swapped underneath it. Falling back to the
+   * placeholder keeps a person's card intact instead of showing a broken
+   * image icon where their photograph should be.
+   */
+  const [failed, setFailed] = useState(false)
+  const showImage = image !== null && !failed
+
   return (
     <PaperCutout seed={seed} className={cn('aspect-square w-full', className)}>
-      {image ? (
+      {showImage ? (
         <img
           src={image.url}
           // Alt text is bilingual and falls back like any other field.
@@ -47,6 +58,7 @@ export function MemberPhoto({
           loading={priority ? 'eager' : 'lazy'}
           fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
+          onError={() => setFailed(true)}
           className="h-full w-full object-cover"
         />
       ) : (

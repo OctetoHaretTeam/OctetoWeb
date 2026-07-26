@@ -46,11 +46,13 @@ function TeamPage() {
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-6xl space-y-10 px-4 py-10 sm:px-6">
-        <header className="space-y-2">
+        {/*
+          Heading only. The site tagline belongs in the document head and the
+          site header, not repeated as a subtitle on every page — a real
+          description for this page comes from `teamInfo` once /about lands.
+        */}
+        <header>
           <h1 className="text-3xl font-semibold">{dictionary.nav.team}</h1>
-          <p className="text-branch-muted max-w-measure">
-            {dictionary.site.tagline}
-          </p>
         </header>
 
         {grouped.length === 0 ? (

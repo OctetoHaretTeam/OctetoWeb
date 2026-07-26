@@ -9,14 +9,21 @@ import path from 'node:path'
  * - **Vercel Blob** whenever `BLOB_READ_WRITE_TOKEN` is set. This is the real
  *   store and the only one used in staging or production.
  * - **A local folder** when it is not, so the admin panel is usable before a
- *   Blob store exists. Refused in production, and `.uploads/` is gitignored.
+ *   Blob store exists. Refused in production, and `public/uploads/` is gitignored.
  *
  * EXIF is already gone by the time bytes arrive here: the browser re-encodes
  * every image through a canvas before uploading (§8), so GPS coordinates never
  * leave the member's device.
  */
 
-export const LOCAL_UPLOAD_DIR = '.uploads'
+/**
+ * Local uploads live under `public/` so Vite's own static middleware serves
+ * them. A dedicated route cannot: a request ending in `.webp` is claimed by
+ * that middleware before TanStack's router ever sees it, so every image 404'd.
+ *
+ * Gitignored, and unused in production, where Blob is configured.
+ */
+export const LOCAL_UPLOAD_DIR = path.join('public', 'uploads')
 
 /** Mirrors the browser's output. Nothing else is accepted. */
 const ACCEPTED_TYPE = 'image/webp'
