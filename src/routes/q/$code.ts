@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { withLocale } from '@/i18n/locale'
+import { rateLimit } from '@/server/rate-limit'
 import {
   countryFromHeaders,
   localeForScan,
@@ -22,11 +23,20 @@ import {
  * The target is stored unprefixed (`/team/andrei`) and the locale is resolved
  * on the way through, so a judge at an international event lands on English
  * without touching the toggle.
+ *
+ * Rate-limited to 30 scans per minute per IP to prevent bots from flooding
+ * the `qr_scan` table. This is generous enough for any real human usage —
+ * even a judge scanning every member's shirt at a competition would not come
+ * close.
  */
 export const Route = createFileRoute('/q/$code')({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        // Bot protection: 30 scans per minute per IP.
+        const blocked = rateLimit('qr-scan', request, 30, 60_000)
+        if (blocked) return blocked
+
         const { pathname } = new URL(request.url)
         const code = decodeURIComponent(
           pathname.replace(/^\/q\/?/, ''),

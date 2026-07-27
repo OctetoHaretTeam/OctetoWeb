@@ -29,7 +29,13 @@ export function SiteHeader() {
   const dictionary = useDictionary()
 
   return (
-    <header className="border-branch-border bg-branch-ground border-b">
+    // `data-branch="tech"` pins the bar to the ink layer whatever the page
+    // below it uses. The pages are on sage now, and a sage header on a sage
+    // page loses the boundary between chrome and content entirely.
+    <header
+      data-branch="tech"
+      className="border-branch-border bg-branch-ground border-b"
+    >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <div className="flex items-center justify-between gap-4 py-3">
           <Link

@@ -118,4 +118,23 @@ export const en: Dictionary = {
     scans: 'QR scans',
     countries: 'Countries',
   },
+
+  hero: {
+    goToSlide: 'Go to slide',
+  },
+
+  sponsorship: {
+    title: 'Become a sponsor',
+    body: 'We are always glad to welcome new sponsors. Every bit of support takes us further — parts, travel, workshops. Write to us and we will send the sponsorship pack.',
+    cta: 'Get in touch',
+  },
+
+  contact: {
+    title: 'Get in touch',
+    lead: 'Sponsors, teams or press — we answer every message.',
+    email: 'Email',
+    phone: 'Phone',
+    address: 'Address',
+    follow: 'Follow us',
+  },
 }

@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite'
-import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -14,7 +13,8 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   plugins: [
-    devtools(),
+    // No `devtools()` plugin. It injects a floating overlay into every page in
+    // development, which covers the bottom-right corner of the real design.
     // Vercel has no dedicated preset — it is served by Nitro, which detects the
     // Vercel build environment and emits the correct output. See README.
     nitro(),

@@ -56,6 +56,8 @@ describe('dictionaries', () => {
       'team.instagram',
       // "Mentor" is the same word in Romanian and English.
       'team.branchMentor',
+      // So is "Email" — Romanian borrows it unchanged.
+      'contact.email',
       // Each dictionary carries the *other* language's invitation, in that
       // language — so these two are identical across locales on purpose.
       'language.switchTo',

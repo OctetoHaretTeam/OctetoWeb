@@ -1,8 +1,14 @@
 import { ArrowRight } from 'lucide-react'
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 
 import { BranchTheme } from '@/components/branch-theme'
 import { HeroMark } from '@/components/hero-mark'
+import {
+  HeroSlideshow,
+  heroSlideCaption,
+  type HeroSlide,
+} from '@/components/hero-slideshow'
 import { TornSection } from '@/components/torn-section'
 import { getDictionary } from '@/i18n/dictionaries'
 import { formatCompact, formatDate, formatNumber, toIsoDate } from '@/i18n/format'
@@ -44,7 +50,11 @@ function Home() {
   const dictionary = useDictionary()
 
   const hero = slides[0]
-  const heroCaption = hero ? getLocalized(bilingual(hero, 'caption'), locale) : null
+  // Seeded with the first slide so the server render and the first client
+  // render agree; the slideshow reports every change after that, including
+  // this initial one, via `onActiveSlideChange`.
+  const [activeSlide, setActiveSlide] = useState<HeroSlide | undefined>(hero)
+  const heroCaption = heroSlideCaption(activeSlide, locale)
 
   return (
     <main>
@@ -58,7 +68,7 @@ function Home() {
             would sit behind that image and fight it, so it steps aside. */}
         {hero ? null : <HeroMark />}
 
-        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:py-20">
+        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:py-20">
           <div className="space-y-5">
             <p className="branch-label text-branch-accent-text">
               {dictionary.site.teamNumber}
@@ -94,17 +104,14 @@ function Home() {
             </div>
           </div>
 
-          {/* A real hero slide takes the second column when one exists; the
+          {/* The slideshow takes the second column when a slide exists; the
               watermark carries the space on its own when none does. */}
           {hero ? (
-            <img
-              src={hero.image.url}
-              alt={getLocalized(hero.image.alt, locale)?.value ?? ''}
-              width={hero.image.width}
-              height={hero.image.height}
-              fetchPriority="high"
-              decoding="async"
-              className="w-full rounded-lg object-cover lg:max-w-md"
+            <HeroSlideshow
+              slides={slides}
+              locale={locale}
+              onActiveSlideChange={setActiveSlide}
+              className="w-full lg:max-w-md"
             />
           ) : null}
         </div>

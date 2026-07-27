@@ -127,6 +127,25 @@ export const ro = {
     scans: 'Scanări QR',
     countries: 'Țări',
   },
+
+  hero: {
+    goToSlide: 'Mergi la diapozitivul',
+  },
+
+  sponsorship: {
+    title: 'Devino sponsor',
+    body: 'Suntem mereu bucuroși să primim sponsori noi. Fiecare sprijin ne duce mai departe — piese, deplasări, ateliere. Scrie-ne și îți trimitem pachetul de sponsorizare.',
+    cta: 'Scrie-ne',
+  },
+
+  contact: {
+    title: 'Scrie-ne',
+    lead: 'Sponsori, echipe sau presă — răspundem la fiecare mesaj.',
+    email: 'Email',
+    phone: 'Telefon',
+    address: 'Adresă',
+    follow: 'Urmărește-ne',
+  },
 }
 
 /**

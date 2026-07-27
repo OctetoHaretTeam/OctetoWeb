@@ -1,7 +1,5 @@
 /// <reference types="vite/client" />
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { ReactNode } from 'react'
 
 import { LOCALE_TAGS } from '@/i18n/locale'
@@ -30,19 +28,14 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <HeadContent />
       </head>
+      {/*
+        No devtools overlay. It floated a badge over the bottom-right corner of
+        every page in development, which sat on top of real content while the
+        design was being reviewed. The router can still be inspected from the
+        browser's own devtools.
+      */}
       <body>
         {children}
-        {import.meta.env.DEV ? (
-          <TanStackDevtools
-            config={{ position: 'bottom-right' }}
-            plugins={[
-              {
-                name: 'TanStack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-            ]}
-          />
-        ) : null}
         <Scripts />
       </body>
     </html>

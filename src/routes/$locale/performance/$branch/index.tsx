@@ -142,7 +142,7 @@ function BranchNotFound() {
   const locale = useLocale()
   const dictionary = useDictionary()
   return (
-    <BranchTheme branch="tech" as="main" className="min-h-screen">
+    <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-measure space-y-4 px-4 py-16 sm:px-6">
         <h1 className="text-2xl font-semibold">
           {dictionary.errors.notFoundTitle}
@@ -159,7 +159,7 @@ function BranchNotFound() {
 function BranchError() {
   const dictionary = useDictionary()
   return (
-    <BranchTheme branch="tech" as="main" className="min-h-screen">
+    <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-measure space-y-2 px-4 py-16 sm:px-6">
         <h1 className="text-2xl font-semibold">
           {dictionary.errors.serverTitle}

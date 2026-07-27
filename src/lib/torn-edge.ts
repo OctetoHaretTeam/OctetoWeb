@@ -224,3 +224,34 @@ export function tornEdgeSvgPath({
   commands.push(`L100 ${height}`, `L0 ${height}`, 'Z')
   return commands.join(' ')
 }
+
+/**
+ * The torn edge as an OPEN SVG path — only the curvy part, no straight
+ * bottom closure. Used for stroking the outline without drawing a straight
+ * line along the bottom of the strip.
+ */
+export function tornEdgeSvgCurvePath({
+  seed,
+  segments = 64,
+  amplitude = 3.2,
+  height = 10,
+}: {
+  seed: string
+  segments?: number
+  amplitude?: number
+  height?: number
+}): string {
+  const profile = makeTearProfile(hashSeed(seed))
+  const mid = height / 2
+  const commands: string[] = []
+
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments
+    const y = clamp(mid + profile(t) * amplitude, 0, height)
+    commands.push(`${i === 0 ? 'M' : 'L'}${round(t * 100)} ${round(y)}`)
+  }
+
+  // NO closure — the path stays open so only the curvy edge is stroked.
+  return commands.join(' ')
+}
+

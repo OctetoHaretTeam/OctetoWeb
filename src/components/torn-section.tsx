@@ -3,7 +3,7 @@ import type { ElementType, ReactNode } from 'react'
 
 import { BranchTheme } from '@/components/branch-theme'
 import type { Branch } from '@/lib/branch'
-import { tornEdgeSvgPath } from '@/lib/torn-edge'
+import { tornEdgeSvgPath, tornEdgeSvgCurvePath } from '@/lib/torn-edge'
 import { cn } from '@/lib/utils'
 
 /**
@@ -30,6 +30,11 @@ export function TornSection({
   as = 'section',
   /** The first section on a page has nothing to tear over. */
   torn = true,
+  /**
+   * Strokes the torn edge so it reads even when the section above shares this
+   * section's ground colour. Costs no vertical space, unlike a rule.
+   */
+  outlined = false,
 }: {
   branch: Branch
   seed: string
@@ -37,8 +42,13 @@ export function TornSection({
   className?: string
   as?: ElementType
   torn?: boolean
+  outlined?: boolean
 }) {
-  const path = useMemo(() => tornEdgeSvgPath({ seed }), [seed])
+  const fillPath = useMemo(() => tornEdgeSvgPath({ seed }), [seed])
+  const curvePath = useMemo(
+    () => (outlined ? tornEdgeSvgCurvePath({ seed }) : undefined),
+    [seed, outlined],
+  )
 
   return (
     <BranchTheme
@@ -56,7 +66,23 @@ export function TornSection({
              own ground colour, so the sheet reads as lying on top of it. */
           className="pointer-events-none absolute inset-x-0 -top-[var(--tear)] h-[var(--tear)] w-full [--tear:1.5rem]"
         >
-          <path d={path} fill="var(--branch-ground)" />
+          {/* The fill covers the whole shape so the section's ground colour
+              paints behind the tear. No stroke on this path. */}
+          <path d={fillPath} fill="var(--branch-ground)" />
+
+          {/* When outlined, stroke ONLY the curvy torn edge — never the
+              straight bottom closure. This is a separate open path (no Z)
+              so no straight line is drawn. */}
+          {outlined && curvePath ? (
+            <path
+              d={curvePath}
+              fill="none"
+              stroke="var(--branch-muted)"
+              strokeOpacity={0.55}
+              strokeWidth={1}
+              vectorEffect="non-scaling-stroke"
+            />
+          ) : null}
         </svg>
       ) : null}
 
@@ -64,3 +90,4 @@ export function TornSection({
     </BranchTheme>
   )
 }
+

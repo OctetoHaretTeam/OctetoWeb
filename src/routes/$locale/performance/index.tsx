@@ -71,10 +71,17 @@ function PerformanceOverview() {
   const tech = entries.filter((entry) => entry.branch === 'tech')
   const nonTech = entries.filter((entry) => entry.branch === 'non_tech')
 
+  /*
+   * The split fills the viewport itself (`min-h-screen`), matching every
+   * other page's outer section. Without it the hero was only as tall as its
+   * three lines of text, and the site-wide footer now sits right under every
+   * page — a short torn hero with a flat, undecorated void between it and the
+   * footer read as broken rather than as breathing room.
+   */
   return (
-    <main>
+    <main className="flex flex-1 flex-col">
       <div
-        className="relative isolate"
+        className="relative isolate flex flex-1 flex-col"
         style={
           {
             '--seam': SEAM_HORIZONTAL,
@@ -82,9 +89,9 @@ function PerformanceOverview() {
           } as React.CSSProperties
         }
       >
-        <div className="grid lg:grid-cols-2">
+        <div className="grid flex-1 lg:grid-cols-2">
           {/* ── Tech half ─────────────────────────────────────────────── */}
-          <BranchTheme branch="tech" className="relative">
+          <BranchTheme branch="tech" className="relative flex items-center">
             <div className="relative mx-auto w-full max-w-xl space-y-4 px-4 py-12 sm:px-6 lg:ml-auto lg:mr-0 lg:py-20 lg:pr-16">
               <p className="branch-label text-branch-accent-text">
                 {dictionary.nav.performance}
@@ -175,7 +182,7 @@ function PerformanceOverview() {
       </div>
 
       {entries.length === 0 ? (
-        <BranchTheme branch="tech" className="border-branch-border border-t">
+        <BranchTheme branch="non_tech" className="border-branch-border border-t">
           <div className="mx-auto max-w-measure px-4 py-10 sm:px-6">
             <p className="text-branch-muted">{dictionary.empty.performance}</p>
           </div>
@@ -188,7 +195,7 @@ function PerformanceOverview() {
 function PerformanceError() {
   const dictionary = useDictionary()
   return (
-    <BranchTheme branch="tech" as="main" className="min-h-screen">
+    <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-measure space-y-2 px-4 py-16 sm:px-6">
         <h1 className="text-2xl font-semibold">
           {dictionary.errors.serverTitle}

@@ -1,5 +1,6 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
+import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getDictionary } from '@/i18n/dictionaries'
 import {
@@ -13,6 +14,7 @@ import {
 } from '@/i18n/locale'
 import { persistLocalePreference, resolveLocale } from '@/i18n/resolve-locale'
 import { absoluteUrl } from '@/lib/site'
+import { getContactInfo } from '@/server/contact'
 
 /**
  * The locale layout — every public route lives under it (CLAUDE.md §11).
@@ -39,6 +41,11 @@ export const Route = createFileRoute('/$locale')({
 
     return { locale: params.locale }
   },
+
+  // Loaded once at the layout, not per page: the footer is on every route, so
+  // fetching it lower down would repeat the same singleton query on every
+  // navigation instead of resolving with the layout that owns it.
+  loader: () => getContactInfo(),
 
   head: ({ params, matches }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
@@ -85,10 +92,27 @@ export const Route = createFileRoute('/$locale')({
 })
 
 function LocaleLayout() {
+  const contact = Route.useLoaderData()
+
+  /*
+   * The layout ground is the PAPER layer (§7.1). Every page except the home
+   * hero sits on sage, which is the half of the brand that is actually the
+   * team's own; pages opt back onto ink only where §7.3 requires it, i.e. the
+   * technical performance branch.
+   *
+   * `flex-col` with a growing `<main>` slot keeps the footer at the bottom of
+   * a short page instead of floating halfway up it.
+   */
   return (
-    <div className="bg-branch-ground text-branch-text min-h-screen">
+    <div
+      data-branch="non_tech"
+      className="bg-branch-ground text-branch-text flex min-h-screen flex-col"
+    >
       <SiteHeader />
-      <Outlet />
+      <div className="flex flex-1 flex-col">
+        <Outlet />
+      </div>
+      <SiteFooter info={contact} />
     </div>
   )
 }

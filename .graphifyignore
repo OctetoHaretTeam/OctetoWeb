@@ -7,3 +7,13 @@
 
 # Generated route tree and drizzle journal metadata carry no design intent.
 drizzle/meta/
+
+# The Obsidian vault kept alongside the code. Its notes and plugin config
+# produced 2647 of 3827 nodes on a full re-extract — nearly 70% of the graph,
+# against 810 for the actual source — which buries the codebase in every query.
+# The vault is a VIEW of this project, not part of it.
+OctetoWEB/
+
+# Graphify's own output, including the exported vault. Extracting the graph's
+# own notes back into the graph compounds on every run.
+graphify-out/

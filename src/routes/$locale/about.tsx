@@ -1,4 +1,3 @@
-import { ExternalLink, Mail, MapPin, Phone } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import { FallbackNote } from '@/components/localized-text'
@@ -33,15 +32,6 @@ export const Route = createFileRoute('/$locale/about')({
   errorComponent: AboutError,
 })
 
-const SOCIAL_LABELS: Record<string, string> = {
-  instagram: 'Instagram',
-  tiktok: 'TikTok',
-  facebook: 'Facebook',
-  youtube: 'YouTube',
-  github: 'GitHub',
-  instagramFll: 'Instagram · FLL',
-}
-
 function About() {
   const info = Route.useLoaderData()
   const locale = useLocale()
@@ -60,10 +50,6 @@ function About() {
 
   const story = info.originStoryHtml[locale] ?? info.originStoryHtml.ro
   const isFallback = info.originStoryHtml[locale] === null
-
-  const socials = Object.entries(info.socialLinks ?? {}).filter(
-    (entry): entry is [string, string] => typeof entry[1] === 'string',
-  )
 
   return (
     <main>
@@ -108,50 +94,11 @@ function About() {
         </div>
       </TornSection>
 
-      <TornSection branch="tech" seed="about-contact">
-        <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-12 sm:px-6">
-          <h2 className="text-2xl font-semibold">
-            {dictionary.actions.contact}
-          </h2>
-
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2">
-              <Mail aria-hidden="true" className="text-branch-muted size-4" />
-              <a href={`mailto:${info.contactEmail}`}>{info.contactEmail}</a>
-            </li>
-            {info.phone ? (
-              <li className="flex items-center gap-2">
-                <Phone aria-hidden="true" className="text-branch-muted size-4" />
-                <a href={`tel:${info.phone.replace(/\s+/g, '')}`}>{info.phone}</a>
-              </li>
-            ) : null}
-            <li className="flex items-center gap-2">
-              <MapPin aria-hidden="true" className="text-branch-muted size-4" />
-              <span>
-                {info.schoolName}, {info.city}, {info.country}
-              </span>
-            </li>
-          </ul>
-
-          {socials.length > 0 ? (
-            <ul className="flex flex-wrap gap-3">
-              {socials.map(([key, url]) => (
-                <li key={key}>
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="border-branch-border inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm no-underline"
-                  >
-                    {SOCIAL_LABELS[key] ?? key}
-                    <ExternalLink aria-hidden="true" className="size-3.5" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-      </TornSection>
+      {/*
+        The contact block used to live here. It is now `SiteFooter`, rendered
+        by the locale layout on every page — repeating it on About would show
+        the same details twice on one screen.
+      */}
     </main>
   )
 }
@@ -159,7 +106,7 @@ function About() {
 function AboutError() {
   const dictionary = useDictionary()
   return (
-    <TornSection branch="tech" seed="about-error" torn={false} as="main">
+    <TornSection branch="non_tech" seed="about-error" torn={false} as="main">
       <div className="mx-auto w-full max-w-measure space-y-2 px-4 py-16 sm:px-6">
         <h1 className="text-2xl font-semibold">
           {dictionary.errors.serverTitle}

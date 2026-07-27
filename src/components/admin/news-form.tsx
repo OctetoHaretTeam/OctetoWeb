@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 
 import { BilingualField } from '@/components/admin/bilingual-field'
+import { BilingualMarkdownField } from '@/components/admin/bilingual-markdown-field'
 import { GalleryField } from '@/components/admin/gallery-field'
 import { ImageField } from '@/components/admin/image-field'
 import { useDraftAutosave } from '@/components/admin/use-draft-autosave'
@@ -247,16 +248,15 @@ export function NewsForm({
         error={errors.excerptRo}
       />
 
-      <BilingualField
-        label="Text (Markdown)"
+      <BilingualMarkdownField
+        label="Text"
         required
-        multiline
         rows={14}
         ro={values.bodyRo}
         en={values.bodyEn}
         onRoChange={(v) => set('bodyRo', v)}
         onEnChange={(v) => set('bodyEn', v)}
-        hint="Previzualizarea live se adaugă odată cu randarea Markdown, de care are nevoie și pagina publică."
+        hint="Folosește bara de formatare sau scrie direct Markdown. Ctrl+B îngroșat, Ctrl+I cursiv, Ctrl+K link."
         error={errors.bodyRo}
       />
 
