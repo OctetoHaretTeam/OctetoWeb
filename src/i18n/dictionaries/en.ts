@@ -12,6 +12,7 @@ export const en: Dictionary = {
     teamNumber: 'FTC #25474',
     tagline: 'A FIRST Tech Challenge team from Chișinău, Moldova',
     skipToContent: 'Skip to content',
+    copyright: 'All rights reserved',
   },
 
   nav: {

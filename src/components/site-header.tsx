@@ -65,11 +65,11 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* Second row below sm, scrollable rather than collapsed. */}
+        {/* Second row below sm, clean responsive flex-wrap row without clunky scrollbars. */}
         <SectionNav
           locale={locale}
           dictionary={dictionary}
-          className="-mx-4 flex px-4 pb-2 sm:hidden"
+          className="-mx-4 flex flex-wrap px-4 py-1.5 sm:hidden"
         />
       </div>
     </header>
@@ -88,14 +88,14 @@ function SectionNav({
   return (
     <nav
       aria-label={dictionary.nav.home}
-      className={`items-center gap-1 overflow-x-auto ${className}`}
+      className={`items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
     >
       {NAV.map((item) => (
         <Link
           key={item.to}
           to={item.to}
           params={{ locale }}
-          className="text-branch-muted hover:text-branch-text data-[status=active]:text-branch-text rounded px-2 py-1 text-sm whitespace-nowrap no-underline"
+          className="text-branch-muted hover:text-branch-text data-[status=active]:text-branch-text data-[status=active]:bg-branch-text/10 rounded-md px-2.5 py-1 text-sm whitespace-nowrap no-underline transition-colors"
         >
           {dictionary.nav[item.key]}
         </Link>

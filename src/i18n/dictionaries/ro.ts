@@ -14,6 +14,7 @@ export const ro = {
     teamNumber: 'FTC #25474',
     tagline: 'Echipă FIRST Tech Challenge din Chișinău',
     skipToContent: 'Sari la conținut',
+    copyright: 'Toate drepturile rezervate',
   },
 
   nav: {

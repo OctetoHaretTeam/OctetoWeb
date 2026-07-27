@@ -127,7 +127,7 @@ export function SiteFooter({ info }: { info: ContactInfo }) {
             at a 404.
           */}
           <p className="text-branch-muted ml-auto text-xs">
-            {dictionary.site.name} · {dictionary.site.teamNumber}
+            © {new Date().getFullYear()} {dictionary.site.name} ({dictionary.site.teamNumber}). {dictionary.site.copyright}.
           </p>
         </div>
       </div>
