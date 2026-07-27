@@ -74,15 +74,20 @@ export async function lookupCode(code: string): Promise<ResolvedCode | null> {
  * agent, no precise location, no device identifier** (§6, §8) — this is the
  * site's only telemetry and it holds nothing personal.
  *
- * Deliberately not awaited by the caller: §6 requires the write not to block
- * the redirect. On a serverless host that makes it best-effort, which is the
- * right trade — a lost row is better than a judge waiting on a database.
+ * §6 asks for this not to block the redirect, and it originally did not await.
+ * That is now `await`ed instead: an un-awaited write is a loose database call
+ * that can overlap anything else in flight, and against the local WASM
+ * database that is what corrupted the whole data directory once already. A
+ * single indexed insert costs a few milliseconds — far cheaper than the class
+ * of bug the alternative buys.
  */
-export function recordScan(qrCodeId: string, country: string | null): void {
-  void db
-    .insert(qrScan)
-    .values({ qrCodeId, country })
-    .catch(() => {
-      // A failed scan log must never surface to the person scanning.
-    })
+export async function recordScan(
+  qrCodeId: string,
+  country: string | null,
+): Promise<void> {
+  try {
+    await db.insert(qrScan).values({ qrCodeId, country })
+  } catch {
+    // A failed scan log must never surface to the person scanning.
+  }
 }

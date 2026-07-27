@@ -88,8 +88,25 @@ bun run db:local   # apply migrations to a fresh local database
 bun run db:seed    # add placeholder content — safe to re-run
 ```
 
-PGlite allows a single writer, so **stop the dev server before running
-`db:local` or `db:seed`**, then start it again.
+**Only one process may hold `.pglite/` at a time.** Stop the dev server before
+running any `db:*` script, then start it again. Two PGlite instances on one
+data directory do not share a page cache — writes through one are invisible to
+the other — and the local database has already been lost once to a WASM abort
+that left the directory permanently unreadable.
+
+### Back up before you lose an afternoon
+
+```bash
+bun run db:backup            # → db-backups/<timestamp>.json
+bun run db:restore <file>    # into a freshly built database
+bun run db:reset             # rebuild + reseed from scratch
+```
+
+The dump is JSON written outside the data directory, so a corrupted database
+cannot take the backup with it. **Run `db:backup` after any real content
+entry.** None of this applies to Neon, which has its own backups — this is a
+crutch for developing without a database server, and the honest fix is to get
+one.
 
 Once you have a Neon connection string, put it in `.env` and nothing else
 changes: `DATABASE_URL` being present switches the driver, and `db:migrate`

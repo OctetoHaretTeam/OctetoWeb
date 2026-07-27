@@ -16,7 +16,10 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "bun run src/db/seed.ts",
-    "db:local": "bun run src/db/setup-local.ts"
+    "db:local": "bun run src/db/setup-local.ts",
+    "db:reset": "bun run src/db/setup-local.ts && bun run src/db/seed.ts",
+    "db:backup": "bun run src/db/backup.ts",
+    "db:restore": "bun run src/db/backup.ts restore"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

@@ -42,8 +42,72 @@ async function createLocalDb() {
     import('drizzle-orm/pglite'),
   ])
 
-  localClient = new PGlite(LOCAL_DB_PATH)
-  return drizzle(localClient, drizzleOptions)
+  /*
+   * Cached on `globalThis`, not in a module variable.
+   *
+   * The dev server re-evaluates modules on change, and this one opens a
+   * connection at import time — so each reload would open ANOTHER PGlite
+   * instance on the same directory. Two instances on one data directory do
+   * not share a page cache: writes through one are invisible to the other,
+   * and the local database has already been lost once to a WASM abort that
+   * left the directory unreadable. A module variable is reset by the reload;
+   * `globalThis` is not.
+   */
+  const store = globalThis as typeof globalThis & {
+    __octetoPglite?: import('@electric-sql/pglite').PGlite
+  }
+
+  localClient = store.__octetoPglite ?? new PGlite(LOCAL_DB_PATH)
+  store.__octetoPglite = localClient
+
+  return drizzle(serializeLocalClient(localClient), drizzleOptions)
+}
+
+/**
+ * Forces one database call at a time against PGlite.
+ *
+ * PGlite is a single-threaded Postgres compiled to WebAssembly, and it does
+ * not tolerate overlapping calls the way a real server with a connection pool
+ * does. Overlapping them aborts the WASM instance — and because the abort can
+ * land mid-write, it takes the data directory with it. That is exactly what
+ * happened here: adding a home slide ran a write while the home page's five
+ * parallel reads were in flight, and the whole local database was lost.
+ *
+ * Queuing every call removes the concurrency entirely. It costs nothing in
+ * practice — these are local, sub-millisecond queries — and it applies only to
+ * the development driver. Neon is a real server and needs none of this.
+ */
+function serializeLocalClient<T extends object>(client: T): T {
+  let tail: Promise<unknown> = Promise.resolve()
+
+  const enqueue = <R>(run: () => Promise<R>): Promise<R> => {
+    const result = tail.then(run, run)
+    // A failed call must not poison the queue for the next one.
+    tail = result.then(
+      () => undefined,
+      () => undefined,
+    )
+    return result
+  }
+
+  const SERIALISED = new Set(['query', 'exec', 'transaction', 'sql'])
+
+  return new Proxy(client, {
+    get(target, property, receiver) {
+      const value = Reflect.get(target, property, receiver) as unknown
+
+      if (typeof value !== 'function') return value
+
+      const fn = value as (...args: Array<unknown>) => unknown
+
+      if (typeof property === 'string' && SERIALISED.has(property)) {
+        return (...args: Array<unknown>) =>
+          enqueue(() => Promise.resolve(fn.apply(target, args)))
+      }
+
+      return fn.bind(target)
+    },
+  })
 }
 
 /**

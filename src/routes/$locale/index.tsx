@@ -54,7 +54,9 @@ function Home() {
         torn={false}
         className="overflow-hidden"
       >
-        <HeroMark />
+        {/* The watermark stands in for artwork. Once a real slide exists it
+            would sit behind that image and fight it, so it steps aside. */}
+        {hero ? null : <HeroMark />}
 
         <div className="relative mx-auto grid w-full max-w-6xl items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:py-20">
           <div className="space-y-5">
@@ -92,7 +94,7 @@ function Home() {
             </div>
           </div>
 
-          {/* A real hero slide takes the second column when one exists. The
+          {/* A real hero slide takes the second column when one exists; the
               watermark carries the space on its own when none does. */}
           {hero ? (
             <img

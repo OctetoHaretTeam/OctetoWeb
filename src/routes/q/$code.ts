@@ -40,8 +40,9 @@ export const Route = createFileRoute('/q/$code')({
         // scanning gets a designed page either way, never a raw 404 (§6).
         if (!resolved || !resolved.isActive) return unknown()
 
-        // Not awaited — §6 requires the log not to block the redirect.
-        recordScan(resolved.id, countryFromHeaders(request.headers))
+        // Awaited: see recordScan for why the fire-and-forget version was
+        // removed. A single insert costs a few milliseconds.
+        await recordScan(resolved.id, countryFromHeaders(request.headers))
 
         const locale = localeForScan(
           request.headers,
