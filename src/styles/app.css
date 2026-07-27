@@ -111,6 +111,30 @@ body {
   line-height: 1.45;
   letter-spacing: var(--branch-label-tracking);
   text-transform: uppercase;
+
+  /* Cards and columns grow considerably on desktop (see team roster); the
+     micro-label reads as disproportionately tiny next to them if it stays
+     pinned to its mobile size. */
+  @media (min-width: 64rem) {
+    font-size: var(--text-xs);
+  }
+}
+
+/* Same treatment as `branch-label`, sized for a section heading (e.g. the
+   TECHNICAL / NON-TECHNICAL column titles on the team roster) rather than an
+   inline tag. Kept separate instead of pairing `branch-label` with a second
+   `text-*` utility on the same element — that utility also sets
+   letter-spacing, and the two would silently fight over it. */
+@utility branch-label-lg {
+  font-family: var(--branch-label-font);
+  font-size: var(--text-2xs);
+  line-height: 1.45;
+  letter-spacing: var(--branch-label-tracking);
+  text-transform: uppercase;
+
+  @media (min-width: 64rem) {
+    font-size: var(--text-sm);
+  }
 }
 
 /* ── Rendered markdown ────────────────────────────────────────────────────

@@ -32,6 +32,10 @@ Thumbs.db
 public/uploads
 !public/logo.webp
 
+# Knowledge graph output. Regenerated from source by `graphify update .`, ~2MB,
+# and rewritten in full on every run — committing it means a giant diff per commit.
+graphify-out/
+
 # Local database dumps. NEVER committed: they contain real member names and
 # the photoConsent / fullNamePublic flags, and members are 14-18 (§8).
 # They are the only copy of local content, so keep them — just not in git.

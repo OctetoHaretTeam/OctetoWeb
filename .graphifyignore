@@ -1,0 +1,9 @@
+# Files graphify should skip on top of .gitignore.
+
+# graphify's own vendored skill documentation. It describes the tool, not
+# OctetoWeb — its step headings otherwise form the largest "community" in the
+# graph and drown out the actual codebase in every query.
+.claude/skills/graphify/
+
+# Generated route tree and drizzle journal metadata carry no design intent.
+drizzle/meta/

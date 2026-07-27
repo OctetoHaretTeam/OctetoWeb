@@ -50,12 +50,14 @@ export function MemberCard({
           seed={member.slug}
           priority={priority}
         />
-        <div className="mt-3 space-y-0.5">
-          <p className="text-branch-text font-semibold group-hover:underline">
+        <div className="mt-2 space-y-0.5 lg:mt-3">
+          <p className="text-branch-text truncate font-semibold group-hover:underline lg:text-lg">
             {member.displayName}
           </p>
           {role ? (
-            <p className="text-branch-muted text-sm">{role.value}</p>
+            <p className="text-branch-muted truncate text-sm lg:text-base">
+              {role.value}
+            </p>
           ) : null}
           <p className="branch-label text-branch-muted">
             {branchLabel(member.branch, dictionary)}
