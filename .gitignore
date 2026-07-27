@@ -32,5 +32,7 @@ Thumbs.db
 public/uploads
 !public/logo.webp
 
-# local database dumps — keep these, they are the only copy
-!db-backups
+# Local database dumps. NEVER committed: they contain real member names and
+# the photoConsent / fullNamePublic flags, and members are 14-18 (§8).
+# They are the only copy of local content, so keep them — just not in git.
+db-backups/
