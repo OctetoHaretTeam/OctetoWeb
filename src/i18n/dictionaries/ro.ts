@@ -137,6 +137,9 @@ export const ro = {
     title: 'Devino sponsor',
     body: 'Suntem mereu bucuroși să primim sponsori noi. Fiecare sprijin ne duce mai departe — piese, deplasări, ateliere. Scrie-ne și îți trimitem pachetul de sponsorizare.',
     cta: 'Scrie-ne',
+    /** Scurt, pentru fâșia de pe pagina principală — nu repetă tagline-ul. */
+    shortPitch:
+      'Fiecare robot pe care îl construim are nevoie de piese, deplasări și timp — sponsorii ne ajută să ajungem la linia de start.',
   },
 
   contact: {

@@ -266,7 +266,7 @@ function Home() {
 
           <div className="border-branch-border flex flex-wrap items-center justify-between gap-4 rounded-lg border p-6">
             <p className="max-w-measure text-lg font-semibold">
-              {dictionary.site.tagline}
+              {dictionary.sponsorship.shortPitch}
             </p>
             <Link
               to="/$locale/sponsors"

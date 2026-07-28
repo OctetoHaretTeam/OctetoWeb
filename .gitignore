@@ -40,3 +40,4 @@ graphify-out/
 # the photoConsent / fullNamePublic flags, and members are 14-18 (§8).
 # They are the only copy of local content, so keep them — just not in git.
 db-backups/
+.env*

@@ -128,6 +128,9 @@ export const en: Dictionary = {
     title: 'Become a sponsor',
     body: 'We are always glad to welcome new sponsors. Every bit of support takes us further — parts, travel, workshops. Write to us and we will send the sponsorship pack.',
     cta: 'Get in touch',
+    /** Short, for the home page strip — must not repeat `site.tagline`. */
+    shortPitch:
+      'Every robot we build needs parts, travel and time — sponsors get us to the starting line.',
   },
 
   contact: {

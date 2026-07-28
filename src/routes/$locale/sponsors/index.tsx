@@ -11,9 +11,10 @@ import { getSponsors } from '@/server/sponsors'
 /**
  * The sponsor wall — CLAUDE.md §4.
  *
- * Tech treatment: this is a credibility page for companies, and the ink ground
- * is where a logo wall reads best. `logoDark` is preferred here for exactly
- * that reason — §5 exists to let a sponsor supply one.
+ * Paper treatment: each sponsor sits in its own light card so any logo —
+ * whatever colour it ships in — reads cleanly, which is why the regular
+ * `logo` is used rather than `logoDark` (that variant is for a dark ground,
+ * and this page's cards are never one).
  */
 export const Route = createFileRoute('/$locale/sponsors/')({
   loader: () => getSponsors(),
@@ -49,39 +50,56 @@ function SponsorWall() {
             <p className="text-branch-muted">{dictionary.empty.sponsors}</p>
           </div>
         ) : (
-          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sponsors.map((sponsor, index) => {
-              // The wall sits on ink, so the dark-ground variant wins when the
-              // sponsor supplied one.
-              const logo = sponsor.logoDark ?? sponsor.logo
+              const logo = sponsor.logo
               const description = getLocalized(
                 bilingual(sponsor, 'description'),
                 locale,
               )
 
-              const card = (
+              const cardContent = (
                 <>
-                  <img
-                    src={logo.url}
-                    alt={getLocalized(logo.alt, locale)?.value ?? sponsor.name}
-                    width={logo.width}
-                    height={logo.height}
-                    loading={index < 3 ? 'eager' : 'lazy'}
-                    decoding="async"
-                    className="h-16 w-full object-contain object-left"
+                  {/* Gold marks a sponsor per §7.2. A rule, not a fill — full
+                      chroma is fine at this thin, but a whole card in it
+                      would blow past the accent-coverage cap. */}
+                  <span
+                    aria-hidden="true"
+                    className="bg-gold absolute inset-x-0 top-0 h-1 rounded-t-xl opacity-90 transition-opacity duration-300 group-hover:opacity-100"
                   />
-                  <div className="mt-3 space-y-1">
-                    <p className="flex items-center gap-1.5 font-semibold">
-                      {sponsor.name}
+
+                  {/* `bg-paper`, not white: white is not in the palette, and
+                      paper is already the site's own off-white. */}
+                  <div className="ring-branch-border/40 bg-paper relative flex h-24 w-full items-center justify-center rounded-lg p-3 shadow-inner ring-1 transition-transform duration-300 group-hover:scale-102">
+                    <img
+                      src={logo.url}
+                      alt={getLocalized(logo.alt, locale)?.value ?? sponsor.name}
+                      width={logo.width}
+                      height={logo.height}
+                      loading={index < 3 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      className="max-h-full max-w-full object-contain drop-shadow-xs"
+                    />
+                  </div>
+
+                  {/* The card is always on `bg-paper` regardless of page
+                      branch, so its text is always ink — not `branch-text`,
+                      which would flip on a page using the tech ground. */}
+                  <div className="border-branch-border mt-3 space-y-1 border-t pt-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-ink text-lg font-bold">
+                        {sponsor.name}
+                      </p>
                       {sponsor.websiteUrl ? (
                         <ExternalLink
                           aria-hidden="true"
-                          className="text-branch-muted size-3.5"
+                          className="text-slate/60 size-4 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                         />
                       ) : null}
-                    </p>
+                    </div>
+
                     {description ? (
-                      <p className="text-branch-muted text-sm">
+                      <p className="text-slate/80 text-sm leading-relaxed">
                         {description.value}
                       </p>
                     ) : null}
@@ -92,7 +110,11 @@ function SponsorWall() {
               return (
                 <li
                   key={sponsor.id}
-                  className="border-branch-border rounded-md border p-4"
+                  // Same soft cream as the "become a sponsor" card — solid
+                  // `bg-paper` read too bright next to sage; the logo badge
+                  // below stays solid, since that one exists for logo
+                  // legibility rather than as a page surface.
+                  className="border-branch-border bg-branch-surface/60 group relative overflow-hidden rounded-xl border p-5 shadow-lg shadow-black/15 transition-all duration-300 hover:-translate-y-1.5 hover:border-gold hover:shadow-2xl hover:shadow-black/20"
                 >
                   {sponsor.websiteUrl ? (
                     <a
@@ -101,10 +123,10 @@ function SponsorWall() {
                       rel="noreferrer noopener"
                       className="block no-underline"
                     >
-                      {card}
+                      {cardContent}
                     </a>
                   ) : (
-                    card
+                    cardContent
                   )}
                 </li>
               )
@@ -115,19 +137,16 @@ function SponsorWall() {
         {/*
           The ask. A sponsor wall that only lists existing sponsors gives a
           company reading it nothing to do — this is the page they land on
-          from the packet, so it has to say the team is open and how to start.
-          Gold fill with ink on it, because §7.2 reserves gold for sponsors and
-          §7.3 forbids it as a text colour on sage (1.97:1); as a fill behind
-          ink it measures 10.50:1.
+          from the packet, so it has to say the team is open and how to
+          start.
+
+          `bg-branch-surface` at full opacity (solid paper) next to sage was
+          too sharp a jump; no fill at all read as too flat. This is the
+          middle ground — a real cream wash, softened by letting the sage
+          show through underneath rather than diluting the paper colour
+          itself.
         */}
-        <aside className="border-branch-border bg-branch-text/8 rounded-lg border p-6">
-          {/*
-            Gold marks this as the sponsor block (§7.2 reserves it for exactly
-            that) but as a 2px rule, not a fill. A gold button on the paper
-            surface put the page's loudest colour on its largest control, and
-            §7.2 also caps accent coverage and asks for chroma to drop as area
-            grows.
-          */}
+        <aside className="border-branch-border bg-branch-surface/60 rounded-lg border p-6 shadow-sm">
           <span
             aria-hidden="true"
             className="bg-branch-accent mb-4 block h-0.5 w-10 rounded-full"
@@ -138,16 +157,9 @@ function SponsorWall() {
           <p className="text-branch-muted mt-2 max-w-measure text-sm">
             {dictionary.sponsorship.body}
           </p>
-          {/* No address configured yet — the footer carries the same call, so
-              a dead `mailto:` here would be worse than none. */}
           {contactEmail ? (
             <a
               href={`mailto:${contactEmail}`}
-              /*
-               * Ink on paper: 15.46:1, and it echoes the footer's own ground
-               * rather than shouting. The gold rule above already says what
-               * kind of block this is.
-               */
               className="bg-branch-text text-branch-surface mt-5 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold no-underline transition-opacity hover:opacity-90"
             >
               <Mail aria-hidden="true" className="size-4" />
