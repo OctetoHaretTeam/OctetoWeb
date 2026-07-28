@@ -7,24 +7,22 @@ non-tech**. The non-tech ground is sage.
 
 | Pairing | Ratio | Verdict |
 |---|---|---|
-| gold on sage | **1.97:1** | fails, badly |
-| signal on sage | **2.49:1** | fails |
+| gold on sage | **1.69:1** | fails, badly |
+| signal on sage | **1.98:1** | fails |
 | paper on sage | 2.90:1 | fails |
 | ink on sage | 5.33:1 | passes |
-| **ink on gold** | **10.50:1** | passes comfortably |
+| **ink on gold** | **9.03:1** | passes comfortably |
 
 Gold on sage is worse than the signal pairing the brief warned about — and it
 is the one §7.3 actually specifies.
 
 ## Darkening does not rescue it
 
-Sage is a **mid-tone**, so no chromatic accent clears 4.5:1 against it. A
-sweep of both accents:
-
-- gold reaches only 3.15:1 at 0.3× brightness, by which point it is brown
-- signal maxes out at 2.85:1
-
-So the fix has to be structural, not a colour tweak.
+Sage is a **mid-tone**, so no chromatic accent clears 4.5:1 against it — that
+was true of the original yellow-green signal and gold, and it is still true
+after both were recoloured to a sage-mint green and a purple (see
+[[Design system]]): both new hues still fail against sage. So the fix has to
+be structural, not a colour tweak.
 
 ## The rule
 
@@ -32,7 +30,7 @@ So the fix has to be structural, not a colour tweak.
 > `--branch-accent-text` is the token that *is* safe to set text in: signal on
 > tech, **ink** on non-tech.
 
-Gold behind ink text measures 10.50:1. The emphasis survives; the failure
+Gold behind ink text measures 9.03:1. The emphasis survives; the failure
 does not.
 
 ## It is enforced by tests, not by a comment

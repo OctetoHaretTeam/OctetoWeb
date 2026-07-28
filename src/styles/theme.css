@@ -3,11 +3,13 @@
    hex or a font stack in a component; add a token here instead. */
 
 /* ── Brand palette ────────────────────────────────────────────────────────
-   WARNING: these hexes are approximations sampled from Instagram screenshots
-   (CLAUDE.md §7.2, §15.1). Before launch, pull the exact values from the logo
-   SVG / Canva file and replace them here. Everything downstream — the branch
-   grounds and the whole shadcn/ui bridge — derives from this block, so each
-   colour stays a one-line fix.
+   WARNING: most of these hexes are approximations sampled from Instagram
+   screenshots (CLAUDE.md §7.2, §15.1); `signal` and `gold` are eyeballed from
+   a pasted swatch instead. Before launch, pull the exact values from the logo
+   SVG / Canva file (and a real colour picker for signal/gold) and replace
+   them here. Everything downstream — the branch grounds and the whole
+   shadcn/ui bridge — derives from this block, so each colour stays a
+   one-line fix.
 
    `static` emits every variable below even when no utility references it yet.
    Tailwind v4 tree-shakes unused @theme variables by default, which would make
@@ -20,11 +22,17 @@
   --color-slate: #232a20; /* borders, dividers */
   --color-sage: #7c8a6b; /* kraft backdrop — non-tech canvas */
   --color-paper: #e9e4d6; /* cutout edges, cards, body text on dark */
-  /* Interactive ONLY. Read by eye from the logo artwork (the octopus and the
-     scattered dots), NOT sampled from a file — still replace with the exact
-     value once the logo SVG or Canva file is available. */
-  --color-signal: #afd46a;
-  --color-gold: #efb428; /* awards, sponsors, emphasis */
+  /* Interactive ONLY. Eyeballed from a pasted swatch, not a colour-picked
+     file — replace with the exact value if a precise one becomes available.
+     Was #afd46a (a yellow-green, read from the logo artwork); the team asked
+     for this cooler sage-mint instead. */
+  --color-signal: #a3c7a8;
+  /* Awards, sponsors, emphasis. Eyeballed from a pasted swatch, same caveat
+     as signal above. Was #efb428 (gold) — the team asked for this purple
+     instead, so the CSS variable name is now a historical identifier rather
+     than a literal description; renaming it would touch every `bg-gold` /
+     `text-gold` / `border-gold` call site for no functional gain. */
+  --color-gold: #cda0dc;
   /* The soft lilac on "HARET" and the wordmark outline. CLAUDE.md calls this
      token `violet`; the artwork is pinker and far less saturated than the
      placeholder suggested. Logo only — do not build UI on it. */
@@ -108,19 +116,24 @@
 
    ACCESSIBILITY, measured (WCAG 2.1, see the styleguide for the full table):
 
-     paper on ink    15.46:1   signal on ink   13.28:1   gold on ink   10.50:1
-     ink on sage      5.33:1   ink on paper    15.46:1   ink on gold   10.50:1
+     paper on ink    15.46:1   signal on ink   10.56:1   gold on ink     9.03:1
+     ink on sage      5.33:1   ink on paper    15.46:1   ink on gold     9.03:1
 
    The load-bearing constraint is that sage is a MID-TONE, so no chromatic
-   accent clears 4.5:1 against it — signal manages 2.49:1 and gold only
-   1.97:1, and darkening gold to reach even 3:1 turns it brown. Therefore:
+   accent clears 4.5:1 against it — signal manages 1.98:1 and gold only
+   1.69:1. Therefore:
 
      `--branch-accent` is a FILL, never a text colour.
      `--branch-accent-text` is the colour that is safe to set text in.
 
    On tech those are the same (signal reads on ink). On non-tech the accent
    text colour falls back to ink, and gold carries emphasis as a fill behind
-   ink text — which measures 10.50:1 rather than 1.97:1. */
+   ink text — which measures 9.03:1 rather than 1.69:1.
+
+   This held even after signal and gold were recoloured (a sage-mint green
+   and a purple, both eyeballed from a pasted swatch — see the token
+   comments above): both new hues still clear 4.5:1 against ink and both
+   still fail against sage, so the fill-only rule needed no rework. */
 
 /* Each block declares BOTH the branch tokens and the shadcn semantic tokens
    that depend on them, pointing at brand colours directly.
@@ -170,7 +183,7 @@
   --branch-text: var(--color-ink);
   --branch-muted: var(--color-carbon);
   --branch-accent: var(--color-gold);
-  /* NOT gold: gold on sage is 1.97:1. Emphasis comes from the fill instead. */
+  /* NOT gold: gold on sage is 1.69:1. Emphasis comes from the fill instead. */
   --branch-accent-text: var(--color-ink);
   --branch-accent-contrast: var(--color-ink);
   --branch-font: var(--font-body);
@@ -182,7 +195,7 @@
   --foreground: var(--color-ink);
   --card: var(--color-paper);
   --card-foreground: var(--color-ink);
-  /* Gold as a fill with ink on it: 10.50:1. */
+  /* Gold as a fill with ink on it: 9.03:1. */
   --primary: var(--color-gold);
   --primary-foreground: var(--color-ink);
   --secondary: var(--color-paper);

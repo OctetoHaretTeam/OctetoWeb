@@ -278,15 +278,18 @@ a component.**
   --color-slate:   #232A20;  /\* borders, dividers \*/
   --color-sage:    #7C8A6B;  /\* kraft backdrop — non-tech canvas \*/
   --color-paper:   #E9E4D6;  /\* cutout edges, cards, body text on dark \*/
-  --color-signal:  #63F06A;  /\* interactive ONLY \*/
-  --color-gold:    #EFB428;  /\* awards, sponsors, emphasis \*/
+  --color-signal:  #A3C7A8;  /\* interactive ONLY \*/
+  --color-gold:    #CDA0DC;  /\* awards, sponsors, emphasis \*/
   --color-violet:  #8B5CF6;  /\* logo gradient only \*/
 }
 ```
 
-> \*\*These hexes are approximations sampled from Instagram screenshots.\*\* Before
-> launch, pull exact values from the logo SVG / Canva file and update this block.
-> Everything else derives from here, so it is a one-line fix.
+> \*\*Most of these hexes are approximations sampled from Instagram screenshots;
+> `signal` and `gold` are eyeballed from a pasted swatch instead\*\* — the team
+> asked for a sage-mint green and a purple in place of the original yellow-green
+> and gold. Before launch, pull exact values from the logo SVG / Canva file (and
+> a real colour picker for signal/gold) and update this block. Everything else
+> derives from here, so it is a one-line fix.
 
 **Rules**
 
@@ -558,6 +561,7 @@ merch run.
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
 
 Rules:
+- Before running any grep or broad file searches, always query graphify-out/ or the local graph DB first. Only read raw files if the graph lookup indicates direct relevant node paths.
 - For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.

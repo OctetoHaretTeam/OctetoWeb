@@ -11,15 +11,16 @@ hardcode a hex in a component.**
 --color-slate   #232a20   borders, dividers
 --color-sage    #7c8a6b   kraft backdrop — non-tech canvas
 --color-paper   #e9e4d6   cutouts, cards, body text on dark
---color-signal  #5cb94a   interactive ONLY
---color-gold    #efb428   achievement ONLY
+--color-signal  #a3c7a8   interactive ONLY
+--color-gold    #cda0dc   achievement ONLY
 --color-violet  #8b5cf6   logo gradient only
 ```
 
 > [!warning] These are still estimates
-> Sampled by eye — `--color-signal` from a swatch the team sent, the rest from
-> Instagram screenshots. The exact values must come from the logo SVG. See
-> [[Open questions]].
+> Sampled by eye — `--color-signal` and `--color-gold` from swatches the team
+> sent (a sage-mint green and a purple, replacing an earlier yellow-green and
+> gold), the rest from Instagram screenshots. The exact values must still come
+> from the logo SVG / a real colour picker. See [[Open questions]].
 
 The `/styleguide` route **recomputes every contrast ratio from the live
 palette**, and `contrast.test.ts` fails if a pairing stops clearing AA. So
@@ -30,9 +31,9 @@ swapping in the real hexes immediately shows what broke.
 The load-bearing accessibility fact on this site:
 
 > [!danger] No chromatic accent clears 4.5:1 against sage
-> Sage is a mid-tone. Gold on sage measures **1.97:1**, signal **2.49:1** —
-> and darkening does not rescue either; gold only reaches 3.15:1 by which
-> point it is brown. Ink on sage is 5.33:1.
+> Sage is a mid-tone. Gold on sage measures **1.69:1**, signal **1.98:1**.
+> Ink on sage is 5.33:1. This held even after both accents were recoloured —
+> see [[Why the accent is a fill]] for the current numbers.
 
 Hence: **the accent is a fill, never a text colour.** `--branch-accent-text`
 exists as the colour that *is* safe to set text in — signal on tech, ink on

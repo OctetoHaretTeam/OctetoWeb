@@ -73,8 +73,8 @@ function BranchDemo({ branch }: { branch: Branch }) {
         <p className="branch-label">Accent ca umplere</p>
         <p className="text-branch-muted max-w-measure text-sm">
           Accentul este o umplere, niciodată o culoare de text. Pe pânza sage,{' '}
-          <code>gold</code> ca text dă 1.97:1; ca umplere cu text{' '}
-          <code>ink</code> dă 10.50:1.
+          <code>gold</code> ca text dă 1.69:1; ca umplere cu text{' '}
+          <code>ink</code> dă 9.03:1.
         </p>
         <span className="bg-branch-accent text-branch-accent-contrast inline-block rounded px-2 py-1 text-sm font-semibold">
           Connect Award

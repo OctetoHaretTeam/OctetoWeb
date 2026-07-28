@@ -80,11 +80,11 @@ body {
 
 /* ── Focus ring — CLAUDE.md §7.7 ──────────────────────────────────────────
    Two-tone on purpose. No single colour clears 3:1 on every ground this site
-   uses: signal against sage measures 2.49:1, and ink against the ink ground
+   uses: signal against sage measures 1.98:1, and ink against the ink ground
    is invisible. Drawing both means at least one always contrasts —
 
-     on ink   : signal ring 13.28:1
-     on carbon: signal ring 12.15:1
+     on ink   : signal ring 10.56:1
+     on carbon: signal ring  9.66:1
      on sage  : ink ring     5.33:1
      on paper : ink ring    15.46:1
 
