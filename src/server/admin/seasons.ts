@@ -48,15 +48,21 @@ export const adminGetSeason = createServerFn({ method: 'GET' })
   })
 
 /**
- * Only one season may be current (§5 enforces it with a partial unique index),
- * so setting one clears the rest in the same transaction. Doing it the other
- * way round would trip the constraint.
+ * Only one season may be current (§5 enforces it with a partial unique
+ * index), so every caller clears the rest BEFORE setting its own row — never
+ * the other way round, or the constraint trips.
+ *
+ * Not run inside `db.transaction(...)`: production's driver
+ * (`drizzle-orm/neon-http`) throws unconditionally on `.transaction()` calls
+ * (see the comment on adminReorderHomeSlides in server/admin/misc.ts). The
+ * clear-then-set ORDER is what keeps the constraint satisfied at every
+ * intermediate step even without atomicity — the only residual risk is the
+ * second statement failing after the first succeeds, which leaves zero
+ * current seasons rather than a constraint violation, and is repaired by
+ * simply retrying.
  */
-async function clearOtherCurrent(
-  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
-  keepId: string | null,
-) {
-  await tx
+async function clearOtherCurrent(keepId: string | null) {
+  await db
     .update(season)
     .set({ isCurrent: false })
     .where(keepId ? ne(season.id, keepId) : sql`true`)
@@ -76,10 +82,8 @@ export const adminCreateSeason = createServerFn({ method: 'POST' })
       return { ok: false as const, error: 'slug-taken' as const }
     }
 
-    await db.transaction(async (tx) => {
-      if (data.isCurrent) await clearOtherCurrent(tx, null)
-      await tx.insert(season).values(data)
-    })
+    if (data.isCurrent) await clearOtherCurrent(null)
+    await db.insert(season).values(data)
 
     return { ok: true as const, slug: data.slug }
   })
@@ -111,10 +115,8 @@ export const adminUpdateSeason = createServerFn({ method: 'POST' })
       }
     }
 
-    await db.transaction(async (tx) => {
-      if (data.values.isCurrent) await clearOtherCurrent(tx, row.id)
-      await tx.update(season).set(data.values).where(eq(season.id, row.id))
-    })
+    if (data.values.isCurrent) await clearOtherCurrent(row.id)
+    await db.update(season).set(data.values).where(eq(season.id, row.id))
 
     return { ok: true as const, slug: data.values.slug }
   })

@@ -67,14 +67,24 @@ export const adminReorderHomeSlides = createServerFn({ method: 'POST' })
   .middleware([adminMiddleware])
   .validator(z.object({ ids: z.array(z.uuid()).min(1) }))
   .handler(async ({ data }) => {
-    await db.transaction(async (tx) => {
-      for (const [index, id] of data.ids.entries()) {
-        await tx
-          .update(homeSlide)
-          .set({ displayOrder: index })
-          .where(eq(homeSlide.id, id))
-      }
-    })
+    /*
+     * NOT `db.transaction(...)`. Production runs on `drizzle-orm/neon-http`,
+     * whose `.transaction()` unconditionally throws "No transactions support
+     * in neon-http driver" — every call, not a rate limit or a flaky edge
+     * case. It never surfaced locally because dev runs on PGlite, a
+     * different driver that supports real transactions.
+     *
+     * A half-applied reorder here is a stale display position, self-healing
+     * on the next successful reorder — not a correctness risk worth a driver
+     * change (Neon's pooled/WebSocket driver does support transactions, at
+     * the cost of a different connection model).
+     */
+    for (const [index, id] of data.ids.entries()) {
+      await db
+        .update(homeSlide)
+        .set({ displayOrder: index })
+        .where(eq(homeSlide.id, id))
+    }
     return { ok: true }
   })
 

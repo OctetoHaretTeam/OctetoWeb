@@ -98,14 +98,16 @@ export const adminReorderSponsors = createServerFn({ method: 'POST' })
   .middleware([adminMiddleware])
   .validator(z.object({ ids: z.array(z.uuid()).min(1) }))
   .handler(async ({ data }) => {
-    await db.transaction(async (tx) => {
-      for (const [index, id] of data.ids.entries()) {
-        await tx
-          .update(sponsor)
-          .set({ displayOrder: index })
-          .where(eq(sponsor.id, id))
-      }
-    })
+    // Not `db.transaction(...)` — see the comment on adminReorderHomeSlides
+    // in server/admin/misc.ts. neon-http (production's driver) throws on
+    // every `.transaction()` call; PGlite (dev's driver) does not, which is
+    // why this passed locally and failed live.
+    for (const [index, id] of data.ids.entries()) {
+      await db
+        .update(sponsor)
+        .set({ displayOrder: index })
+        .where(eq(sponsor.id, id))
+    }
 
     return { ok: true }
   })
