@@ -57,7 +57,15 @@ export function ReorderList<T>({
             <li
               key={key}
               draggable={!disabled}
-              onDragStart={() => setDraggingKey(key)}
+              onDragStart={(event) => {
+                // The HTML5 drag-and-drop spec requires a dataTransfer
+                // payload for a drag to be considered valid. Chrome tolerates
+                // its absence; Firefox does not — the drag simply never
+                // completes, with no error anywhere to explain why.
+                event.dataTransfer.setData('text/plain', key)
+                event.dataTransfer.effectAllowed = 'move'
+                setDraggingKey(key)
+              }}
               onDragEnd={() => setDraggingKey(null)}
               onDragOver={(event) => event.preventDefault()}
               onDrop={(event) => {
