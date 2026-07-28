@@ -19,8 +19,8 @@
   --color-slate: #232a20; /* borders, dividers */
   --color-sage: #7c8a6b; /* kraft backdrop — non-tech canvas */
   --color-paper: #e9e4d6; /* cutout edges, cards, body text on dark */
-  --color-signal: #63f06a; /* interactive ONLY */
-  --color-gold: #efb428; /* awards, sponsors, emphasis */
+  --color-signal: #a7c6a7; /* interactive ONLY */
+  --color-gold: #d3a0df; /* awards, sponsors, emphasis */
   --color-violet: #8b5cf6; /* logo gradient only — do not build UI on it */
 
   /* ── Typography — CLAUDE.md §7.6 ────────────────────────────────────────

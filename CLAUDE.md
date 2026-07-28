@@ -258,8 +258,8 @@ a component.**
   --color-slate:   #232A20;  /* borders, dividers */
   --color-sage:    #7C8A6B;  /* kraft backdrop — non-tech canvas */
   --color-paper:   #E9E4D6;  /* cutout edges, cards, body text on dark */
-  --color-signal:  #63F06A;  /* interactive ONLY */
-  --color-gold:    #EFB428;  /* awards, sponsors, emphasis */
+  --color-signal:  #A7C6A7;  /* interactive ONLY */
+  --color-gold:    #D3A0DF;  /* awards, sponsors, emphasis */
   --color-violet:  #8B5CF6;  /* logo gradient only */
 }
 ```
