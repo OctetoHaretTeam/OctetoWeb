@@ -32,9 +32,16 @@ export function SiteHeader() {
     // `data-branch="tech"` pins the bar to the ink layer whatever the page
     // below it uses. The pages are on sage now, and a sage header on a sage
     // page loses the boundary between chrome and content entirely.
+    //
+    // `lg:sticky` — desktop only. Mobile keeps normal scroll: the two-row
+    // layout there (§2) already costs more vertical space than a phone can
+    // spare permanently pinned, and losing scroll real estate on a 390px
+    // screen on 3G is a worse trade than on a desktop monitor. `z-50` keeps
+    // it above page content once it stops scrolling with the page; nothing
+    // else on the site sets a z-index this high, including the torn seam.
     <header
       data-branch="tech"
-      className="border-branch-border bg-branch-ground border-b"
+      className="border-branch-border bg-branch-ground border-b lg:sticky lg:top-0 lg:z-50"
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <div className="flex items-center justify-between gap-4 py-3">
