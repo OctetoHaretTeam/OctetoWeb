@@ -117,6 +117,24 @@ const userInfoSchema = z.object({
   email_verified: z.boolean().optional(),
 })
 
+/**
+ * Whether Google actually asserted that it verified this address.
+ *
+ * Verification must be PROVEN, not merely un-disproven. This was once
+ * `=== false`, which passes when the claim is absent — and "the identity
+ * provider stopped sending the field" is precisely the case where failing
+ * open hands out admin access. Google does send `email_verified` for the
+ * `email` scope, so in practice the difference only shows up if that response
+ * shape ever changes; the whole allowlist rests on the address being real, so
+ * this fails closed instead.
+ *
+ * Pure and exported so the decision can be tested directly, like
+ * `isAllowedAdmin` and `isSessionFresh`.
+ */
+export function isVerifiedEmail(claim: boolean | undefined): boolean {
+  return claim === true
+}
+
 export type OAuthResult =
   | { ok: true; email: string; returnTo: string }
   | { ok: false; reason: 'state' | 'exchange' | 'profile' | 'unverified' }
@@ -172,9 +190,7 @@ export async function completeGoogleOAuth(
   const profile = userInfoSchema.safeParse(await profileResponse.json())
   if (!profile.success) return { ok: false, reason: 'profile' }
 
-  // An unverified address would let anyone claim an admin's email on a Google
-  // account they control.
-  if (profile.data.email_verified === false) {
+  if (!isVerifiedEmail(profile.data.email_verified)) {
     return { ok: false, reason: 'unverified' }
   }
 

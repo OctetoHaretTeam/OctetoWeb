@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { base64url, safeReturnPath } from './oauth'
+import { base64url, isVerifiedEmail, safeReturnPath } from './oauth'
 
 /**
  * `returnTo` comes straight off the query string, so it is an open-redirect
@@ -60,5 +60,25 @@ describe('base64url', () => {
     expect(encoded).not.toContain('+')
     expect(encoded).not.toContain('/')
     expect(encoded).not.toContain('=')
+  })
+})
+
+/**
+ * The allowlist decides *whether* an address may administer the site; this
+ * decides whether the address is even real. If it fails open, anyone can put
+ * an admin's address on a Google account they control and walk in.
+ */
+describe('isVerifiedEmail', () => {
+  test('accepts only an explicit true', () => {
+    expect(isVerifiedEmail(true)).toBe(true)
+  })
+
+  test('refuses an explicit false', () => {
+    expect(isVerifiedEmail(false)).toBe(false)
+  })
+
+  test('refuses an ABSENT claim — the fail-open case', () => {
+    // A `=== false` check would return true here and admit the address.
+    expect(isVerifiedEmail(undefined)).toBe(false)
   })
 })

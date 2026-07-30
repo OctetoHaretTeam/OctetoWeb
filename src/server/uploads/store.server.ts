@@ -27,7 +27,14 @@ export const LOCAL_UPLOAD_DIR = path.join('public', 'uploads')
 
 /** Mirrors the browser's output. Nothing else is accepted. */
 const ACCEPTED_TYPE = 'image/webp'
-const MAX_BYTES = 8 * 1024 * 1024
+
+/**
+ * The real cap, enforced on the decoded bytes. Exported so the route can also
+ * refuse an oversized request from its Content-Length, before buffering it.
+ */
+export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024
+
+const MAX_BYTES = MAX_UPLOAD_BYTES
 
 export type StoredUpload = { url: string }
 

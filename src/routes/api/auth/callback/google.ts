@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { isAllowedAdmin } from '@/server/auth/allowlist'
 import { completeGoogleOAuth } from '@/server/auth/oauth'
 import { createAdminSession, destroyAdminSession } from '@/server/auth/session'
+import { rateLimit } from '@/server/rate-limit'
 
 /**
  * Google sign-in callback — CLAUDE.md §9.
@@ -20,6 +21,17 @@ export const Route = createFileRoute('/api/auth/callback/google')({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        /*
+         * Rate-limited like the start of the flow. Every unthrottled hit here
+         * costs two outbound requests to Google (token exchange, then
+         * userinfo), so an attacker replaying this endpoint burns the team's
+         * OAuth quota and this function's execution budget without ever
+         * needing a valid code. 10/min matches `/api/auth/google`; a real
+         * sign-in reaches this exactly once.
+         */
+        const blocked = rateLimit('oauth-callback', request, 10, 60_000)
+        if (blocked) return blocked
+
         const params = new URL(request.url).searchParams
 
         // The user declined at Google's consent screen, or Google returned an
