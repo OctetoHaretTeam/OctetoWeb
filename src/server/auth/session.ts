@@ -1,6 +1,9 @@
-import { useSession } from '@tanstack/react-start/server'
-
 import { isAllowedAdmin } from './allowlist'
+import {
+  openSealedSession,
+  requireSessionSecret,
+  sessionCookieOptions,
+} from './sealed-session'
 
 /**
  * The admin session — CLAUDE.md §9.
@@ -31,20 +34,6 @@ export type AdminSession = {
 
 const SESSION_NAME = 'octeto_admin'
 const DEFAULT_MAX_AGE_HOURS = 8
-/** `sealSession` requires at least 32 characters of key material. */
-const MIN_SECRET_LENGTH = 32
-
-function requireSessionSecret(): string {
-  const secret = process.env.SESSION_SECRET
-
-  if (!secret || secret.length < MIN_SECRET_LENGTH) {
-    throw new Error(
-      `SESSION_SECRET must be set and at least ${MIN_SECRET_LENGTH} characters. Generate one with: openssl rand -base64 32`,
-    )
-  }
-
-  return secret
-}
 
 /**
  * Session lifetime. Eight hours by default (§9) — long enough to survive a
@@ -63,24 +52,21 @@ export function sessionMaxAgeSeconds(): number {
 }
 
 /**
- * No top-level `maxAge` on purpose. h3 measures that from the session's
- * `createdAt`, which `update()` never moves — so it is an absolute lifetime
- * from sign-in, and the window could never slide. Expiry is decided by
- * `isSessionFresh` against `lastSeenAt` instead, and the cookie's own Max-Age
- * is re-issued on every `update()`, so the browser's copy slides with it.
+ * `ttl` is renewed on every `save()`, so the seal and the cookie's Max-Age
+ * both slide with activity. `isSessionFresh` re-checks `lastSeenAt` on top, so
+ * the window is enforced by data the server sealed, not only by the browser.
  */
-function sessionConfig() {
+function sessionOptions() {
   return {
+    cookieName: SESSION_NAME,
     password: requireSessionSecret(),
-    name: SESSION_NAME,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: sessionMaxAgeSeconds(),
-    },
-  } as const
+    ttl: sessionMaxAgeSeconds(),
+    cookieOptions: sessionCookieOptions(),
+  }
+}
+
+function openAdminSession() {
+  return openSealedSession<AdminSessionData>(sessionOptions())
 }
 
 /**
@@ -110,34 +96,33 @@ export function isSessionFresh(
  * `ALLOWED_ADMIN_EMAILS` take effect immediately.
  */
 export async function readAdminSession(): Promise<AdminSession | null> {
-  const session = await useSession<AdminSessionData>(sessionConfig())
-  const data = session.data
+  const session = await openAdminSession()
+  const { email } = session
 
-  if (!data?.email) return null
+  if (!email) return null
 
-  if (!isSessionFresh(data, sessionMaxAgeSeconds(), Date.now())) {
-    await session.clear()
+  if (!isSessionFresh(session, sessionMaxAgeSeconds(), Date.now())) {
+    session.destroy()
     return null
   }
 
-  if (!isAllowedAdmin(data.email, process.env.ALLOWED_ADMIN_EMAILS)) {
-    await session.clear()
+  if (!isAllowedAdmin(email, process.env.ALLOWED_ADMIN_EMAILS)) {
+    session.destroy()
     return null
   }
 
-  return { email: data.email }
+  return { email }
 }
 
 /** Issues a session. Only ever called after the allowlist check has passed. */
 export async function createAdminSession(email: string): Promise<void> {
-  const session = await useSession<AdminSessionData>(sessionConfig())
+  const session = await openAdminSession()
   const now = Date.now()
 
-  await session.update({
-    email: email.trim().toLowerCase(),
-    issuedAt: now,
-    lastSeenAt: now,
-  })
+  session.email = email.trim().toLowerCase()
+  session.issuedAt = now
+  session.lastSeenAt = now
+  await session.save()
 }
 
 /**
@@ -145,14 +130,15 @@ export async function createAdminSession(email: string): Promise<void> {
  * re-issues the cookie, so `Max-Age` restarts from now.
  */
 export async function touchAdminSession(): Promise<void> {
-  const session = await useSession<AdminSessionData>(sessionConfig())
-  if (!session.data?.email) return
+  const session = await openAdminSession()
+  if (!session.email) return
 
-  await session.update((current) => ({ ...current, lastSeenAt: Date.now() }))
+  session.lastSeenAt = Date.now()
+  await session.save()
 }
 
 /** Destroys the session — on sign-out, and on a refused sign-in (§9). */
 export async function destroyAdminSession(): Promise<void> {
-  const session = await useSession<AdminSessionData>(sessionConfig())
-  await session.clear()
+  const session = await openAdminSession()
+  session.destroy()
 }

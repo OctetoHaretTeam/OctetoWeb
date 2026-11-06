@@ -1,7 +1,12 @@
 import crypto from 'node:crypto'
 
-import { useSession } from '@tanstack/react-start/server'
 import { z } from 'zod'
+
+import {
+  openSealedSession,
+  requireSessionSecret,
+  sessionCookieOptions,
+} from './sealed-session'
 
 /**
  * Google sign-in — CLAUDE.md §9.
@@ -59,23 +64,14 @@ function requireEnv(name: string): string {
   return value
 }
 
-function oauthSessionConfig() {
-  const password = process.env.SESSION_SECRET
-  if (!password || password.length < 32) {
-    throw new Error('SESSION_SECRET must be set and at least 32 characters.')
-  }
-
-  return {
-    password,
-    name: OAUTH_COOKIE,
-    maxAge: OAUTH_TTL_SECONDS,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    },
-  } as const
+/** Short-lived and saved once, so `ttl` is an absolute ten-minute limit. */
+function openOAuthAttempt() {
+  return openSealedSession<OAuthAttempt>({
+    cookieName: OAUTH_COOKIE,
+    password: requireSessionSecret(),
+    ttl: OAUTH_TTL_SECONDS,
+    cookieOptions: sessionCookieOptions(),
+  })
 }
 
 /**
@@ -89,8 +85,11 @@ export async function beginGoogleOAuth(returnTo?: string | null): Promise<string
     crypto.createHash('sha256').update(verifier).digest(),
   )
 
-  const session = await useSession<OAuthAttempt>(oauthSessionConfig())
-  await session.update({ state, verifier, returnTo: safeReturnPath(returnTo) })
+  const session = await openOAuthAttempt()
+  session.state = state
+  session.verifier = verifier
+  session.returnTo = safeReturnPath(returnTo)
+  await session.save()
 
   const url = new URL(AUTHORIZE_ENDPOINT)
   url.searchParams.set('response_type', 'code')
@@ -150,12 +149,16 @@ export async function completeGoogleOAuth(
   code: string | null,
   state: string | null,
 ): Promise<OAuthResult> {
-  const session = await useSession<OAuthAttempt>(oauthSessionConfig())
-  const attempt = session.data
+  const session = await openOAuthAttempt()
+  const attempt = {
+    state: session.state,
+    verifier: session.verifier,
+    returnTo: session.returnTo,
+  }
   // One attempt per cookie: clear it immediately so a code cannot be replayed.
-  await session.clear()
+  session.destroy()
 
-  if (!code || !state || !attempt?.state || !attempt.verifier) {
+  if (!code || !state || !attempt.state || !attempt.verifier) {
     return { ok: false, reason: 'state' }
   }
 
