@@ -13,6 +13,7 @@ import {
   withLocale,
 } from '@/i18n/locale'
 import { persistLocalePreference, resolveLocale } from '@/i18n/resolve-locale'
+import { useDictionary } from '@/i18n/use-locale'
 import { absoluteUrl } from '@/lib/site'
 import { getContactInfo } from '@/server/contact'
 
@@ -93,6 +94,7 @@ export const Route = createFileRoute('/$locale')({
 
 function LocaleLayout() {
   const contact = Route.useLoaderData()
+  const dictionary = useDictionary()
 
   /*
    * The layout ground is the PAPER layer (§7.1). Every page except the home
@@ -108,8 +110,17 @@ function LocaleLayout() {
       data-branch="non_tech"
       className="bg-branch-ground text-branch-text flex min-h-screen flex-col"
     >
+      {/* First tab stop on every page (§7.7): past the nav and the switcher
+          in one key press. A plain fragment link, so it works before
+          hydration like the language switcher does. */}
+      <a
+        href="#continut"
+        className="bg-paper text-ink sr-only rounded-md px-4 py-2 text-sm font-semibold focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60]"
+      >
+        {dictionary.site.skipToContent}
+      </a>
       <SiteHeader />
-      <div className="flex flex-1 flex-col">
+      <div id="continut" tabIndex={-1} className="flex flex-1 flex-col">
         <Outlet />
       </div>
       <SiteFooter info={contact} />

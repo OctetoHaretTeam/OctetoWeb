@@ -24,15 +24,22 @@ export function assertSameOrigin(): void {
 
   if (request.method === 'GET' || request.method === 'HEAD') return
 
+  if (!hasSameOrigin(request)) throw new UnauthorizedError()
+}
+
+/**
+ * The one Origin comparison every mutation shares — server functions, the
+ * upload route and sign-out. A missing, `null` or malformed Origin fails
+ * closed rather than throwing.
+ */
+export function hasSameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin')
   const expected = getRequestUrl({
     xForwardedHost: true,
     xForwardedProto: true,
   }).origin
 
-  if (!origin || safeOrigin(origin) !== expected) {
-    throw new UnauthorizedError()
-  }
+  return origin !== null && safeOrigin(origin) === expected
 }
 
 /**

@@ -93,6 +93,24 @@ describe('the form schema refuses bad input', () => {
     ).toBe(false)
   })
 
+  test('a link that is not http(s) — it is rendered as a public href', () => {
+    for (const instagramUrl of [
+      'javascript:alert(1)',
+      'data:text/html,<script>alert(1)</script>',
+      'file:///etc/passwd',
+    ]) {
+      expect(
+        teamMemberFormSchema.safeParse({ ...VALID, instagramUrl }).success,
+      ).toBe(false)
+    }
+    expect(
+      teamMemberFormSchema.safeParse({
+        ...VALID,
+        instagramUrl: 'https://instagram.com/octetoharet.ftc',
+      }).success,
+    ).toBe(true)
+  })
+
   test('consent flags must be explicit booleans, never omitted', () => {
     const { photoConsent: _p, ...withoutPhoto } = VALID
     expect(teamMemberFormSchema.safeParse(withoutPhoto).success).toBe(false)

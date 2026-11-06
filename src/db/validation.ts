@@ -11,6 +11,7 @@ import {
   imageSchema,
   performanceMetricsSchema,
   socialLinksSchema,
+  webUrlSchema,
 } from '@/lib/schemas'
 import {
   NON_TECH_CATEGORIES,
@@ -54,7 +55,7 @@ export const seasonInsertSchema = createInsertSchema(season, {
   slug,
   coverImage: imageSchema.nullish(),
   gallery: gallerySchema.optional(),
-  portfolioUrl: z.url().nullish(),
+  portfolioUrl: webUrlSchema.nullish(),
 })
 export const seasonSelectSchema = createSelectSchema(season, {
   coverImage: imageSchema.nullable(),
@@ -78,7 +79,7 @@ export const teamMemberInsertSchema = createInsertSchema(teamMember, {
   slug,
   name: z.string().min(1).max(120),
   image: imageSchema.nullish(),
-  instagramUrl: z.url().nullish(),
+  instagramUrl: webUrlSchema.nullish(),
   octetIndex: z.int().min(0).max(255),
 })
 export const teamMemberSelectSchema = createSelectSchema(teamMember, {
@@ -156,7 +157,7 @@ export const sponsorInsertSchema = createInsertSchema(sponsor, {
   name: z.string().min(1).max(160),
   logo: imageSchema,
   logoDark: imageSchema.nullish(),
-  websiteUrl: z.url().nullish(),
+  websiteUrl: webUrlSchema.nullish(),
   activeSeasons: z.array(slug).optional(),
 })
 export const sponsorSelectSchema = createSelectSchema(sponsor, {

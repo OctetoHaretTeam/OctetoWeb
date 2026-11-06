@@ -5,8 +5,8 @@ import { rateLimit } from '@/server/rate-limit'
 import {
   countryFromHeaders,
   localeForScan,
+  logScan,
   lookupCode,
-  recordScan,
 } from '@/server/qr.server'
 
 /**
@@ -38,9 +38,7 @@ export const Route = createFileRoute('/q/$code')({
         if (blocked) return blocked
 
         const { pathname } = new URL(request.url)
-        const code = decodeURIComponent(
-          pathname.replace(/^\/q\/?/, ''),
-        ).trim()
+        const code = decodeCode(pathname.replace(/^\/q\/?/, ''))
 
         if (!code) return unknown()
 
@@ -50,9 +48,8 @@ export const Route = createFileRoute('/q/$code')({
         // scanning gets a designed page either way, never a raw 404 (§6).
         if (!resolved || !resolved.isActive) return unknown()
 
-        // Awaited: see recordScan for why the fire-and-forget version was
-        // removed. A single insert costs a few milliseconds.
-        await recordScan(resolved.id, countryFromHeaders(request.headers))
+        // Off the redirect path where the host allows it — see logScan.
+        await logScan(request, resolved.id, countryFromHeaders(request.headers))
 
         const locale = localeForScan(
           request.headers,
@@ -71,6 +68,19 @@ export const Route = createFileRoute('/q/$code')({
     },
   },
 })
+
+/**
+ * A damaged print or a scanner that mangles the URL can send a malformed
+ * escape like `%E0%A4`, on which `decodeURIComponent` throws. That is an
+ * unknown code, not a server error (§6).
+ */
+function decodeCode(raw: string): string | null {
+  try {
+    return decodeURIComponent(raw).trim()
+  } catch {
+    return null
+  }
+}
 
 function unknown() {
   return new Response(null, {

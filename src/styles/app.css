@@ -76,6 +76,14 @@ body {
     text-wrap: pretty;
   }
 
+  /* The header is sticky from `lg` up (site-header.tsx). Without this, anchor
+     jumps and focus scrolling land the target underneath it. */
+  @media (width >= 64rem) {
+    html {
+      scroll-padding-top: 5rem;
+    }
+  }
+
 }
 
 /* ── Focus ring — CLAUDE.md §7.7 ──────────────────────────────────────────
@@ -99,6 +107,15 @@ body {
   outline: 2px solid var(--color-ink);
   outline-offset: 1px;
   box-shadow: 0 0 0 4px var(--color-signal);
+}
+
+/* Pictures are shown whole — never cropped or stretched to fill their frame.
+   The frame keeps its fixed aspect ratio, so nothing shifts while it loads
+   (§12), and whatever the picture leaves uncovered reads as a paper mat in
+   the branch's own surface colour rather than as a gap. */
+@utility image-fit {
+  object-fit: contain;
+  background-color: var(--branch-surface, transparent);
 }
 
 /* A complete label style, including its own size.

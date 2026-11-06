@@ -111,7 +111,7 @@ export function ImageField({
             alt=""
             width={value.width}
             height={value.height}
-            className="h-24 w-24 rounded object-cover"
+            className="h-24 w-24 rounded image-fit"
           />
 
           <div className="min-w-0 flex-1 space-y-2">

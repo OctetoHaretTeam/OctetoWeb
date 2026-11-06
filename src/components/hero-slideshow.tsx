@@ -129,7 +129,7 @@ export function HeroSlideshow({
               // land on a photo that isn't actually showing.
               aria-hidden={isActive ? undefined : true}
               className={cn(
-                'absolute inset-0 h-full w-full object-cover transition-opacity duration-700',
+                'absolute inset-0 h-full w-full image-fit transition-opacity duration-700',
                 isActive ? 'opacity-100' : 'opacity-0',
               )}
             />

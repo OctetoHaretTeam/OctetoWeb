@@ -19,7 +19,7 @@ import { isAllowedAdmin } from './allowlist'
 
 export type AdminSessionData = {
   email: string
-  /** When the session was first issued. Bounds the sliding window. */
+  /** When the session was first issued. Informational; expiry uses `lastSeenAt`. */
   issuedAt: number
   /** Refreshed on activity — this is what makes the window slide. */
   lastSeenAt: number
@@ -62,16 +62,23 @@ export function sessionMaxAgeSeconds(): number {
   )
 }
 
+/**
+ * No top-level `maxAge` on purpose. h3 measures that from the session's
+ * `createdAt`, which `update()` never moves — so it is an absolute lifetime
+ * from sign-in, and the window could never slide. Expiry is decided by
+ * `isSessionFresh` against `lastSeenAt` instead, and the cookie's own Max-Age
+ * is re-issued on every `update()`, so the browser's copy slides with it.
+ */
 function sessionConfig() {
   return {
     password: requireSessionSecret(),
     name: SESSION_NAME,
-    maxAge: sessionMaxAgeSeconds(),
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
+      maxAge: sessionMaxAgeSeconds(),
     },
   } as const
 }

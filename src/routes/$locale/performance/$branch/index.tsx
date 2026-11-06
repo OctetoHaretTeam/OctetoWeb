@@ -107,7 +107,7 @@ function BranchIndex() {
                           height={entry.coverImage.height}
                           loading="lazy"
                           decoding="async"
-                          className="h-full w-full object-cover"
+                          className="h-full w-full image-fit"
                         />
                       ) : (
                         <div className="bg-branch-ground h-full w-full" />

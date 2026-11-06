@@ -73,7 +73,7 @@ export function MemberPhoto({
           fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
           onError={() => setFailed(true)}
-          className="h-full w-full object-cover"
+          className="h-full w-full image-fit"
         />
       ) : (
         <div

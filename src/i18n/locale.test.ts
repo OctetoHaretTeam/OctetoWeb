@@ -3,10 +3,12 @@ import { describe, expect, test } from 'bun:test'
 import {
   DEFAULT_LOCALE,
   LOCALES,
+  cookieValue,
   isLocale,
   localeFromPathname,
   otherLocale,
   parseAcceptLanguage,
+  pickLocale,
   stripLocale,
   withLocale,
 } from './locale'
@@ -145,5 +147,33 @@ describe('locale helpers', () => {
   test('Romanian is the default', () => {
     expect(DEFAULT_LOCALE).toBe('ro')
     expect(LOCALES).toEqual(['ro', 'en'])
+  })
+})
+
+describe('pickLocale', () => {
+  test('the cookie wins over Accept-Language', () => {
+    expect(pickLocale('ro', 'en-US')).toBe('ro')
+  })
+
+  test('falls through to Accept-Language, then Romanian', () => {
+    expect(pickLocale(undefined, 'en-GB')).toBe('en')
+    expect(pickLocale('fr', 'de')).toBe('ro')
+    expect(pickLocale(null, null)).toBe('ro')
+  })
+})
+
+describe('cookieValue', () => {
+  test('finds one cookie among several, with or without spaces', () => {
+    expect(cookieValue('a=1; locale=en; b=2', 'locale')).toBe('en')
+    expect(cookieValue('a=1;locale=ro', 'locale')).toBe('ro')
+  })
+
+  test('does not match a cookie whose name merely ends the same', () => {
+    expect(cookieValue('xlocale=en', 'locale')).toBeUndefined()
+  })
+
+  test('absent header or cookie', () => {
+    expect(cookieValue(null, 'locale')).toBeUndefined()
+    expect(cookieValue('a=1', 'locale')).toBeUndefined()
   })
 })

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { imageSchema } from '@/lib/schemas'
+import { imageSchema, webUrlSchema } from '@/lib/schemas'
 import { slugSchema } from './primitives'
 
 /**
@@ -24,7 +24,7 @@ export const teamMemberFormSchema = z.object({
   descriptionRo: z.string().nullable(),
   descriptionEn: z.string().nullable(),
   image: imageSchema.nullable(),
-  instagramUrl: z.url('Adresa nu pare validă.').nullable(),
+  instagramUrl: webUrlSchema.nullable(),
   octetIndex: z
     .int('Introdu un număr întreg.')
     .min(0, 'Minim 0.')

@@ -1,12 +1,6 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 
-import {
-  DEFAULT_LOCALE,
-  LOCALE_COOKIE,
-  type Locale,
-  isLocale,
-  parseAcceptLanguage,
-} from './locale'
+import { LOCALE_COOKIE, type Locale, cookieValue, pickLocale } from './locale'
 import { persistLocale, resolveRequestLocale } from './locale.server'
 
 /**
@@ -22,19 +16,13 @@ import { persistLocale, resolveRequestLocale } from './locale.server'
  */
 export const resolveLocale = createIsomorphicFn()
   .server((): Locale => resolveRequestLocale())
-  .client((): Locale => {
-    const cookie = document.cookie
-      .split('; ')
-      .find((entry) => entry.startsWith(`${LOCALE_COOKIE}=`))
-      ?.slice(LOCALE_COOKIE.length + 1)
-
-    if (isLocale(cookie)) return cookie
-
-    return (
-      parseAcceptLanguage(navigator.languages?.join(',') ?? navigator.language) ??
-      DEFAULT_LOCALE
-    )
-  })
+  .client(
+    (): Locale =>
+      pickLocale(
+        cookieValue(document.cookie, LOCALE_COOKIE),
+        navigator.languages?.join(',') ?? navigator.language,
+      ),
+  )
 
 /**
  * Writes the `locale` cookie so the choice survives the next visit — including

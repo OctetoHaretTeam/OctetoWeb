@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless'
+import type { BatchItem } from 'drizzle-orm/batch'
 import {
   type NeonHttpDatabase,
   drizzle as drizzleNeon,
@@ -139,3 +140,28 @@ export const db: Database = databaseUrl
 
 /** True when running against the throwaway local database rather than Neon. */
 export const isLocalDb = !databaseUrl
+
+/**
+ * Runs several writes as one unit, in order.
+ *
+ * NOT `db.transaction(...)`: neon-http throws on every `.transaction()` call.
+ * Its `batch()` is the supported alternative — one HTTP round trip, run inside
+ * a single transaction on Neon's side, so it is atomic AND cheaper than
+ * awaiting each statement in turn.
+ *
+ * PGlite has no `batch()`, so locally the statements run one after another.
+ * That loses atomicity only in development, against a throwaway database.
+ */
+export async function runBatch(
+  queries: ReadonlyArray<BatchItem<'pg'> & PromiseLike<unknown>>,
+): Promise<void> {
+  const [first, ...rest] = queries
+  if (!first) return
+
+  if (isLocalDb) {
+    for (const query of queries) await query
+    return
+  }
+
+  await db.batch([first, ...rest])
+}

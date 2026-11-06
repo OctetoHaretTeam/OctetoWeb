@@ -54,7 +54,7 @@ function SeasonIndex() {
                       height={season.coverImage.height}
                       loading={index === 0 ? 'eager' : 'lazy'}
                       decoding="async"
-                      className="aspect-[3/2] w-full rounded-md object-cover"
+                      className="aspect-[3/2] w-full rounded-md image-fit"
                     />
                   ) : (
                     <div className="bg-branch-surface aspect-[3/2] w-full rounded-md" />

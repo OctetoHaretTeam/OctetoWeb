@@ -130,7 +130,7 @@ export function GalleryField({
                 alt=""
                 width={image.width}
                 height={image.height}
-                className="h-16 w-16 rounded object-cover"
+                className="h-16 w-16 rounded image-fit"
               />
 
               <div className="min-w-0 flex-1 space-y-1.5">

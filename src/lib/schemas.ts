@@ -8,6 +8,18 @@ import { z } from 'zod'
  * so the table definition and the validator cannot drift apart.
  */
 
+/**
+ * An outbound link that ends up as a public `<a href>`.
+ *
+ * A bare `z.url()` accepts any scheme the URL parser does — `javascript:`,
+ * `data:`, `file:` — so an admin field could publish a script link on a member
+ * page. Pinned to http(s), the only schemes a real profile or website uses.
+ */
+export const webUrlSchema = z.url({
+  protocol: /^https?$/,
+  error: 'Adresa nu pare validă — trebuie să înceapă cu https://.',
+})
+
 /** Bilingual alt text. `en` is optional — CLAUDE.md §5 falls back to `ro`. */
 export const altTextSchema = z.object({
   ro: z.string().min(1, 'Textul alternativ în română este obligatoriu.'),
@@ -70,13 +82,13 @@ export const performanceMetricsSchema = z.object({
  * an open record so a typo becomes a validation error instead of a dead icon.
  */
 export const socialLinksSchema = z.object({
-  instagram: z.url().optional(),
-  tiktok: z.url().optional(),
-  facebook: z.url().optional(),
-  youtube: z.url().optional(),
-  github: z.url().optional(),
+  instagram: webUrlSchema.optional(),
+  tiktok: webUrlSchema.optional(),
+  facebook: webUrlSchema.optional(),
+  youtube: webUrlSchema.optional(),
+  github: webUrlSchema.optional(),
   /** Sister FLL team — linked from the About page (CLAUDE.md §1). */
-  instagramFll: z.url().optional(),
+  instagramFll: webUrlSchema.optional(),
 })
 
 export type AltText = z.infer<typeof altTextSchema>

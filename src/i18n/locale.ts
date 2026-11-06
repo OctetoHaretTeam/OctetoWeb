@@ -119,6 +119,31 @@ export function parseAcceptLanguage(
   return null
 }
 
+/**
+ * The resolution order the whole site depends on (§6, §11): the `locale`
+ * cookie, then `Accept-Language`, then Romanian. The one copy of that rule —
+ * the bare `/` redirect, the client fallback and the QR resolver all call it.
+ */
+export function pickLocale(
+  cookie: string | null | undefined,
+  acceptLanguage: string | null | undefined,
+): Locale {
+  if (isLocale(cookie)) return cookie
+  return parseAcceptLanguage(acceptLanguage) ?? DEFAULT_LOCALE
+}
+
+/** Reads one cookie's value out of a raw `Cookie` header. */
+export function cookieValue(
+  header: string | null | undefined,
+  name: string,
+): string | undefined {
+  return header
+    ?.split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`))
+    ?.slice(name.length + 1)
+}
+
 function normalize(pathname: string): string {
   if (!pathname.startsWith('/')) return `/${pathname}`
   return pathname === '' ? '/' : pathname

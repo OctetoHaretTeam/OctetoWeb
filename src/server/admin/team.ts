@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { asc, eq, sql } from 'drizzle-orm'
 import { z } from 'zod'
 
-import { db } from '@/db'
+import { db, runBatch } from '@/db'
 import { teamMember } from '@/db/schema'
 import { teamMemberFormSchema } from '@/lib/forms/team-member'
 import { adminMiddleware } from '@/server/auth/middleware'
@@ -139,25 +139,21 @@ export const adminDeleteTeamMember = createServerFn({ method: 'POST' })
   })
 
 /**
- * Persists a new order (§10).
- *
- * NOT wrapped in `db.transaction(...)`: production runs on
- * `drizzle-orm/neon-http`, whose `.transaction()` unconditionally throws "No
- * transactions support in neon-http driver" — it never worked in production,
- * only in local dev (PGlite, a driver that does support transactions). A
- * half-applied reorder here is a stale display position, self-healing on the
- * next successful reorder, not a correctness risk worth a driver change.
+ * Persists a new order (§10), as one atomic batch — see `runBatch` for why it
+ * is not `db.transaction(...)`.
  */
 export const adminReorderTeamMembers = createServerFn({ method: 'POST' })
   .middleware([adminMiddleware])
   .validator(z.object({ slugs: z.array(z.string().min(1)).min(1) }))
   .handler(async ({ data }) => {
-    for (const [index, slug] of data.slugs.entries()) {
-      await db
-        .update(teamMember)
-        .set({ displayOrder: index })
-        .where(eq(teamMember.slug, slug))
-    }
+    await runBatch(
+      data.slugs.map((slug, index) =>
+        db
+          .update(teamMember)
+          .set({ displayOrder: index })
+          .where(eq(teamMember.slug, slug)),
+      ),
+    )
 
     return { ok: true }
   })

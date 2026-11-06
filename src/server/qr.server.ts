@@ -1,10 +1,13 @@
 import { eq } from 'drizzle-orm'
 
-import { db } from '@/db'
+import { db, isLocalDb } from '@/db'
 import { qrCode, qrScan } from '@/db/schema'
-import { DEFAULT_LOCALE, type Locale, parseAcceptLanguage } from '@/i18n/locale'
-import { isLocale } from '@/i18n/locale'
-import { LOCALE_COOKIE } from '@/i18n/locale'
+import {
+  LOCALE_COOKIE,
+  type Locale,
+  cookieValue,
+  pickLocale,
+} from '@/i18n/locale'
 
 /**
  * QR scan resolution — CLAUDE.md §6.
@@ -36,15 +39,10 @@ export function countryFromHeaders(headers: Headers): string | null {
  * should land on English without touching the toggle (§6).
  */
 export function localeForScan(headers: Headers, cookieHeader: string | null): Locale {
-  const cookie = cookieHeader
-    ?.split(';')
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${LOCALE_COOKIE}=`))
-    ?.slice(LOCALE_COOKIE.length + 1)
-
-  if (isLocale(cookie)) return cookie
-
-  return parseAcceptLanguage(headers.get('accept-language')) ?? DEFAULT_LOCALE
+  return pickLocale(
+    cookieValue(cookieHeader, LOCALE_COOKIE),
+    headers.get('accept-language'),
+  )
 }
 
 export type ResolvedCode = {
@@ -73,21 +71,43 @@ export async function lookupCode(code: string): Promise<ResolvedCode | null> {
  * Stores only the code, the time, and a coarse country. **No IP, no user
  * agent, no precise location, no device identifier** (§6, §8) — this is the
  * site's only telemetry and it holds nothing personal.
- *
- * §6 asks for this not to block the redirect, and it originally did not await.
- * That is now `await`ed instead: an un-awaited write is a loose database call
- * that can overlap anything else in flight, and against the local WASM
- * database that is what corrupted the whole data directory once already. A
- * single indexed insert costs a few milliseconds — far cheaper than the class
- * of bug the alternative buys.
  */
-export async function recordScan(
-  qrCodeId: string,
-  country: string | null,
-): Promise<void> {
+async function recordScan(qrCodeId: string, country: string | null): Promise<void> {
   try {
     await db.insert(qrScan).values({ qrCodeId, country })
   } catch {
     // A failed scan log must never surface to the person scanning.
   }
+}
+
+type BackgroundCapable = Request & {
+  waitUntil?: (promise: Promise<unknown>) => void
+}
+
+/**
+ * Logs a scan without holding the redirect (§6), whenever that is safe.
+ *
+ * On Neon the insert is handed to the host's `waitUntil`, so the 307 goes out
+ * immediately and the function stays alive until the write lands. A bare
+ * un-awaited promise is not enough on a serverless host — the instance can be
+ * frozen the moment the response is sent, and the scan is lost.
+ *
+ * Awaited instead in two cases: when the runtime offers no `waitUntil`, and
+ * against the local PGlite database, where an overlapping loose write is what
+ * corrupted the whole data directory once already.
+ */
+export async function logScan(
+  request: Request,
+  qrCodeId: string,
+  country: string | null,
+): Promise<void> {
+  const pending = recordScan(qrCodeId, country)
+  const { waitUntil } = request as BackgroundCapable
+
+  if (!isLocalDb && typeof waitUntil === 'function') {
+    waitUntil.call(request, pending)
+    return
+  }
+
+  await pending
 }

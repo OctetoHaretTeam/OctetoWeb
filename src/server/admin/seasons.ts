@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { asc, desc, eq, ne, sql } from 'drizzle-orm'
 import { z } from 'zod'
 
-import { db } from '@/db'
+import { db, runBatch } from '@/db'
 import { award, season } from '@/db/schema'
 import { awardFormSchema, seasonFormSchema } from '@/lib/forms/entities'
 import { adminMiddleware } from '@/server/auth/middleware'
@@ -49,20 +49,15 @@ export const adminGetSeason = createServerFn({ method: 'GET' })
 
 /**
  * Only one season may be current (§5 enforces it with a partial unique
- * index), so every caller clears the rest BEFORE setting its own row — never
- * the other way round, or the constraint trips.
+ * index), so the rest are cleared BEFORE the row is written — never the other
+ * way round, or the constraint trips.
  *
- * Not run inside `db.transaction(...)`: production's driver
- * (`drizzle-orm/neon-http`) throws unconditionally on `.transaction()` calls
- * (see the comment on adminReorderHomeSlides in server/admin/misc.ts). The
- * clear-then-set ORDER is what keeps the constraint satisfied at every
- * intermediate step even without atomicity — the only residual risk is the
- * second statement failing after the first succeeds, which leaves zero
- * current seasons rather than a constraint violation, and is repaired by
- * simply retrying.
+ * Both statements go through `runBatch`, so on Neon they commit or fail
+ * together: a write that fails after the clear (a slug race on the unique
+ * index, say) can no longer leave the site with no current season.
  */
-async function clearOtherCurrent(keepId: string | null) {
-  await db
+function clearOtherCurrent(keepId: string | null) {
+  return db
     .update(season)
     .set({ isCurrent: false })
     .where(keepId ? ne(season.id, keepId) : sql`true`)
@@ -82,8 +77,8 @@ export const adminCreateSeason = createServerFn({ method: 'POST' })
       return { ok: false as const, error: 'slug-taken' as const }
     }
 
-    if (data.isCurrent) await clearOtherCurrent(null)
-    await db.insert(season).values(data)
+    const write = db.insert(season).values(data)
+    await runBatch(data.isCurrent ? [clearOtherCurrent(null), write] : [write])
 
     return { ok: true as const, slug: data.slug }
   })
@@ -115,8 +110,10 @@ export const adminUpdateSeason = createServerFn({ method: 'POST' })
       }
     }
 
-    if (data.values.isCurrent) await clearOtherCurrent(row.id)
-    await db.update(season).set(data.values).where(eq(season.id, row.id))
+    const write = db.update(season).set(data.values).where(eq(season.id, row.id))
+    await runBatch(
+      data.values.isCurrent ? [clearOtherCurrent(row.id), write] : [write],
+    )
 
     return { ok: true as const, slug: data.values.slug }
   })

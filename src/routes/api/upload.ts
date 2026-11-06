@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import crypto from 'node:crypto'
 
+import { hasSameOrigin } from '@/server/auth/guards.server'
 import { readAdminSession } from '@/server/auth/session'
 import { rateLimit } from '@/server/rate-limit'
 import {
@@ -50,8 +51,7 @@ export const Route = createFileRoute('/api/upload')({
 
         // Same-origin only. The session cookie is SameSite=Lax, which does not
         // stop a POST from a sibling subdomain.
-        const origin = request.headers.get('origin')
-        if (!origin || new URL(origin).origin !== new URL(request.url).origin) {
+        if (!hasSameOrigin(request)) {
           return new Response('Forbidden', { status: 403 })
         }
 

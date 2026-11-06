@@ -5,6 +5,8 @@ import {
   gallerySchema,
   imageSchema,
   performanceMetricsSchema,
+  socialLinksSchema,
+  webUrlSchema,
 } from '@/lib/schemas'
 import { slugSchema, unprefixedPathSchema } from './primitives'
 
@@ -21,7 +23,7 @@ import { slugSchema, unprefixedPathSchema } from './primitives'
 
 /** Empty strings are not the same as absent — §5 relies on the difference. */
 const nullableText = z.string().nullable()
-const nullableUrl = z.url('Adresa nu pare validă.').nullable()
+const nullableUrl = webUrlSchema.nullable()
 /** Drizzle returns `date` columns as `YYYY-MM-DD` strings. */
 const dateString = z
   .string()
@@ -190,14 +192,7 @@ export const teamInfoFormSchema = z.object({
     .regex(/^[A-Z]{2}$/, 'Cod de țară din două litere, cu majuscule.'),
   contactEmail: z.email('Adresa de email nu pare validă.'),
   phone: nullableText,
-  socialLinks: z.object({
-    instagram: z.url().optional(),
-    tiktok: z.url().optional(),
-    facebook: z.url().optional(),
-    youtube: z.url().optional(),
-    github: z.url().optional(),
-    instagramFll: z.url().optional(),
-  }),
+  socialLinks: socialLinksSchema,
   mapEmbedLat: z.number().min(-90).max(90).nullable(),
   mapEmbedLng: z.number().min(-180).max(180).nullable(),
 })

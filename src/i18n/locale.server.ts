@@ -4,13 +4,7 @@ import {
   setCookie,
 } from '@tanstack/react-start/server'
 
-import {
-  DEFAULT_LOCALE,
-  LOCALE_COOKIE,
-  type Locale,
-  isLocale,
-  parseAcceptLanguage,
-} from './locale'
+import { LOCALE_COOKIE, type Locale, pickLocale } from './locale'
 
 /**
  * Request-bound locale resolution — CLAUDE.md §11.
@@ -28,10 +22,7 @@ import {
  * which is the single highest-value place the language system pays off.
  */
 export function resolveRequestLocale(): Locale {
-  const cookie = getCookie(LOCALE_COOKIE)
-  if (isLocale(cookie)) return cookie
-
-  return parseAcceptLanguage(getRequestHeader('accept-language')) ?? DEFAULT_LOCALE
+  return pickLocale(getCookie(LOCALE_COOKIE), getRequestHeader('accept-language'))
 }
 
 /**

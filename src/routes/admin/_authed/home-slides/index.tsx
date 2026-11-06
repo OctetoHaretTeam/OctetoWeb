@@ -190,7 +190,7 @@ function AdminHomeSlides() {
                 alt=""
                 width={slide.image.width}
                 height={slide.image.height}
-                className="h-12 w-16 rounded object-cover"
+                className="h-12 w-16 rounded image-fit"
               />
               <span className="text-sm">{slide.captionRo ?? '—'}</span>
               {slide.linkPath ? (

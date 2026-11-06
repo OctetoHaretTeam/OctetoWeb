@@ -71,7 +71,7 @@ function NewsIndex() {
                         loading={index === 0 ? 'eager' : 'lazy'}
                         fetchPriority={index === 0 ? 'high' : 'auto'}
                         decoding="async"
-                        className="aspect-[3/2] w-full rounded-md object-cover"
+                        className="aspect-[3/2] w-full rounded-md image-fit"
                       />
                     ) : (
                       <div className="bg-branch-surface aspect-[3/2] w-full rounded-md" />

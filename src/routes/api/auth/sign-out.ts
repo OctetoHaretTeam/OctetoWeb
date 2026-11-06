@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { hasSameOrigin } from '@/server/auth/guards.server'
 import { destroyAdminSession } from '@/server/auth/session'
-import { getRequestUrl } from '@tanstack/react-start/server'
 
 /**
  * Signs out — CLAUDE.md §9.
@@ -26,13 +26,7 @@ export const Route = createFileRoute('/api/auth/sign-out')({
         }),
 
       POST: async ({ request }) => {
-        const origin = request.headers.get('origin')
-        const expected = getRequestUrl({
-          xForwardedHost: true,
-          xForwardedProto: true,
-        }).origin
-
-        if (!origin || safeOrigin(origin) !== expected) {
+        if (!hasSameOrigin(request)) {
           return new Response('Forbidden', { status: 403 })
         }
 
@@ -46,11 +40,3 @@ export const Route = createFileRoute('/api/auth/sign-out')({
     },
   },
 })
-
-function safeOrigin(value: string): string | null {
-  try {
-    return new URL(value).origin
-  } catch {
-    return null
-  }
-}
