@@ -49,7 +49,7 @@ function TeamPage() {
 
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
-      <div className="mx-auto w-full max-w-6xl space-y-12 px-4 py-10 sm:px-6">
+      <div className="mx-auto w-full max-w-7xl space-y-12 px-4 py-10 sm:px-6">
         {/*
           Heading only. The site tagline belongs in the document head and the
           site header, not repeated as a subtitle on every page.
@@ -70,15 +70,21 @@ function TeamPage() {
         {grouped.length === 0 ? (
           <EmptyRoster message={dictionary.empty.team} locale={locale} />
         ) : (
-          <div className="space-y-12">
+          <div className="grid gap-x-8 gap-y-12 lg:grid-cols-[repeat(auto-fit,minmax(16.5rem,1fr))] lg:items-start">
             {grouped.map((group, groupIndex) => (
-              <section key={group.branch} className="space-y-6">
+              <section key={group.branch} className="space-y-5">
                 <div className="flex items-center gap-2">
                   <h2 className="zine-btn bg-paper text-ink inline-block px-3.5 py-1 text-base font-black -rotate-1">
                     {branchLabel(group.branch, dictionary)}
                   </h2>
                 </div>
-                <ul className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                <ul
+                  className={
+                    group.members.length === 1
+                      ? 'grid grid-cols-1 gap-y-7'
+                      : 'grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))]'
+                  }
+                >
                   {group.members.map((member, index) => (
                     <MemberCard
                       key={member.slug}

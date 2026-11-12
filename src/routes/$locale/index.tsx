@@ -316,23 +316,35 @@ function Home() {
               <h2 className="branch-label text-branch-muted">
                 {dictionary.nav.sponsors}
               </h2>
-              <ul className="flex flex-wrap items-center gap-6">
+              <ul className="flex flex-wrap items-center gap-3">
                 {sponsors.map((item) => {
                   const logo = item.logoDark ?? item.logo
+                  const badgeTone = item.logoDark
+                    ? 'bg-carbon border-slate'
+                    : 'bg-sage border-slate'
                   return (
                     <li key={item.id}>
-                      <img
-                        src={logo.url}
-                        alt={item.name}
-                        width={logo.width}
-                        height={logo.height}
-                        loading="lazy"
-                        decoding="async"
+                      <Link
+                        to="/$locale/sponsors"
+                        params={{ locale }}
                         className={cn(
-                          'h-10 w-24 rounded-xs',
-                          imageFitClass(logo, 'contain'),
+                          'inline-flex h-12 w-28 items-center justify-center rounded-xl border px-3 py-1.5 transition-transform duration-200 hover:-translate-y-0.5',
+                          badgeTone,
                         )}
-                      />
+                      >
+                        <img
+                          src={logo.url}
+                          alt={item.name}
+                          width={logo.width}
+                          height={logo.height}
+                          loading="lazy"
+                          decoding="async"
+                          className={cn(
+                            'h-full w-full !bg-transparent drop-shadow-[0_1px_1px_rgba(10,12,9,0.28)]',
+                            imageFitClass(logo, 'contain'),
+                          )}
+                        />
+                      </Link>
                     </li>
                   )
                 })}

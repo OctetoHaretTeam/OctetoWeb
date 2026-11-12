@@ -15,10 +15,9 @@ import { getSponsors } from '@/server/sponsors'
 /**
  * The sponsor wall — CLAUDE.md §4.
  *
- * Paper treatment: each sponsor sits in its own light card so any logo —
- * whatever colour it ships in — reads cleanly, which is why the regular
- * `logo` is used rather than `logoDark` (that variant is for a dark ground,
- * and this page's cards are never one).
+ * Paper treatment: each sponsor sits in a roomy zine card, with a framed
+ * mid-sage logo stage (transparent image fill + subtle center lift) so both
+ * light/white marks and dark brand marks read clearly.
  */
 export const Route = createFileRoute('/$locale/sponsors/')({
   loader: () => getSponsors(),
@@ -76,21 +75,24 @@ function SponsorWall() {
             <p className="text-branch-muted">{dictionary.empty.sponsors}</p>
           </div>
         ) : (
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-7 md:grid-cols-2">
             {sponsors.map((sponsor, index) => {
               const logo = sponsor.logo
               const description = getLocalized(
                 bilingual(sponsor, 'description'),
                 locale,
               )
-              const tilt = ((index % 3) - 1) * 1.3
+              const tilt = ((index % 2 === 0 ? -1 : 1) * 0.8).toFixed(1)
+              const hostLabel = sponsor.websiteUrl
+                ? formatSponsorHost(sponsor.websiteUrl)
+                : null
 
               const cardContent = (
-                <>
+                <div className="flex h-full flex-col">
                   <div
                     className={cn(
-                      'ring-branch-border/40 bg-paper relative flex h-24 w-full items-center justify-center overflow-hidden rounded-lg shadow-inner ring-1 transition-transform duration-300 group-hover:scale-102',
-                      logo.fit === 'cover' ? 'p-0' : 'p-3',
+                      'border-ink bg-sage bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--color-paper)_26%,var(--color-sage)_74%),var(--color-sage)_78%)] relative flex h-32 w-full items-center justify-center overflow-hidden rounded-xl border-2 shadow-inner transition-transform duration-300 group-hover:scale-[1.015] sm:h-36',
+                      logo.fit === 'cover' ? 'p-0' : 'p-4',
                     )}
                   >
                     <img
@@ -98,42 +100,45 @@ function SponsorWall() {
                       alt={getLocalized(logo.alt, locale)?.value ?? sponsor.name}
                       width={logo.width}
                       height={logo.height}
-                      loading={index < 3 ? 'eager' : 'lazy'}
+                      loading={index < 4 ? 'eager' : 'lazy'}
                       decoding="async"
                       className={cn(
-                        'h-full w-full drop-shadow-xs',
+                        'h-full w-full !bg-transparent drop-shadow-[0_1px_2px_rgba(10,12,9,0.38)]',
                         imageFitClass(logo, 'contain'),
                       )}
                     />
                   </div>
 
-                  <div className="mt-3 space-y-1 pt-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-ink font-display text-lg font-bold">
+                  <div className="mt-4 flex flex-1 flex-col gap-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h2 className="text-ink font-display text-xl font-black sm:text-2xl">
                         {sponsor.name}
-                      </p>
-                      {sponsor.websiteUrl ? (
-                        <ExternalLink
-                          aria-hidden="true"
-                          className="text-slate/60 size-4 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                        />
+                      </h2>
+                      {hostLabel ? (
+                        <span className="border-ink bg-gold/65 text-ink inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 font-mono text-2xs font-bold transition-colors group-hover:bg-gold">
+                          {hostLabel}
+                          <ExternalLink
+                            aria-hidden="true"
+                            className="size-3 shrink-0"
+                          />
+                        </span>
                       ) : null}
                     </div>
 
                     {description ? (
-                      <p className="text-slate/80 text-sm leading-relaxed">
+                      <p className="text-ink/85 text-sm leading-relaxed sm:text-[15px]">
                         {description.value}
                       </p>
                     ) : null}
                   </div>
-                </>
+                </div>
               )
 
               return (
                 <li
                   key={sponsor.id}
                   style={{ transform: `rotate(${tilt}deg)` }}
-                  className="zine-card-paper group relative rounded-2xl p-5 transition-all duration-300 hover:rotate-0"
+                  className="zine-card-paper group relative rounded-2xl p-5 transition-all duration-300 hover:rotate-0 sm:p-6"
                 >
                   <span
                     aria-hidden="true"
@@ -144,7 +149,7 @@ function SponsorWall() {
                       href={sponsor.websiteUrl}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="block no-underline"
+                      className="block h-full no-underline"
                     >
                       {cardContent}
                     </a>
@@ -200,4 +205,12 @@ function SponsorsError() {
       </div>
     </BranchTheme>
   )
+}
+
+function formatSponsorHost(rawUrl: string): string {
+  try {
+    return new URL(rawUrl).hostname.replace(/^www\./, '')
+  } catch {
+    return rawUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0] ?? rawUrl
+  }
 }
