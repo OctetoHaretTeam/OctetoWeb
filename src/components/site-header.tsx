@@ -16,12 +16,12 @@ import { useDictionary, useLocale } from '@/i18n/use-locale'
  * it to be visible and never hidden inside a menu.
  */
 const NAV = [
-  { to: '/$locale/performance', key: 'performance' },
-  { to: '/$locale/team', key: 'team' },
-  { to: '/$locale/news', key: 'news' },
-  { to: '/$locale/seasons', key: 'seasons' },
-  { to: '/$locale/sponsors', key: 'sponsors' },
-  { to: '/$locale/about', key: 'about' },
+  { to: '/$locale/performance', key: 'performance', tilt: 'hover:-rotate-2' },
+  { to: '/$locale/team', key: 'team', tilt: 'hover:rotate-2' },
+  { to: '/$locale/news', key: 'news', tilt: 'hover:-rotate-1' },
+  { to: '/$locale/seasons', key: 'seasons', tilt: 'hover:rotate-1' },
+  { to: '/$locale/sponsors', key: 'sponsors', tilt: 'hover:-rotate-2' },
+  { to: '/$locale/about', key: 'about', tilt: 'hover:rotate-2' },
 ] as const
 
 export function SiteHeader() {
@@ -29,40 +29,42 @@ export function SiteHeader() {
   const dictionary = useDictionary()
 
   return (
-    // `data-branch="tech"` pins the bar to the ink layer whatever the page
-    // below it uses. The pages are on sage now, and a sage header on a sage
-    // page loses the boundary between chrome and content entirely.
-    //
-    // `lg:sticky` — desktop only. Mobile keeps normal scroll: the two-row
-    // layout there (§2) already costs more vertical space than a phone can
-    // spare permanently pinned, and losing scroll real estate on a 390px
-    // screen on 3G is a worse trade than on a desktop monitor. `z-50` keeps
-    // it above page content once it stops scrolling with the page; nothing
-    // else on the site sets a z-index this high, including the torn seam.
     <header
       data-branch="tech"
-      className="border-branch-border bg-branch-ground border-b lg:sticky lg:top-0 lg:z-50"
+      className="border-branch-border bg-branch-ground relative border-b-2 border-dashed lg:sticky lg:top-0 lg:z-50"
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <div className="flex items-center justify-between gap-4 py-3">
-          <Link
-            to="/$locale"
-            params={{ locale }}
-            className="flex items-center gap-2.5 no-underline"
-          >
-            <SiteLogo />
-            <span className="flex flex-col leading-tight">
-              <span className="text-branch-text text-lg font-semibold tracking-tight">
-                {dictionary.site.name}
+          <div className="flex items-center gap-3">
+            <Link
+              to="/$locale"
+              params={{ locale }}
+              className="group flex items-center gap-2.5 no-underline"
+            >
+              <SiteLogo className="transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-105" />
+              <span className="flex flex-col leading-tight">
+                <span className="font-display text-branch-text text-xl font-black tracking-tight transition-transform group-hover:rotate-1">
+                  {dictionary.site.name}
+                </span>
+                <span className="text-branch-muted font-mono text-2xs">
+                  {dictionary.site.teamNumber}
+                </span>
               </span>
-              <span className="text-branch-muted font-mono text-2xs uppercase">
-                {dictionary.site.teamNumber}
-              </span>
-            </span>
-          </Link>
+            </Link>
+
+            <img
+              src="/onton/onton-french.webp"
+              alt=""
+              aria-hidden="true"
+              width={640}
+              height={468}
+              loading="lazy"
+              decoding="async"
+              className="onton-sticker-shadow hidden h-9 w-auto -rotate-6 transition-transform duration-200 hover:rotate-6 hover:scale-110 md:block"
+            />
+          </div>
 
           <div className="flex items-center gap-3">
-            {/* Inline once there is room for it. */}
             <SectionNav
               locale={locale}
               dictionary={dictionary}
@@ -72,11 +74,10 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* Second row below sm, clean responsive flex-wrap row without clunky scrollbars. */}
         <SectionNav
           locale={locale}
           dictionary={dictionary}
-          className="-mx-4 flex flex-wrap px-4 py-1.5 sm:hidden"
+          className="-mx-4 flex flex-nowrap px-4 py-2 sm:hidden"
         />
       </div>
     </header>
@@ -95,14 +96,14 @@ function SectionNav({
   return (
     <nav
       aria-label={dictionary.nav.home}
-      className={`items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
+      className={`items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
     >
       {NAV.map((item) => (
         <Link
           key={item.to}
           to={item.to}
           params={{ locale }}
-          className="text-branch-muted hover:text-branch-text data-[status=active]:text-branch-text data-[status=active]:bg-branch-text/10 rounded-md px-2.5 py-1 text-sm whitespace-nowrap no-underline transition-colors"
+          className={`font-display text-branch-muted hover:text-branch-text data-[status=active]:text-ink data-[status=active]:bg-signal rounded-full px-3 py-1.5 text-sm font-bold whitespace-nowrap no-underline transition-all duration-150 ${item.tilt} data-[status=active]:-rotate-1 data-[status=active]:shadow-[2px_3px_0_var(--color-paper)]`}
         >
           {dictionary.nav[item.key]}
         </Link>

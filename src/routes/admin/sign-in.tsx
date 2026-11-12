@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { z } from 'zod'
 
+import { OntonSticker } from '@/components/onton'
 import { getAdminSession } from '@/server/auth'
 
 /**
@@ -40,40 +41,52 @@ function SignIn() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-4">
-      <div className="space-y-2">
-        <p className="font-mono text-2xs uppercase text-muted-foreground">
-          OctetoHaret · FTC 25474
-        </p>
-        <h1 className="text-2xl font-semibold">Administrare</h1>
+      <div className="zine-card-paper masking-tape relative flex flex-col gap-5 rounded-2xl p-6 sm:p-8 -rotate-1">
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-1">
+            <p className="font-mono text-2xs uppercase text-muted-foreground">
+              OctetoHaret · FTC 25474
+            </p>
+            <h1 className="text-2xl font-bold">Administrare</h1>
+          </div>
+          <OntonSticker
+            pose="demolisher"
+            locale="ro"
+            size="md"
+            rotate={6}
+            floating
+          />
+        </div>
+
         <p className="text-muted-foreground text-sm">
           Intră cu contul Google al echipei. Accesul este limitat la adresele
           aprobate.
         </p>
-      </div>
 
-      {error === 'cancelled' ? (
-        <p
-          role="status"
-          className="border-border text-muted-foreground rounded-md border px-3 py-2 text-sm"
+        {error === 'cancelled' ? (
+          <p
+            role="status"
+            className="border-border text-muted-foreground rounded-md border px-3 py-2 text-sm"
+          >
+            Autentificarea a fost anulată. Încearcă din nou.
+          </p>
+        ) : null}
+
+        {/*
+          A real link, not a button with an onClick: sign-in has to work before
+          hydration, and the server route it points at only redirects.
+        */}
+        <a
+          href={href}
+          className="zine-btn bg-primary text-primary-foreground rounded-xl px-4 py-2.5 text-center text-sm font-bold no-underline"
         >
-          Autentificarea a fost anulată. Încearcă din nou.
+          Continuă cu Google
+        </a>
+
+        <p className="text-muted-foreground text-xs">
+          Nu se creează niciun cont. Site-ul nu păstrează parole.
         </p>
-      ) : null}
-
-      {/*
-        A real link, not a button with an onClick: sign-in has to work before
-        hydration, and the server route it points at only redirects.
-      */}
-      <a
-        href={href}
-        className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-center text-sm font-semibold no-underline"
-      >
-        Continuă cu Google
-      </a>
-
-      <p className="text-muted-foreground text-xs">
-        Nu se creează niciun cont. Site-ul nu păstrează parole.
-      </p>
+      </div>
     </main>
   )
 }

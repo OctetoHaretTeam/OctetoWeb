@@ -2,10 +2,14 @@ import { ExternalLink, Mail } from 'lucide-react'
 import { createFileRoute, getRouteApi } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
+import { OntonSticker } from '@/components/onton'
 import { getDictionary } from '@/i18n/dictionaries'
 import { bilingual, getLocalized } from '@/i18n/localized'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
+import { imageFitClass } from '@/lib/schemas'
+import { buildPageMeta } from '@/lib/site'
+import { cn } from '@/lib/utils'
 import { getSponsors } from '@/server/sponsors'
 
 /**
@@ -21,8 +25,16 @@ export const Route = createFileRoute('/$locale/sponsors/')({
   head: ({ params }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
     const dictionary = getDictionary(locale)
+    const title = `${dictionary.nav.sponsors} — ${dictionary.site.name} (${dictionary.site.teamNumber})`
+    const description = `${dictionary.sponsorship.shortPitch} — ${dictionary.site.name} (FTC #25474).`
+
     return {
-      meta: [{ title: `${dictionary.nav.sponsors} — ${dictionary.site.name}` }],
+      meta: buildPageMeta({
+        title,
+        description,
+        locale,
+        pathname: `/${locale}/sponsors`,
+      }),
     }
   },
   component: SponsorWall,
@@ -42,11 +54,28 @@ function SponsorWall() {
 
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
-      <div className="mx-auto w-full max-w-5xl space-y-8 px-4 py-10 sm:px-6">
-        <h1 className="text-3xl font-semibold">{dictionary.nav.sponsors}</h1>
+      <div className="mx-auto w-full max-w-5xl space-y-10 px-4 py-10 sm:px-6">
+        <header className="flex flex-wrap items-center justify-between gap-6">
+          <h1 className="text-3xl font-bold sm:text-4xl">
+            {dictionary.nav.sponsors}
+          </h1>
+          <OntonSticker
+            pose="french"
+            locale={locale}
+            size="lg"
+            rotate={6}
+            floating
+          />
+        </header>
 
         {sponsors.length === 0 ? (
-          <div className="border-branch-border max-w-measure rounded-md border border-dashed p-6">
+          <div className="zine-card-paper masking-tape relative flex flex-wrap items-center gap-5 rounded-2xl p-6 -rotate-1">
+            <OntonSticker
+              pose="muchacho"
+              locale={locale}
+              size="md"
+              rotate={-5}
+            />
             <p className="text-branch-muted">{dictionary.empty.sponsors}</p>
           </div>
         ) : (
@@ -57,20 +86,21 @@ function SponsorWall() {
                 bilingual(sponsor, 'description'),
                 locale,
               )
+              const tilt = ((index % 3) - 1) * 1.3
 
               const cardContent = (
                 <>
-                  {/* Gold marks a sponsor per §7.2. A rule, not a fill — full
-                      chroma is fine at this thin, but a whole card in it
-                      would blow past the accent-coverage cap. */}
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute inset-x-0 top-0 h-1 rounded-t-xl opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+                    className="bg-gold absolute inset-x-0 top-0 h-1.5 rounded-t-xl opacity-90 transition-opacity duration-300 group-hover:opacity-100"
                   />
 
-                  {/* `bg-paper`, not white: white is not in the palette, and
-                      paper is already the site's own off-white. */}
-                  <div className="ring-branch-border/40 bg-paper relative flex h-24 w-full items-center justify-center rounded-lg p-3 shadow-inner ring-1 transition-transform duration-300 group-hover:scale-102">
+                  <div
+                    className={cn(
+                      'ring-branch-border/40 bg-paper relative flex h-24 w-full items-center justify-center overflow-hidden rounded-lg shadow-inner ring-1 transition-transform duration-300 group-hover:scale-102',
+                      logo.fit === 'cover' ? 'p-0' : 'p-3',
+                    )}
+                  >
                     <img
                       src={logo.url}
                       alt={getLocalized(logo.alt, locale)?.value ?? sponsor.name}
@@ -78,16 +108,16 @@ function SponsorWall() {
                       height={logo.height}
                       loading={index < 3 ? 'eager' : 'lazy'}
                       decoding="async"
-                      className="max-h-full max-w-full object-contain drop-shadow-xs"
+                      className={cn(
+                        'h-full w-full drop-shadow-xs',
+                        imageFitClass(logo, 'contain'),
+                      )}
                     />
                   </div>
 
-                  {/* The card is always on `bg-paper` regardless of page
-                      branch, so its text is always ink — not `branch-text`,
-                      which would flip on a page using the tech ground. */}
                   <div className="border-branch-border mt-3 space-y-1 border-t pt-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-ink text-lg font-bold">
+                      <p className="text-ink font-display text-lg font-bold">
                         {sponsor.name}
                       </p>
                       {sponsor.websiteUrl ? (
@@ -110,11 +140,8 @@ function SponsorWall() {
               return (
                 <li
                   key={sponsor.id}
-                  // Same soft cream as the "become a sponsor" card — solid
-                  // `bg-paper` read too bright next to sage; the logo badge
-                  // below stays solid, since that one exists for logo
-                  // legibility rather than as a page surface.
-                  className="border-branch-border bg-branch-surface/60 group relative overflow-hidden rounded-xl border p-5 shadow-lg shadow-black/15 transition-all duration-300 hover:-translate-y-1.5 hover:border-gold hover:shadow-2xl hover:shadow-black/20"
+                  style={{ transform: `rotate(${tilt}deg)` }}
+                  className="zine-card-paper masking-tape-gold group relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:rotate-0"
                 >
                   {sponsor.websiteUrl ? (
                     <a
@@ -134,38 +161,27 @@ function SponsorWall() {
           </ul>
         )}
 
-        {/*
-          The ask. A sponsor wall that only lists existing sponsors gives a
-          company reading it nothing to do — this is the page they land on
-          from the packet, so it has to say the team is open and how to
-          start.
-
-          `bg-branch-surface` at full opacity (solid paper) next to sage was
-          too sharp a jump; no fill at all read as too flat. This is the
-          middle ground — a real cream wash, softened by letting the sage
-          show through underneath rather than diluting the paper colour
-          itself.
-        */}
-        <aside className="border-branch-border bg-branch-surface/60 rounded-lg border p-6 shadow-sm">
-          <span
-            aria-hidden="true"
-            className="bg-branch-accent mb-4 block h-0.5 w-10 rounded-full"
-          />
-          <h2 className="text-xl font-semibold">
-            {dictionary.sponsorship.title}
-          </h2>
-          <p className="text-branch-muted mt-2 max-w-measure text-sm">
-            {dictionary.sponsorship.body}
-          </p>
-          {contactEmail ? (
-            <a
-              href={`mailto:${contactEmail}`}
-              className="bg-branch-text text-branch-surface mt-5 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold no-underline transition-opacity hover:opacity-90"
-            >
-              <Mail aria-hidden="true" className="size-4" />
-              {dictionary.sponsorship.cta}
-            </a>
-          ) : null}
+        <aside className="zine-card-paper masking-tape-gold relative flex flex-col justify-between gap-6 rounded-2xl p-6 sm:flex-row sm:items-center sm:p-8 rotate-0.5">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">
+              {dictionary.sponsorship.title}
+            </h2>
+            <p className="text-branch-muted max-w-measure text-sm">
+              {dictionary.sponsorship.body}
+            </p>
+            {contactEmail ? (
+              <div className="pt-2">
+                <a
+                  href={`mailto:${contactEmail}`}
+                  className="zine-btn bg-branch-accent text-branch-accent-contrast inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold no-underline -rotate-1"
+                >
+                  <Mail aria-hidden="true" className="size-4" />
+                  {dictionary.sponsorship.cta}
+                </a>
+              </div>
+            ) : null}
+          </div>
+          <OntonSticker pose="ball" locale={locale} size="lg" rotate={-6} />
         </aside>
       </div>
     </BranchTheme>

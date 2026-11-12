@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
+import { OntonSticker } from '@/components/onton'
 import { getDictionary } from '@/i18n/dictionaries'
 import { DEFAULT_LOCALE } from '@/i18n/locale'
 import { resolveLocale } from '@/i18n/resolve-locale'
@@ -36,30 +37,43 @@ function UnknownCode() {
       as="main"
       className="flex min-h-screen items-center"
     >
-      <div className="mx-auto w-full max-w-measure space-y-4 px-4 py-16 sm:px-6">
-        <p className="branch-label text-branch-muted">
-          {dictionary.site.teamNumber}
-        </p>
-        <h1 className="text-3xl font-semibold">
-          {dictionary.errors.notFoundTitle}
-        </h1>
-        <p className="text-branch-muted">{dictionary.errors.notFoundBody}</p>
+      <div className="mx-auto w-full max-w-xl px-4 py-16 sm:px-6">
+        <div className="zine-card-paper masking-tape relative space-y-5 rounded-2xl p-6 sm:p-8 -rotate-1">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <OntonSticker
+              pose="watahel"
+              locale={locale}
+              size="lg"
+              rotate={-6}
+              floating
+            />
+            <OntonSticker pose="huh" locale={locale} size="md" rotate={8} />
+          </div>
 
-        <div className="flex flex-wrap gap-3 pt-2">
-          <Link
-            to="/$locale/team"
-            params={{ locale }}
-            className="bg-branch-accent text-branch-accent-contrast rounded-md px-4 py-2 text-sm font-semibold no-underline"
-          >
-            {dictionary.errors.goToTeam}
-          </Link>
-          <Link
-            to="/$locale"
-            params={{ locale }}
-            className="border-branch-border rounded-md border px-4 py-2 text-sm font-semibold no-underline"
-          >
-            {dictionary.errors.goHome}
-          </Link>
+          <p className="branch-label text-branch-muted">
+            {dictionary.site.teamNumber}
+          </p>
+          <h1 className="text-3xl font-bold">
+            {dictionary.errors.notFoundTitle}
+          </h1>
+          <p className="text-branch-muted">{dictionary.errors.notFoundBody}</p>
+
+          <div className="flex flex-wrap gap-3 pt-2">
+            <Link
+              to="/$locale/team"
+              params={{ locale }}
+              className="zine-btn bg-branch-accent text-branch-accent-contrast rounded-xl px-5 py-2.5 text-sm font-bold no-underline -rotate-1"
+            >
+              {dictionary.errors.goToTeam}
+            </Link>
+            <Link
+              to="/$locale"
+              params={{ locale }}
+              className="zine-btn bg-paper text-ink rounded-xl px-5 py-2.5 text-sm font-bold no-underline rotate-1"
+            >
+              {dictionary.errors.goHome}
+            </Link>
+          </div>
         </div>
       </div>
     </BranchTheme>

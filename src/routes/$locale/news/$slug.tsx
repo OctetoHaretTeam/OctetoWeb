@@ -3,11 +3,15 @@ import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
 import { FallbackNote } from '@/components/localized-text'
+import { OntonSticker, ontonPoseForSeed } from '@/components/onton'
 import { getDictionary } from '@/i18n/dictionaries'
 import { formatDate, toIsoDate } from '@/i18n/format'
 import { bilingual, getLocalized } from '@/i18n/localized'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
+import { imageFitClass } from '@/lib/schemas'
+import { buildPageMeta } from '@/lib/site'
+import { cn } from '@/lib/utils'
 import { getNewsPost } from '@/server/news'
 
 /**
@@ -28,23 +32,31 @@ export const Route = createFileRoute('/$locale/news/$slug')({
   head: ({ params, loaderData }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
     const dictionary = getDictionary(locale)
-    if (!loaderData) return { meta: [{ title: dictionary.nav.news }] }
+    if (!loaderData) {
+      return {
+        meta: buildPageMeta({
+          title: `${dictionary.nav.news} — ${dictionary.site.name}`,
+          description: dictionary.site.tagline,
+          locale,
+          pathname: `/${locale}/news/${params.slug}`,
+        }),
+      }
+    }
 
     const title = getLocalized(bilingual(loaderData, 'title'), locale)
     const excerpt = getLocalized(bilingual(loaderData, 'excerpt'), locale)
     const heading = title?.value ?? dictionary.nav.news
 
     return {
-      meta: [
-        { title: `${heading} — ${dictionary.site.name}` },
-        { name: 'description', content: excerpt?.value ?? dictionary.site.tagline },
-        { property: 'og:title', content: heading },
-        { property: 'og:description', content: excerpt?.value ?? '' },
-        { property: 'og:type', content: 'article' },
-        ...(loaderData.coverImage
-          ? [{ property: 'og:image', content: loaderData.coverImage.url }]
-          : []),
-      ],
+      meta: buildPageMeta({
+        title: `${heading} — ${dictionary.site.name} (${dictionary.site.teamNumber})`,
+        description: excerpt?.value ?? dictionary.site.tagline,
+        locale,
+        pathname: `/${locale}/news/${loaderData.slug}`,
+        image: loaderData.coverImage?.url,
+        imageAlt: heading,
+        type: 'article',
+      }),
     }
   },
 
@@ -60,10 +72,9 @@ function Article() {
   const dictionary = useDictionary()
 
   const title = getLocalized(bilingual(post, 'title'), locale)
-  // The body is pre-rendered per language, so the fallback rule is applied to
-  // the HTML pair exactly as it would be to any other bilingual field (§11).
   const body = post.bodyHtml[locale] ?? post.bodyHtml.ro
   const isFallback = post.bodyHtml[locale] === null
+  const pose = ontonPoseForSeed(post.slug)
 
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
@@ -77,22 +88,31 @@ function Article() {
           {dictionary.nav.news}
         </Link>
 
-        <article className="mt-6 space-y-5">
-          <header className="space-y-2">
-            {post.publishedAt ? (
-              <time
-                dateTime={toIsoDate(post.publishedAt)}
-                className="branch-label text-branch-muted"
-              >
-                {formatDate(post.publishedAt, locale)}
-              </time>
-            ) : null}
+        <article className="mt-6 space-y-6">
+          <header className="flex flex-wrap items-start justify-between gap-4">
+            <div className="space-y-2">
+              {post.publishedAt ? (
+                <time
+                  dateTime={toIsoDate(post.publishedAt)}
+                  className="branch-label text-branch-muted"
+                >
+                  {formatDate(post.publishedAt, locale)}
+                </time>
+              ) : null}
 
-            <h1 className="text-3xl font-semibold">{title?.value}</h1>
+              <h1 className="text-3xl font-bold sm:text-4xl">{title?.value}</h1>
 
-            {post.author ? (
-              <p className="text-branch-muted text-sm">{post.author.name}</p>
-            ) : null}
+              {post.author ? (
+                <p className="text-branch-muted text-sm">{post.author.name}</p>
+              ) : null}
+            </div>
+            <OntonSticker
+              pose={pose}
+              locale={locale}
+              size="md"
+              rotate={6}
+              floating
+            />
           </header>
 
           {post.coverImage ? (
@@ -103,22 +123,31 @@ function Article() {
               height={post.coverImage.height}
               fetchPriority="high"
               decoding="async"
-              className="w-full rounded-md"
+              className={cn(
+                'zine-card-paper aspect-[3/2] w-full rounded-2xl',
+                imageFitClass(post.coverImage),
+              )}
             />
           ) : null}
 
-          <div
-            className="prose-body max-w-measure space-y-4"
-            lang={isFallback ? 'ro' : undefined}
-            dangerouslySetInnerHTML={{ __html: body }}
-          />
-
-          {isFallback ? <FallbackNote locale={locale} /> : null}
+          <div className="zine-card-paper masking-tape relative rounded-2xl p-6 sm:p-8 -rotate-0.5">
+            <div
+              className="prose-body max-w-measure space-y-4"
+              lang={isFallback ? 'ro' : undefined}
+              dangerouslySetInnerHTML={{ __html: body }}
+            />
+            {isFallback ? <FallbackNote locale={locale} /> : null}
+          </div>
 
           {post.gallery.length > 0 ? (
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {post.gallery.map((image) => (
-                <li key={image.url}>
+            <ul className="grid gap-4 sm:grid-cols-2">
+              {post.gallery.map((image, idx) => (
+                <li
+                  key={image.url}
+                  style={{
+                    transform: `rotate(${idx % 2 === 0 ? -1.4 : 1.4}deg)`,
+                  }}
+                >
                   <img
                     src={image.url}
                     alt={getLocalized(image.alt, locale)?.value ?? ''}
@@ -126,7 +155,10 @@ function Article() {
                     height={image.height}
                     loading="lazy"
                     decoding="async"
-                    className="w-full rounded-md"
+                    className={cn(
+                      'zine-card-paper aspect-[4/3] w-full rounded-xl',
+                      imageFitClass(image),
+                    )}
                   />
                 </li>
               ))}
@@ -157,7 +189,8 @@ function ArticleNotFound() {
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-measure space-y-4 px-4 py-16 sm:px-6">
-        <h1 className="text-2xl font-semibold">
+        <OntonSticker pose="huh" locale={locale} size="lg" rotate={-5} />
+        <h1 className="text-2xl font-bold">
           {dictionary.errors.notFoundTitle}
         </h1>
         <p className="text-branch-muted">{dictionary.errors.notFoundBody}</p>

@@ -11,9 +11,15 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'OctetoHaret' },
+      { title: 'OctetoHaret — FTC #25474' },
+      { name: 'theme-color', content: '#0a0c09' },
+      { name: 'application-name', content: 'OctetoHaret #25474' },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    links: [
+      { rel: 'stylesheet', href: appCss },
+      { rel: 'icon', type: 'image/webp', href: '/logo.webp' },
+      { rel: 'apple-touch-icon', href: '/logo.webp' },
+    ],
   }),
   shellComponent: RootDocument,
 })

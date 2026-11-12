@@ -3,19 +3,12 @@
    for class names from this file's location in src/styles/. */
 @import 'tailwindcss' source('../');
 
-/* Self-hosted fonts — CLAUDE.md §7.6. Fontsource ships the woff2 files inside
-   node_modules, so these are bundled and served from our own origin: no
-   Google Fonts request, and `font-display: swap` is already set in each file.
-
-   The `wght` builds carry the weight axis only. Archivo also publishes a
-   `wdth` build with the width axis §7.6 mentions — switching this one line
-   enables it, at a cost of 106 KB (see the note in theme.css).
-
-   Each import declares latin, latin-ext and (per font) vietnamese or cyrillic
-   faces gated by `unicode-range`, so a RO or EN reader only ever downloads
-   latin and latin-ext. */
-@import '@fontsource-variable/archivo/wght.css';
-@import '@fontsource-variable/instrument-sans/wght.css';
+/* Self-hosted fonts — Shantell Sans (weight + bounce variable axes),
+   Bricolage Grotesque (expressive body), and Martian Mono (8-bit tech labels).
+   Three families maximum (CLAUDE.md §7.6). All include Romanian diacritics
+   (ăâîșț) in latin-ext with `font-display: swap`. */
+@import '@fontsource-variable/shantell-sans/bnce.css';
+@import '@fontsource-variable/bricolage-grotesque/wght.css';
 @import '@fontsource-variable/martian-mono/wght.css';
 
 @import 'tw-animate-css';
@@ -33,6 +26,7 @@
 html,
 body {
   min-height: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -60,15 +54,21 @@ body {
     @apply bg-background text-foreground font-body;
   }
 
-  /* Display face is opt-in via `font-display`, not applied to all headings —
-     §7.6 says to use it with restraint. */
+  /* Hand-drawn marker display face with organic bounce (BNCE) across all
+     headings so nothing feels sterile or AI-generated. */
   h1,
   h2,
-  h3,
+  h3 {
+    @apply font-display font-bold;
+    font-variation-settings: 'BNCE' 38;
+    text-wrap: balance;
+  }
+
   h4,
   h5,
   h6 {
-    @apply font-body font-semibold;
+    @apply font-display font-semibold;
+    font-variation-settings: 'BNCE' 24;
     text-wrap: balance;
   }
 
@@ -76,52 +76,185 @@ body {
     text-wrap: pretty;
   }
 
-  /* The header is sticky from `lg` up (site-header.tsx). Without this, anchor
-     jumps and focus scrolling land the target underneath it. */
   @media (width >= 64rem) {
     html {
       scroll-padding-top: 5rem;
     }
   }
-
 }
 
-/* ── Focus ring — CLAUDE.md §7.7 ──────────────────────────────────────────
-   Two-tone on purpose. No single colour clears 3:1 on every ground this site
-   uses: signal against sage measures 1.98:1, and ink against the ink ground
-   is invisible. Drawing both means at least one always contrasts —
+/* Apply Shantell Sans bounce whenever `.font-display` is used */
+.font-display {
+  font-variation-settings: 'BNCE' 42;
+}
 
-     on ink   : signal ring 10.56:1
-     on carbon: signal ring  9.66:1
-     on sage  : ink ring     5.33:1
-     on paper : ink ring    15.46:1
+.font-hand {
+  font-family: var(--font-hand);
+}
 
-   DELIBERATELY UNLAYERED. shadcn's primitives carry their own
-   `focus-visible:ring-*` utilities, and utilities live in a cascade layer —
-   an unlayered rule beats every layered one regardless of specificity. Inside
-   `@layer base` this was silently overridden, leaving buttons with an ink ring
-   on the ink ground, i.e. no visible focus at all.
+/* ── Branch atmospheric textures ──────────────────────────────────────────
+   Gives the paper layer a tactile scrapbook grain & doodle dot feel, and the
+   digital tech layer a subtle hand-drawn blueprint grid so neither ground is
+   ever a dead flat rectangle. */
+[data-branch='non_tech'] {
+  background-image:
+    radial-gradient(rgba(10, 12, 9, 0.08) 1px, transparent 1px),
+    radial-gradient(rgba(233, 228, 214, 0.12) 1.5px, transparent 1.5px);
+  background-size: 22px 22px, 37px 37px;
+  background-position: 0 0, 11px 13px;
+}
 
-   Never replace this with `outline: none` (§7.7). */
+[data-branch='tech'] {
+  background-image:
+    radial-gradient(rgba(163, 199, 168, 0.07) 1px, transparent 1px),
+    linear-gradient(to right, rgba(35, 42, 32, 0.28) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(35, 42, 32, 0.28) 1px, transparent 1px);
+  background-size: 20px 20px, 60px 60px, 60px 60px;
+}
+
+/* ── Chaotic Zine / Scrapbook Utilities ─────────────────────────────────── */
+
+/* Organic hand-drawn border radius — breaks up rigid straight lines */
+@utility zine-card {
+  border-radius: 225px 14px 195px 16px / 16px 205px 14px 235px;
+  border: 2.5px solid var(--branch-border);
+  box-shadow: 4px 5px 0px var(--color-ink);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:hover {
+    box-shadow: 6px 8px 0px var(--color-ink);
+  }
+}
+
+@utility zine-card-paper {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  border-radius: 215px 16px 185px 14px / 14px 195px 16px 225px;
+  border: 2.5px solid var(--color-ink);
+  box-shadow: 5px 6px 0px var(--color-ink);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:hover {
+    box-shadow: 7px 9px 0px var(--color-ink);
+  }
+}
+
+/* Hand-cut button with irregular corners and chunky offset shadow */
+@utility zine-btn {
+  border-radius: 185px 12px 165px 14px / 12px 175px 14px 195px;
+  border: 2px solid var(--color-ink);
+  box-shadow: 3px 4px 0px var(--color-ink);
+  font-family: var(--font-display);
+  font-variation-settings: 'BNCE' 30;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:hover {
+    transform: translate(-1.5px, -2px) rotate(-1deg);
+    box-shadow: 5px 6px 0px var(--color-ink);
+  }
+
+  &:active {
+    transform: translate(1px, 2px);
+    box-shadow: 1px 2px 0px var(--color-ink);
+  }
+}
+
+/* Die-cut vinyl sticker outline for Onton illustrations (2-pass GPU-friendly shadow) */
+@utility onton-sticker-shadow {
+  filter:
+    drop-shadow(0 0 2px var(--color-paper))
+    drop-shadow(3px 4px 0 rgba(10, 12, 9, 0.5));
+}
+
+/* Masking tape strip that pins cards */
+@utility masking-tape {
+  background-color: rgba(233, 228, 214, 0.86);
+  border-top: 1px dashed rgba(10, 12, 9, 0.22);
+  border-bottom: 1px dashed rgba(10, 12, 9, 0.22);
+  box-shadow: 0 2px 4px rgba(10, 12, 9, 0.18);
+  clip-path: polygon(
+    3% 0%, 97% 2%, 100% 18%, 98% 39%, 100% 62%, 97% 84%, 99% 100%,
+    2% 98%, 0% 80%, 3% 58%, 0% 35%, 2% 14%
+  );
+}
+
+@utility masking-tape-gold {
+  background-color: rgba(205, 160, 220, 0.85);
+  border-top: 1px dashed rgba(10, 12, 9, 0.25);
+  border-bottom: 1px dashed rgba(10, 12, 9, 0.25);
+  box-shadow: 0 2px 4px rgba(10, 12, 9, 0.2);
+  clip-path: polygon(
+    2% 2%, 98% 0%, 100% 22%, 97% 45%, 100% 68%, 98% 88%, 99% 100%,
+    1% 99%, 3% 78%, 0% 54%, 2% 30%, 0% 10%
+  );
+}
+
+/* Wavy hand-drawn underline accent */
+@utility wavy-underline {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: var(--branch-accent);
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 2px;
+}
+
+@keyframes onton-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(var(--onton-rot, 0deg));
+  }
+  50% {
+    transform: translateY(-6px) rotate(calc(var(--onton-rot, 0deg) + 2.5deg));
+  }
+}
+
+@keyframes onton-wiggle {
+  0%, 100% {
+    transform: scale(1) rotate(var(--onton-rot, 0deg));
+  }
+  25% {
+    transform: scale(1.09, 0.92) rotate(calc(var(--onton-rot, 0deg) - 7deg));
+  }
+  50% {
+    transform: scale(0.94, 1.08) rotate(calc(var(--onton-rot, 0deg) + 7deg));
+  }
+  75% {
+    transform: scale(1.04, 0.97) rotate(calc(var(--onton-rot, 0deg) - 3deg));
+  }
+}
+
+.animate-onton-float {
+  animation: onton-float 4.2s ease-in-out infinite;
+}
+
+.animate-onton-wiggle {
+  animation: onton-wiggle 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* ── Focus ring — CLAUDE.md §7.7 ────────────────────────────────────────── */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid var(--color-ink);
   outline-offset: 1px;
   box-shadow: 0 0 0 4px var(--color-signal);
 }
 
-/* Pictures are shown whole — never cropped or stretched to fill their frame.
-   The frame keeps its fixed aspect ratio, so nothing shifts while it loads
-   (§12), and whatever the picture leaves uncovered reads as a paper mat in
-   the branch's own surface colour rather than as a gap. */
 @utility image-fit {
   object-fit: contain;
   background-color: var(--branch-surface, transparent);
 }
 
-/* A complete label style, including its own size.
-   It deliberately does NOT rely on being paired with `text-2xs`: that utility
-   also sets letter-spacing, and whichever Tailwind emits later wins, which
-   silently flattened the tracking difference between the two branches. */
+@utility image-fit-contain {
+  object-fit: contain;
+  background-color: var(--branch-surface, transparent);
+}
+
+@utility image-fit-cover {
+  object-fit: cover;
+  background-color: var(--branch-surface, transparent);
+}
+
 @utility branch-label {
   font-family: var(--branch-label-font);
   font-size: var(--text-2xs);
@@ -129,19 +262,11 @@ body {
   letter-spacing: var(--branch-label-tracking);
   text-transform: uppercase;
 
-  /* Cards and columns grow considerably on desktop (see team roster); the
-     micro-label reads as disproportionately tiny next to them if it stays
-     pinned to its mobile size. */
   @media (min-width: 64rem) {
     font-size: var(--text-xs);
   }
 }
 
-/* Same treatment as `branch-label`, sized for a section heading (e.g. the
-   TECHNICAL / NON-TECHNICAL column titles on the team roster) rather than an
-   inline tag. Kept separate instead of pairing `branch-label` with a second
-   `text-*` utility on the same element — that utility also sets
-   letter-spacing, and the two would silently fight over it. */
 @utility branch-label-lg {
   font-family: var(--branch-label-font);
   font-size: var(--text-2xs);
@@ -154,22 +279,21 @@ body {
   }
 }
 
-/* ── Rendered markdown ────────────────────────────────────────────────────
-   Body text comes from the database as HTML rendered on the server. Raw HTML
-   is disabled in the renderer, so the only tags that can appear are the ones
-   markdown itself produces — which is why this list is short and closed. */
+/* ── Rendered markdown ──────────────────────────────────────────────────── */
 @utility prose-body {
   & p {
     margin-block: 0 1rem;
   }
 
   & h2 {
+    font-family: var(--font-display);
     font-size: var(--text-2xl);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     margin-block: 1.75rem 0.5rem;
   }
 
   & h3 {
+    font-family: var(--font-display);
     font-size: var(--text-xl);
     font-weight: var(--font-weight-semibold);
     margin-block: 1.5rem 0.5rem;
@@ -196,13 +320,15 @@ body {
   & a {
     color: var(--branch-accent-text);
     text-decoration: underline;
-    text-underline-offset: 0.15em;
+    text-decoration-style: wavy;
+    text-underline-offset: 0.18em;
   }
 
   & blockquote {
-    border-inline-start: 2px solid var(--branch-border);
+    border-inline-start: 3px dashed var(--branch-border);
     padding-inline-start: 1rem;
-    font-style: italic;
+    font-family: var(--font-hand);
+    font-size: 1.25em;
   }
 
   & code {
@@ -216,7 +342,7 @@ body {
 
   & hr {
     border: 0;
-    border-top: 1px solid var(--branch-border);
+    border-top: 2px dashed var(--branch-border);
     margin-block: 2rem;
   }
 }

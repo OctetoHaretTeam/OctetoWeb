@@ -1,23 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { ONTON_POSES, ontonPoseForSeed } from '@/components/onton'
 import { PaperCutout } from '@/components/paper-cutout'
 import { getDictionary } from '@/i18n/dictionaries'
 import { getLocalized } from '@/i18n/localized'
 import type { Locale } from '@/i18n/locale'
-import type { ImageAsset } from '@/lib/schemas'
+import { type ImageAsset, imageFitClass } from '@/lib/schemas'
 import { cn } from '@/lib/utils'
 
-/**
- * A member's photograph, or the placeholder when there is none to show.
- *
- * There is no consent check here on purpose. `photoConsent` is applied on the
- * server (`src/server/team.ts`), so by the time a photo reaches this component
- * it is already one the site is allowed to display — and a withheld one was
- * never serialised into the page at all (CLAUDE.md §8).
- *
- * The box is the same size whether the photo loads, fails, or is absent, which
- * is what keeps CLS at zero (§12).
- */
 export function MemberPhoto({
   image,
   displayName,
@@ -37,27 +27,17 @@ export function MemberPhoto({
 }) {
   const dictionary = getDictionary(locale)
 
-  /*
-   * A stored URL can outlive its file — a row edited before an upload
-   * finished, or storage swapped underneath it. Falling back to the
-   * placeholder keeps a person's card intact instead of showing a broken
-   * image icon where their photograph should be.
-   */
   const [failed, setFailed] = useState(false)
   const imageRef = useRef<HTMLImageElement>(null)
 
-  /*
-   * `onError` alone is not enough. The page is server-rendered, so a broken
-   * image usually finishes failing BEFORE React hydrates — the handler is
-   * attached after the event has already fired, and the broken icon stays.
-   * Re-checking `naturalWidth` once mounted catches exactly that case.
-   */
   useEffect(() => {
     const node = imageRef.current
     if (node?.complete && node.naturalWidth === 0) setFailed(true)
   }, [image?.url])
 
   const showImage = image !== null && !failed
+  const fallbackPose = ontonPoseForSeed(seed)
+  const fallbackSpec = ONTON_POSES[fallbackPose]
 
   return (
     <PaperCutout seed={seed} className={cn('aspect-square w-full', className)}>
@@ -65,7 +45,6 @@ export function MemberPhoto({
         <img
           ref={imageRef}
           src={image.url}
-          // Alt text is bilingual and falls back like any other field.
           alt={getLocalized(image.alt, locale)?.value ?? ''}
           width={image.width}
           height={image.height}
@@ -73,18 +52,27 @@ export function MemberPhoto({
           fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
           onError={() => setFailed(true)}
-          className="h-full w-full image-fit"
+          className={cn('h-full w-full', imageFitClass(image))}
         />
       ) : (
         <div
-          className="bg-branch-surface flex h-full w-full items-center justify-center"
-          // Not decorative: it stands in for a person, so it is announced.
+          className="bg-branch-surface relative flex h-full w-full items-center justify-center p-4"
           role="img"
           aria-label={dictionary.team.noPhoto}
         >
+          <img
+            src={fallbackSpec.src}
+            alt=""
+            aria-hidden="true"
+            width={fallbackSpec.width}
+            height={fallbackSpec.height}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+            className="onton-sticker-shadow max-h-[82%] max-w-[82%] object-contain transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
+          />
           <span
             aria-hidden="true"
-            className="text-branch-muted font-display text-4xl font-black"
+            className="bg-ink text-paper font-display absolute right-3 bottom-3 rounded-full border-2 border-current px-2.5 py-0.5 text-sm font-black -rotate-6"
           >
             {firstInitial(displayName)}
           </span>

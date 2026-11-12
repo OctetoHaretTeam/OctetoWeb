@@ -1,5 +1,5 @@
 import { useId, useState } from 'react'
-import { Trash2, Upload } from 'lucide-react'
+import { Maximize2, Minimize2, Trash2, Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +10,36 @@ import {
   processImage,
   uploadPathname,
 } from '@/lib/images/process'
-import type { ImageAsset } from '@/lib/schemas'
+import {
+  type ImageAsset,
+  type ImageFit,
+  imageFitClass,
+} from '@/lib/schemas'
+import { cn } from '@/lib/utils'
+
+/**
+ * Maps an admin upload folder to the exact aspect-ratio frame used on the
+ * public frontend so the Live Preview shows the real cropping/fitting behavior.
+ */
+function previewFrameClassForFolder(folder: string): {
+  frameClass: string
+  ratioLabel: string
+} {
+  switch (folder) {
+    case 'team':
+      return { frameClass: 'aspect-square w-36', ratioLabel: '1:1' }
+    case 'news':
+    case 'seasons':
+      return { frameClass: 'aspect-[3/2] w-44', ratioLabel: '3:2' }
+    case 'sponsors':
+      return { frameClass: 'h-20 w-40', ratioLabel: 'Logo' }
+    case 'home':
+    case 'performance':
+    case 'about':
+    default:
+      return { frameClass: 'aspect-[4/3] w-44', ratioLabel: '4:3' }
+  }
+}
 
 /**
  * Image upload for the admin editors — CLAUDE.md §10.
@@ -50,7 +79,12 @@ export function ImageField({
   // the most likely reason a save is refused. Say so next to the field rather
   // than letting the form fail with no visible cause.
   const missingAlt = Boolean(value) && value!.alt.ro.trim().length === 0
-  const error = uploadError ?? (missingAlt ? 'Adaugă textul alternativ în română.' : externalError)
+  const error =
+    uploadError ??
+    (missingAlt ? 'Adaugă textul alternativ în română.' : externalError)
+
+  const currentFit: ImageFit = value?.fit ?? 'contain'
+  const { frameClass, ratioLabel } = previewFrameClassForFolder(folder)
 
   async function handleFile(file: File | undefined) {
     if (!file) return
@@ -85,6 +119,7 @@ export function ImageField({
         alt: { ro: value?.alt.ro ?? '', en: value?.alt.en },
         width: processed.width,
         height: processed.height,
+        fit: value?.fit ?? 'contain',
       })
     } catch (caught) {
       setUploadError(messageFor(caught))
@@ -93,12 +128,23 @@ export function ImageField({
     }
   }
 
+  function handleFitChange(nextFit: ImageFit) {
+    if (!value) return
+    onChange({
+      ...value,
+      fit: nextFit,
+    })
+  }
+
   return (
     <fieldset className="space-y-3">
       <legend className="text-sm font-medium">
         {label}
         {required ? (
-          <span aria-hidden="true" className="text-muted-foreground"> *</span>
+          <span aria-hidden="true" className="text-muted-foreground">
+            {' '}
+            *
+          </span>
         ) : null}
       </legend>
 
@@ -106,21 +152,69 @@ export function ImageField({
 
       {value ? (
         <div className="border-border flex flex-wrap items-start gap-4 rounded-md border p-3">
-          <img
-            src={value.url}
-            alt=""
-            width={value.width}
-            height={value.height}
-            className="h-24 w-24 rounded image-fit"
-          />
-
-          <div className="min-w-0 flex-1 space-y-2">
+          <div className="space-y-1.5">
+            <div
+              className={cn(
+                'border-border bg-branch-surface relative shrink-0 overflow-hidden rounded-md border',
+                frameClass,
+              )}
+            >
+              <img
+                src={value.url}
+                alt=""
+                width={value.width}
+                height={value.height}
+                className={cn(
+                  'h-full w-full transition-all duration-150',
+                  imageFitClass(value),
+                )}
+              />
+            </div>
             <p className="text-muted-foreground font-mono text-2xs">
-              {value.width}×{value.height}
+              Previzualizare live ({ratioLabel}) · {value.width}×{value.height}
             </p>
+          </div>
+
+          <div className="min-w-0 flex-1 space-y-3">
+            <div className="space-y-1.5">
+              <span className="font-mono text-2xs uppercase">
+                Mod de încadrare (Fit)
+              </span>
+              <div
+                role="group"
+                aria-label="Mod de încadrare a imaginii"
+                className="flex flex-wrap gap-2"
+              >
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={currentFit === 'contain' ? 'default' : 'outline'}
+                  aria-pressed={currentFit === 'contain'}
+                  onClick={() => handleFitChange('contain')}
+                  className="text-xs"
+                >
+                  <Minimize2 aria-hidden="true" className="size-3.5" />
+                  Încadrează tot (Shrink / Contain)
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={currentFit === 'cover' ? 'default' : 'outline'}
+                  aria-pressed={currentFit === 'cover'}
+                  onClick={() => handleFitChange('cover')}
+                  className="text-xs"
+                >
+                  <Maximize2 aria-hidden="true" className="size-3.5" />
+                  Umple spațiul (Fill / Cover)
+                </Button>
+              </div>
+            </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor={`${id}-alt-ro`} className="font-mono text-2xs uppercase">
+              <Label
+                htmlFor={`${id}-alt-ro`}
+                className="font-mono text-2xs uppercase"
+              >
                 Text alternativ · Română
               </Label>
               <Input
@@ -138,7 +232,10 @@ export function ImageField({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor={`${id}-alt-en`} className="font-mono text-2xs uppercase">
+              <Label
+                htmlFor={`${id}-alt-en`}
+                className="font-mono text-2xs uppercase"
+              >
                 Text alternativ · Engleză{' '}
                 <span className="text-muted-foreground normal-case">
                   (opțional)

@@ -1,5 +1,6 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
+import { OntonMascotDock } from '@/components/onton'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getDictionary } from '@/i18n/dictionaries'
@@ -13,8 +14,12 @@ import {
   withLocale,
 } from '@/i18n/locale'
 import { persistLocalePreference, resolveLocale } from '@/i18n/resolve-locale'
-import { useDictionary } from '@/i18n/use-locale'
-import { absoluteUrl } from '@/lib/site'
+import { useDictionary, useLocale } from '@/i18n/use-locale'
+import {
+  SEO_KEYWORDS,
+  absoluteUrl,
+  buildSiteJsonLd,
+} from '@/lib/site'
 import { getContactInfo } from '@/server/contact'
 
 /**
@@ -62,14 +67,19 @@ export const Route = createFileRoute('/$locale')({
     return {
       meta: [
         { name: 'description', content: dictionary.site.tagline },
+        { name: 'keywords', content: SEO_KEYWORDS[locale] },
         { property: 'og:site_name', content: dictionary.site.name },
         { property: 'og:type', content: 'website' },
         { property: 'og:url', content: absoluteUrl(pathname) },
+        { property: 'og:image', content: absoluteUrl('/logo.webp') },
+        { property: 'og:image:alt', content: 'OctetoHaret — FTC #25474' },
         { property: 'og:locale', content: OG_LOCALES[locale] },
         {
           property: 'og:locale:alternate',
           content: OG_LOCALES[otherLocale(locale)],
         },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:image', content: absoluteUrl('/logo.webp') },
       ],
       links: [
         { rel: 'canonical', href: absoluteUrl(pathname) },
@@ -95,21 +105,18 @@ export const Route = createFileRoute('/$locale')({
 function LocaleLayout() {
   const contact = Route.useLoaderData()
   const dictionary = useDictionary()
+  const locale = useLocale()
+  const jsonLd = buildSiteJsonLd(locale)
 
-  /*
-   * The layout ground is the PAPER layer (§7.1). Every page except the home
-   * hero sits on sage, which is the half of the brand that is actually the
-   * team's own; pages opt back onto ink only where §7.3 requires it, i.e. the
-   * technical performance branch.
-   *
-   * `flex-col` with a growing `<main>` slot keeps the footer at the bottom of
-   * a short page instead of floating halfway up it.
-   */
   return (
     <div
       data-branch="non_tech"
       className="bg-branch-ground text-branch-text flex min-h-screen flex-col"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* First tab stop on every page (§7.7): past the nav and the switcher
           in one key press. A plain fragment link, so it works before
           hydration like the language switcher does. */}
@@ -124,6 +131,7 @@ function LocaleLayout() {
         <Outlet />
       </div>
       <SiteFooter info={contact} />
+      <OntonMascotDock locale={locale} />
     </div>
   )
 }

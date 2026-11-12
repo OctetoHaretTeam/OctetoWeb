@@ -5,6 +5,7 @@ import type { Locale } from '@/i18n/locale'
 import { bilingual, getLocalized } from '@/i18n/localized'
 import { useDictionary } from '@/i18n/use-locale'
 import { nextSlideIndex } from '@/lib/carousel'
+import { imageFitClass } from '@/lib/schemas'
 import { cn } from '@/lib/utils'
 import type { HomeData } from '@/server/home'
 
@@ -129,7 +130,8 @@ export function HeroSlideshow({
               // land on a photo that isn't actually showing.
               aria-hidden={isActive ? undefined : true}
               className={cn(
-                'absolute inset-0 h-full w-full image-fit transition-opacity duration-700',
+                'absolute inset-0 h-full w-full transition-opacity duration-700',
+                imageFitClass(slide.image),
                 isActive ? 'opacity-100' : 'opacity-0',
               )}
             />
@@ -138,7 +140,7 @@ export function HeroSlideshow({
       </div>
 
       {slides.length > 1 ? (
-        <div className="mt-3 flex justify-center gap-2">
+        <div className="mt-2 flex justify-center gap-1">
           {slides.map((slide, slideIndex) => (
             <button
               key={slide.id}
@@ -146,13 +148,17 @@ export function HeroSlideshow({
               aria-label={`${dictionary.hero.goToSlide} ${slideIndex + 1}`}
               aria-current={slideIndex === index ? 'true' : undefined}
               onClick={() => setIndex(slideIndex)}
-              className={cn(
-                'size-2 rounded-full transition-colors',
-                slideIndex === index
-                  ? 'bg-branch-accent'
-                  : 'bg-branch-border hover:bg-branch-muted',
-              )}
-            />
+              className="group flex size-7 cursor-pointer items-center justify-center rounded-full"
+            >
+              <span
+                className={cn(
+                  'size-2 rounded-full transition-colors',
+                  slideIndex === index
+                    ? 'bg-branch-accent'
+                    : 'bg-branch-border group-hover:bg-branch-muted',
+                )}
+              />
+            </button>
           ))}
         </div>
       ) : null}

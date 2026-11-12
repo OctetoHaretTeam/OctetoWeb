@@ -1,11 +1,19 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
+import {
+  ONTON_POSES,
+  OntonSticker,
+  ontonPoseForSeed,
+} from '@/components/onton'
 import { getDictionary } from '@/i18n/dictionaries'
 import { formatDate, toIsoDate } from '@/i18n/format'
 import { bilingual, getLocalized } from '@/i18n/localized'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
+import { imageFitClass } from '@/lib/schemas'
+import { buildPageMeta } from '@/lib/site'
+import { cn } from '@/lib/utils'
 import { getPublishedNews } from '@/server/news'
 
 /**
@@ -19,11 +27,19 @@ export const Route = createFileRoute('/$locale/news/')({
   head: ({ params }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
     const dictionary = getDictionary(locale)
+    const title = `${dictionary.nav.news} — ${dictionary.site.name} (${dictionary.site.teamNumber})`
+    const description =
+      locale === 'ro'
+        ? `Noutăți și articole de la echipa de robotică ${dictionary.site.name} (Octeto / FTC #25474) din Chișinău.`
+        : `Latest news and articles from ${dictionary.site.name} (Octeto / FTC #25474) robotics team in Chișinău, Moldova.`
+
     return {
-      meta: [
-        { title: `${dictionary.nav.news} — ${dictionary.site.name}` },
-        { name: 'description', content: dictionary.site.tagline },
-      ],
+      meta: buildPageMeta({
+        title,
+        description,
+        locale,
+        pathname: `/${locale}/news`,
+      }),
     }
   },
   component: NewsIndex,
@@ -39,26 +55,43 @@ function NewsIndex() {
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-5xl space-y-8 px-4 py-10 sm:px-6">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-semibold">{dictionary.nav.news}</h1>
+        <header className="flex flex-wrap items-center justify-between gap-6">
+          <h1 className="text-3xl font-bold sm:text-4xl">
+            {dictionary.nav.news}
+          </h1>
+          <OntonSticker
+            pose="cofe"
+            locale={locale}
+            size="lg"
+            rotate={-6}
+            floating
+          />
         </header>
 
         {posts.length === 0 ? (
-          <div className="border-branch-border max-w-measure rounded-md border border-dashed p-6">
+          <div className="zine-card-paper masking-tape relative flex flex-wrap items-center gap-6 rounded-2xl p-6 -rotate-1">
+            <OntonSticker pose="huh" locale={locale} size="md" rotate={5} />
             <p className="text-branch-muted">{dictionary.empty.news}</p>
           </div>
         ) : (
-          <ul className="grid gap-6 sm:grid-cols-2">
+          <ul className="grid gap-8 sm:grid-cols-2">
             {posts.map((post, index) => {
               const title = getLocalized(bilingual(post, 'title'), locale)
               const excerpt = getLocalized(bilingual(post, 'excerpt'), locale)
+              const fallbackPose = ontonPoseForSeed(post.slug)
+              const fallbackSpec = ONTON_POSES[fallbackPose]
+              const tilt = index % 2 === 0 ? -1.3 : 1.3
 
               return (
-                <li key={post.slug}>
+                <li
+                  key={post.slug}
+                  style={{ transform: `rotate(${tilt}deg)` }}
+                  className="transition-transform duration-200 hover:rotate-0"
+                >
                   <Link
                     to="/$locale/news/$slug"
                     params={{ locale, slug: post.slug }}
-                    className="group block no-underline"
+                    className="zine-card-paper masking-tape group block rounded-2xl p-4 no-underline"
                   >
                     {post.coverImage ? (
                       <img
@@ -71,13 +104,27 @@ function NewsIndex() {
                         loading={index === 0 ? 'eager' : 'lazy'}
                         fetchPriority={index === 0 ? 'high' : 'auto'}
                         decoding="async"
-                        className="aspect-[3/2] w-full rounded-md image-fit"
+                        className={cn(
+                          'aspect-[3/2] w-full rounded-xl',
+                          imageFitClass(post.coverImage),
+                        )}
                       />
                     ) : (
-                      <div className="bg-branch-surface aspect-[3/2] w-full rounded-md" />
+                      <div className="bg-sage/40 border-branch-border flex aspect-[3/2] w-full items-center justify-center rounded-xl border-2 border-dashed p-6">
+                        <img
+                          src={fallbackSpec.src}
+                          alt=""
+                          aria-hidden="true"
+                          width={fallbackSpec.width}
+                          height={fallbackSpec.height}
+                          loading="lazy"
+                          decoding="async"
+                          className="onton-sticker-shadow h-32 w-32 object-contain"
+                        />
+                      </div>
                     )}
 
-                    <div className="mt-3 space-y-1">
+                    <div className="mt-3 space-y-1 px-1">
                       {post.publishedAt ? (
                         <time
                           dateTime={toIsoDate(post.publishedAt)}
@@ -86,7 +133,7 @@ function NewsIndex() {
                           {formatDate(post.publishedAt, locale)}
                         </time>
                       ) : null}
-                      <h2 className="text-xl font-semibold group-hover:underline">
+                      <h2 className="text-xl font-bold group-hover:underline">
                         {title?.value}
                       </h2>
                       {excerpt ? (

@@ -28,6 +28,7 @@ const memberColumns = {
   descriptionRo: teamMember.descriptionRo,
   descriptionEn: teamMember.descriptionEn,
   image: teamMember.image,
+  octetIndex: teamMember.octetIndex,
   instagramUrl: teamMember.instagramUrl,
   photoConsent: teamMember.photoConsent,
   fullNamePublic: teamMember.fullNamePublic,

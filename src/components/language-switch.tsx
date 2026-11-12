@@ -67,7 +67,7 @@ export function LanguageSwitch({ className }: { className?: string }) {
             aria-label={label}
             aria-current={isActive ? 'true' : undefined}
             className={cn(
-              'rounded-full px-2.5 py-1 text-2xs font-mono font-semibold uppercase no-underline transition-colors',
+              'rounded-full px-3 py-1.5 text-2xs font-mono font-semibold uppercase no-underline transition-colors',
               isActive
                 ? 'bg-branch-accent text-branch-accent-contrast'
                 : 'text-branch-muted hover:text-branch-text',

@@ -32,25 +32,30 @@ export type PaperCutoutProps = {
    * the ground rather than printed on it.
    */
   lifted?: boolean
+  /** Pins a strip of masking tape at the top of the cutout. */
+  taped?: boolean
 }
 
 export function PaperCutout({
   seed,
   children,
   className,
-  edge = 0.05,
-  roughness = 1,
+  edge = 0.055,
+  roughness = 1.25,
   tone = 'var(--color-paper)',
   lifted = true,
+  taped = true,
 }: PaperCutoutProps) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
   const contentId = `cutout-content-${uid}`
   const shadowId = `cutout-shadow-${uid}`
 
-  const { sheetPath, contentPath } = useMemo(() => {
+  const { sheetPath, contentPath, tapeAngle } = useMemo(() => {
     const base = hashSeed(seed)
-    const amplitude = 0.035 * roughness
+    const amplitude = 0.036 * roughness
+    const angle = ((base % 9) - 4) * 1.1
     return {
+      tapeAngle: angle,
       sheetPath: tornOutlinePath({
         seed: base,
         inset: amplitude,
@@ -69,6 +74,14 @@ export function PaperCutout({
 
   return (
     <div className={cn('relative isolate', className)}>
+      {taped ? (
+        <span
+          aria-hidden="true"
+          className="masking-tape pointer-events-none absolute -top-2 left-1/2 z-20 h-4 w-16 -translate-x-1/2"
+          style={{ transform: `translateX(-50%) rotate(${tapeAngle}deg)` }}
+        />
+      ) : null}
+
       <svg
         viewBox="0 0 1 1"
         preserveAspectRatio="none"
@@ -90,11 +103,11 @@ export function PaperCutout({
               colorInterpolationFilters="sRGB"
             >
               <feDropShadow
-                dx="0"
-                dy="0.012"
+                dx="0.008"
+                dy="0.016"
                 stdDeviation="0.014"
                 floodColor="var(--color-ink)"
-                floodOpacity="0.35"
+                floodOpacity="0.48"
               />
             </filter>
           ) : null}
