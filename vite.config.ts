@@ -51,6 +51,7 @@ const ADMIN_HEADERS = {
 export default defineConfig({
   server: {
     port: 3000,
+    host: true,
   },
   resolve: {
     // Vite 8 resolves the `paths` in tsconfig.json natively; no vite-tsconfig-paths needed.

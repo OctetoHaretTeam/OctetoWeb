@@ -59,8 +59,9 @@ export class UploadStoreError extends Error {
  * lower-kebab characters within it.
  */
 export function safeFilename(name: string): string {
-  const base = path
-    .basename(name)
+  const normalized = name.replace(/\\/g, '/')
+  const base = path.posix
+    .basename(normalized)
     .replace(/\.[^.]*$/, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')

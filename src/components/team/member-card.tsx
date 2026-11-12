@@ -1,9 +1,11 @@
 import { Link } from '@tanstack/react-router'
 
+import { OctetBits } from '@/components/onton'
 import { MemberPhoto } from '@/components/team/member-photo'
 import type { Dictionary } from '@/i18n/dictionaries'
 import { bilingual, getLocalized } from '@/i18n/localized'
 import type { Locale } from '@/i18n/locale'
+import { hashSeed } from '@/lib/torn-edge'
 import type { TeamMemberSummary } from '@/server/team'
 
 /** Branch enum to the label the public sees. */
@@ -23,6 +25,8 @@ export function branchLabel(
   }
 }
 
+const TILTS = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'] as const
+
 export function MemberCard({
   member,
   locale,
@@ -35,9 +39,10 @@ export function MemberCard({
   priority?: boolean
 }) {
   const role = getLocalized(bilingual(member, 'role'), locale)
+  const tilt = TILTS[hashSeed(member.slug) % TILTS.length]
 
   return (
-    <li>
+    <li className={`transition-transform duration-200 hover:z-10 hover:rotate-0 hover:-translate-y-1.5 ${tilt}`}>
       <Link
         to="/$locale/team/$slug"
         params={{ locale, slug: member.slug }}
@@ -50,18 +55,21 @@ export function MemberCard({
           seed={member.slug}
           priority={priority}
         />
-        <div className="mt-2 space-y-0.5 lg:mt-3">
-          <p className="text-branch-text truncate font-semibold group-hover:underline lg:text-lg">
+        <div className="zine-card-paper mt-2.5 space-y-1 p-3 lg:mt-3">
+          <p className="font-display text-ink truncate text-base font-black group-hover:underline lg:text-lg">
             {member.displayName}
           </p>
           {role ? (
-            <p className="text-branch-muted truncate text-sm lg:text-base">
+            <p className="font-hand text-ink/85 truncate text-lg leading-tight font-bold">
               {role.value}
             </p>
           ) : null}
-          <p className="branch-label text-branch-muted">
-            {branchLabel(member.branch, dictionary)}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-1 pt-1">
+            <span className="bg-gold text-ink rounded-full border border-black px-2 py-0.5 font-mono text-2xs font-bold uppercase">
+              {branchLabel(member.branch, dictionary)}
+            </span>
+            <OctetBits octetIndex={member.octetIndex} className="text-ink" />
+          </div>
         </div>
       </Link>
     </li>

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /ro
+Allow: /en
+Disallow: /admin
+Disallow: /api
+Disallow: /q/
+Disallow: /styleguide
+
+Sitemap: https://octeto.md/sitemap.xml

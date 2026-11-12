@@ -1,12 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { FallbackNote } from '@/components/localized-text'
+import { OctetBits, OntonSticker } from '@/components/onton'
 import { TornSection } from '@/components/torn-section'
 import { getDictionary } from '@/i18n/dictionaries'
 import { formatMonthYear } from '@/i18n/format'
 import { getLocalized } from '@/i18n/localized'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
+import { imageFitClass } from '@/lib/schemas'
+import { buildPageMeta } from '@/lib/site'
+import { cn } from '@/lib/utils'
 import { getTeamInfo } from '@/server/about'
 
 /**
@@ -18,14 +22,23 @@ import { getTeamInfo } from '@/server/about'
  */
 export const Route = createFileRoute('/$locale/about')({
   loader: () => getTeamInfo(),
-  head: ({ params }) => {
+  head: ({ params, loaderData }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
     const dictionary = getDictionary(locale)
+    const title = `${dictionary.nav.about} — ${dictionary.site.name} (${dictionary.site.teamNumber})`
+    const description =
+      locale === 'ro'
+        ? `Povestea echipei ${dictionary.site.name} (Octeto / FTC #25474) de la IPLT „Spiru Haret” din Chișinău.`
+        : `The story of ${dictionary.site.name} (Octeto / FTC #25474) from IPLT "Spiru Haret" in Chișinău, Moldova.`
+
     return {
-      meta: [
-        { title: `${dictionary.nav.about} — ${dictionary.site.name}` },
-        { name: 'description', content: dictionary.site.tagline },
-      ],
+      meta: buildPageMeta({
+        title,
+        description,
+        locale,
+        pathname: `/${locale}/about`,
+        image: loaderData?.gallery?.[0]?.url,
+      }),
     }
   },
   component: About,
@@ -41,7 +54,8 @@ function About() {
     return (
       <TornSection branch="non_tech" seed="about" torn={false} as="main">
         <div className="mx-auto w-full max-w-measure px-4 py-16 sm:px-6">
-          <h1 className="text-3xl font-semibold">{dictionary.nav.about}</h1>
+          <OntonSticker pose="huh" locale={locale} size="lg" rotate={-5} />
+          <h1 className="mt-4 text-3xl font-bold">{dictionary.nav.about}</h1>
           <p className="text-branch-muted mt-3">{dictionary.empty.team}</p>
         </div>
       </TornSection>
@@ -54,18 +68,32 @@ function About() {
   return (
     <main>
       <TornSection branch="non_tech" seed="about-story" torn={false}>
-        <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-12 sm:px-6">
-          <header className="space-y-2">
-            <p className="branch-label text-branch-muted">
-              {info.schoolName} · {info.city}
-            </p>
-            <h1 className="text-3xl font-semibold">{dictionary.nav.about}</h1>
-            <p className="text-branch-muted">
-              {formatMonthYear(info.foundedDate, locale)}
-            </p>
+        <div className="mx-auto w-full max-w-4xl space-y-10 px-4 py-12 sm:px-6">
+          <header className="flex flex-wrap items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="branch-label text-branch-muted">
+                  {info.schoolName} · {info.city}
+                </p>
+                <OctetBits />
+              </div>
+              <h1 className="text-3xl font-bold sm:text-5xl">
+                {dictionary.nav.about}
+              </h1>
+              <p className="text-branch-muted text-sm">
+                {formatMonthYear(info.foundedDate, locale)}
+              </p>
+            </div>
+            <OntonSticker
+              pose="cai-verzi"
+              locale={locale}
+              size="lg"
+              rotate={6}
+              floating
+            />
           </header>
 
-          <div>
+          <div className="zine-card-paper masking-tape relative rounded-2xl p-6 sm:p-8 -rotate-0.5">
             <div
               className="prose-body max-w-measure"
               lang={isFallback ? 'ro' : undefined}
@@ -75,9 +103,14 @@ function About() {
           </div>
 
           {info.gallery.length > 0 ? (
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {info.gallery.map((image) => (
-                <li key={image.url}>
+            <ul className="grid gap-4 sm:grid-cols-2">
+              {info.gallery.map((image, idx) => (
+                <li
+                  key={image.url}
+                  style={{
+                    transform: `rotate(${idx % 2 === 0 ? -1.2 : 1.2}deg)`,
+                  }}
+                >
                   <img
                     src={image.url}
                     alt={getLocalized(image.alt, locale)?.value ?? ''}
@@ -85,7 +118,10 @@ function About() {
                     height={image.height}
                     loading="lazy"
                     decoding="async"
-                    className="w-full rounded-md"
+                    className={cn(
+                      'zine-card-paper aspect-[4/3] w-full rounded-xl',
+                      imageFitClass(image),
+                    )}
                   />
                 </li>
               ))}
@@ -93,12 +129,6 @@ function About() {
           ) : null}
         </div>
       </TornSection>
-
-      {/*
-        The contact block used to live here. It is now `SiteFooter`, rendered
-        by the locale layout on every page — repeating it on About would show
-        the same details twice on one screen.
-      */}
     </main>
   )
 }

@@ -19,22 +19,22 @@ const SCALE = [
 
 const FAMILIES = [
   {
-    name: 'Archivo',
-    role: 'Display',
+    name: 'Shantell Sans Variable',
+    role: 'Display (BNCE)',
     className: 'font-display',
-    note: 'Doar axa de greutate. Axa de lățime costă 106 KB în plus.',
+    note: 'Axa variabilă de bounce (BNCE) activă pentru titluri expresive de zine/scrapbook.',
   },
   {
-    name: 'Instrument Sans',
+    name: 'Bricolage Grotesque Variable',
     role: 'Text curent',
     className: 'font-body',
-    note: 'Sans humanist. Fundația site-ului.',
+    note: 'Sans expresiv și cald cu personalitate pentru paragrafe.',
   },
   {
     name: 'Martian Mono',
-    role: 'Utilitar',
+    role: 'Utilitar / 8-Bit',
     className: 'font-mono',
-    note: 'Specificații, metrici, etichete tehnice.',
+    note: 'Specificații, metrici, biți și etichete tehnice.',
   },
 ] as const
 

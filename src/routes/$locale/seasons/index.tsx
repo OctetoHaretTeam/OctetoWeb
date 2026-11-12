@@ -1,10 +1,18 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
+import {
+  ONTON_POSES,
+  OntonSticker,
+  ontonPoseForSeed,
+} from '@/components/onton'
 import { getDictionary } from '@/i18n/dictionaries'
 import { formatMonthYear } from '@/i18n/format'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
+import { imageFitClass } from '@/lib/schemas'
+import { buildPageMeta } from '@/lib/site'
+import { cn } from '@/lib/utils'
 import { getSeasons } from '@/server/seasons'
 
 /**
@@ -15,8 +23,19 @@ export const Route = createFileRoute('/$locale/seasons/')({
   head: ({ params }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
     const dictionary = getDictionary(locale)
+    const title = `${dictionary.nav.seasons} — ${dictionary.site.name} (${dictionary.site.teamNumber})`
+    const description =
+      locale === 'ro'
+        ? `Arhiva de sezoane FIRST Tech Challenge a echipei ${dictionary.site.name} (Octeto / FTC #25474) din Chișinău.`
+        : `FIRST Tech Challenge season archive of ${dictionary.site.name} (Octeto / FTC #25474) in Chișinău, Moldova.`
+
     return {
-      meta: [{ title: `${dictionary.nav.seasons} — ${dictionary.site.name}` }],
+      meta: buildPageMeta({
+        title,
+        description,
+        locale,
+        pathname: `/${locale}/seasons`,
+      }),
     }
   },
   component: SeasonIndex,
@@ -31,59 +50,95 @@ function SeasonIndex() {
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-5xl space-y-8 px-4 py-10 sm:px-6">
-        <h1 className="text-3xl font-semibold">{dictionary.nav.seasons}</h1>
+        <header className="flex flex-wrap items-center justify-between gap-6">
+          <h1 className="text-3xl font-bold sm:text-4xl">
+            {dictionary.nav.seasons}
+          </h1>
+          <OntonSticker
+            pose="ball"
+            locale={locale}
+            size="lg"
+            rotate={-6}
+            floating
+          />
+        </header>
 
         {seasons.length === 0 ? (
-          <div className="border-branch-border max-w-measure rounded-md border border-dashed p-6">
+          <div className="zine-card-paper flex items-center gap-4 rounded-2xl p-6 -rotate-1">
+            <OntonSticker pose="huh" locale={locale} size="md" rotate={4} />
             <p className="text-branch-muted">{dictionary.empty.seasons}</p>
           </div>
         ) : (
-          <ul className="grid gap-6 sm:grid-cols-2">
-            {seasons.map((season, index) => (
-              <li key={season.slug}>
-                <Link
-                  to="/$locale/seasons/$slug"
-                  params={{ locale, slug: season.slug }}
-                  className="group block no-underline"
-                >
-                  {season.coverImage ? (
-                    <img
-                      src={season.coverImage.url}
-                      alt=""
-                      width={season.coverImage.width}
-                      height={season.coverImage.height}
-                      loading={index === 0 ? 'eager' : 'lazy'}
-                      decoding="async"
-                      className="aspect-[3/2] w-full rounded-md image-fit"
-                    />
-                  ) : (
-                    <div className="bg-branch-surface aspect-[3/2] w-full rounded-md" />
-                  )}
+          <ul className="grid gap-8 sm:grid-cols-2">
+            {seasons.map((season, index) => {
+              const fallbackPose = ontonPoseForSeed(season.slug)
+              const fallbackSpec = ONTON_POSES[fallbackPose]
+              const tilt = index % 2 === 0 ? -1.4 : 1.4
 
-                  <div className="mt-3 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-xl font-semibold group-hover:underline">
-                        {season.name}
-                      </h2>
-                      {season.isCurrent ? (
-                        <span className="bg-branch-accent text-branch-accent-contrast rounded px-1.5 py-0.5 font-mono text-2xs font-semibold uppercase">
-                          {dictionary.meta.season}
-                        </span>
-                      ) : null}
+              return (
+                <li
+                  key={season.slug}
+                  style={{ transform: `rotate(${tilt}deg)` }}
+                  className="transition-transform duration-200 hover:rotate-0"
+                >
+                  <Link
+                    to="/$locale/seasons/$slug"
+                    params={{ locale, slug: season.slug }}
+                    className="zine-card-paper masking-tape group block rounded-2xl p-4 no-underline"
+                  >
+                    {season.coverImage ? (
+                      <img
+                        src={season.coverImage.url}
+                        alt=""
+                        width={season.coverImage.width}
+                        height={season.coverImage.height}
+                        loading={index === 0 ? 'eager' : 'lazy'}
+                        decoding="async"
+                        className={cn(
+                          'aspect-[3/2] w-full rounded-xl',
+                          imageFitClass(season.coverImage),
+                        )}
+                      />
+                    ) : (
+                      <div className="bg-sage/40 border-branch-border flex aspect-[3/2] w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6">
+                        <img
+                          src={fallbackSpec.src}
+                          alt=""
+                          aria-hidden="true"
+                          width={fallbackSpec.width}
+                          height={fallbackSpec.height}
+                          loading="lazy"
+                          decoding="async"
+                          className="onton-sticker-shadow h-32 w-32 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+                        />
+                      </div>
+                    )}
+
+                    <div className="mt-4 space-y-1 px-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-xl font-bold group-hover:underline">
+                          {season.name}
+                        </h2>
+                        {season.isCurrent ? (
+                          <span className="bg-branch-accent text-branch-accent-contrast rounded-md px-2 py-0.5 font-mono text-2xs font-bold uppercase -rotate-2">
+                            {dictionary.meta.season}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="text-branch-muted text-sm">
+                        {season.gameName}
+                      </p>
+                      <p className="branch-label text-branch-muted">
+                        {formatMonthYear(season.startDate, locale)}
+                        {season.endDate
+                          ? ` — ${formatMonthYear(season.endDate, locale)}`
+                          : ''}
+                      </p>
                     </div>
-                    <p className="text-branch-muted text-sm">
-                      {season.gameName}
-                    </p>
-                    <p className="branch-label text-branch-muted">
-                      {formatMonthYear(season.startDate, locale)}
-                      {season.endDate
-                        ? ` — ${formatMonthYear(season.endDate, locale)}`
-                        : ''}
-                    </p>
-                  </div>
-                </Link>
-              </li>
-            ))}
+                  </Link>
+                </li>
+              )
+            })}
           </ul>
         )}
       </div>

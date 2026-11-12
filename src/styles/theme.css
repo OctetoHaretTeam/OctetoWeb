@@ -47,15 +47,16 @@
      but it costs 106 KB more (171 KB vs 65 KB for latin + latin-ext) for a
      face used sparingly — a bad trade against the §12 LCP budget. */
 
-  --font-display: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Shantell Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-hand: var(--font-display);
+  --font-body: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Martian Mono Variable', ui-monospace, monospace;
 
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
-  --font-weight-black: 850;
+  --font-weight-black: 800;
 
   /* ── Type scale ────────────────────────────────────────────────────────
      Designed at 390px first (§2). Tracking tightens as size grows, which is

@@ -44,10 +44,13 @@ export function TornSection({
   torn?: boolean
   outlined?: boolean
 }) {
-  const fillPath = useMemo(() => tornEdgeSvgPath({ seed }), [seed])
+  const fillPath = useMemo(
+    () => tornEdgeSvgPath({ seed, amplitude: 3.8, segments: 76 }),
+    [seed],
+  )
   const curvePath = useMemo(
-    () => (outlined ? tornEdgeSvgCurvePath({ seed }) : undefined),
-    [seed, outlined],
+    () => tornEdgeSvgCurvePath({ seed, amplitude: 3.8, segments: 76 }),
+    [seed],
   )
 
   return (
@@ -64,22 +67,21 @@ export function TornSection({
           focusable="false"
           /* Sits above the previous section and is painted in this section's
              own ground colour, so the sheet reads as lying on top of it. */
-          className="pointer-events-none absolute inset-x-0 -top-[var(--tear)] h-[var(--tear)] w-full [--tear:1.5rem]"
+          className="pointer-events-none absolute inset-x-0 -top-[var(--tear)] z-10 h-[var(--tear)] w-full [--tear:2.1rem] drop-shadow-[0_-3px_3px_rgba(10,12,9,0.28)]"
         >
           {/* The fill covers the whole shape so the section's ground colour
-              paints behind the tear. No stroke on this path. */}
+              paints behind the tear. */}
           <path d={fillPath} fill="var(--branch-ground)" />
 
-          {/* When outlined, stroke ONLY the curvy torn edge — never the
-              straight bottom closure. This is a separate open path (no Z)
-              so no straight line is drawn. */}
-          {outlined && curvePath ? (
+          {/* Subtle hand-drawn stitch / ink line along the curvy torn edge */}
+          {curvePath ? (
             <path
               d={curvePath}
               fill="none"
-              stroke="var(--branch-muted)"
-              strokeOpacity={0.55}
-              strokeWidth={1}
+              stroke={outlined ? 'var(--branch-muted)' : 'var(--color-ink)'}
+              strokeOpacity={outlined ? 0.75 : 0.45}
+              strokeWidth={outlined ? 1.5 : 1.2}
+              strokeDasharray={outlined ? '4 3' : undefined}
               vectorEffect="non-scaling-stroke"
             />
           ) : null}

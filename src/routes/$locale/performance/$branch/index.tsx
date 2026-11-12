@@ -1,25 +1,24 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
+import {
+  ONTON_POSES,
+  OntonSticker,
+  ontonPoseForSeed,
+} from '@/components/onton'
 import { PaperCutout } from '@/components/paper-cutout'
 import { getDictionary } from '@/i18n/dictionaries'
 import { bilingual, getLocalized } from '@/i18n/localized'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
 import { BRANCH_SLUGS, branchFromSlug } from '@/lib/branch'
+import { imageFitClass } from '@/lib/schemas'
+import { buildPageMeta } from '@/lib/site'
+import { cn } from '@/lib/utils'
 import { getPerformanceEntries } from '@/server/performance'
 
 /**
  * A branch index — CLAUDE.md §4.
- *
- * NOTE: §7.3 specifies different STRUCTURES per branch — a spec table on a
- * hairline grid for tech, a photo-led collage for non-tech. The team asked for
- * one structure with only the palette changing, having seen both, so this
- * deliberately departs from that table. §7.3 is now out of date with the site.
- *
- * The collage is the surviving design, which means `PaperCutout` covers now
- * appear on technical entries too — a wider use than the three places §7.4
- * names.
  */
 export const Route = createFileRoute('/$locale/performance/$branch/')({
   loader: async ({ params }) => {
@@ -37,9 +36,16 @@ export const Route = createFileRoute('/$locale/performance/$branch/')({
       branch === 'tech'
         ? dictionary.nav.performanceTech
         : dictionary.nav.performanceNonTech
+    const title = `${label} — ${dictionary.site.name} (${dictionary.site.teamNumber})`
+    const description = `${label} — ${dictionary.nav.performance}, ${dictionary.site.name} (FTC #25474).`
 
     return {
-      meta: [{ title: `${label} — ${dictionary.site.name}` }],
+      meta: buildPageMeta({
+        title,
+        description,
+        locale,
+        pathname: `/${locale}/performance/${params.branch}`,
+      }),
     }
   },
   component: BranchIndex,
@@ -60,29 +66,51 @@ function BranchIndex() {
   return (
     <BranchTheme branch={branch} as="main" className="relative min-h-screen">
       <div className="relative mx-auto w-full max-w-5xl space-y-8 px-4 py-10 sm:px-6">
-        <header className="space-y-2">
-          <Link
-            to="/$locale/performance"
-            params={{ locale }}
-            className="branch-label text-branch-muted no-underline"
-          >
-            {dictionary.nav.performance}
-          </Link>
-          <h1 className="text-3xl font-semibold">{label}</h1>
+        <header className="flex flex-wrap items-center justify-between gap-6">
+          <div className="space-y-2">
+            <Link
+              to="/$locale/performance"
+              params={{ locale }}
+              className="branch-label text-branch-muted no-underline"
+            >
+              ← {dictionary.nav.performance}
+            </Link>
+            <h1 className="text-3xl font-bold sm:text-4xl">{label}</h1>
+          </div>
+          <OntonSticker
+            pose={branch === 'tech' ? 'demolisher' : 'muchacho'}
+            locale={locale}
+            size="lg"
+            rotate={branch === 'tech' ? -6 : 6}
+            floating
+          />
         </header>
 
         {entries.length === 0 ? (
-          <div className="border-branch-border max-w-measure rounded-md border border-dashed p-6">
+          <div className="zine-card flex flex-wrap items-center gap-6 rounded-2xl p-6 -rotate-1">
+            <OntonSticker
+              pose={branch === 'tech' ? 'arson' : 'huh'}
+              locale={locale}
+              size="md"
+              rotate={-4}
+            />
             <p className="text-branch-muted">{dictionary.empty.performance}</p>
           </div>
         ) : (
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {entries.map((entry) => {
+          <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {entries.map((entry, idx) => {
               const title = getLocalized(bilingual(entry, 'title'), locale)
               const summary = getLocalized(bilingual(entry, 'summary'), locale)
+              const fallbackPose = ontonPoseForSeed(entry.slug)
+              const fallbackSpec = ONTON_POSES[fallbackPose]
+              const tilt = ((idx % 3) - 1) * 1.4
 
               return (
-                <li key={entry.slug}>
+                <li
+                  key={entry.slug}
+                  style={{ transform: `rotate(${tilt}deg)` }}
+                  className="transition-transform duration-200 hover:rotate-0"
+                >
                   <Link
                     to="/$locale/performance/$branch/$slug"
                     params={{
@@ -107,18 +135,32 @@ function BranchIndex() {
                           height={entry.coverImage.height}
                           loading="lazy"
                           decoding="async"
-                          className="h-full w-full image-fit"
+                          className={cn(
+                            'h-full w-full',
+                            imageFitClass(entry.coverImage),
+                          )}
                         />
                       ) : (
-                        <div className="bg-branch-ground h-full w-full" />
+                        <div className="bg-branch-ground flex h-full w-full items-center justify-center p-6">
+                          <img
+                            src={fallbackSpec.src}
+                            alt=""
+                            aria-hidden="true"
+                            width={fallbackSpec.width}
+                            height={fallbackSpec.height}
+                            loading="lazy"
+                            decoding="async"
+                            className="onton-sticker-shadow max-h-full max-w-full object-contain"
+                          />
+                        </div>
                       )}
                     </PaperCutout>
 
-                    <div className="mt-3 space-y-1">
+                    <div className="zine-card mt-3 space-y-1 rounded-xl p-3.5">
                       <p className="branch-label text-branch-muted">
                         {entry.category}
                       </p>
-                      <p className="font-semibold group-hover:underline">
+                      <p className="font-display font-bold group-hover:underline">
                         {title?.value}
                       </p>
                       {summary ? (
@@ -144,7 +186,8 @@ function BranchNotFound() {
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-measure space-y-4 px-4 py-16 sm:px-6">
-        <h1 className="text-2xl font-semibold">
+        <OntonSticker pose="watahel" locale={locale} size="lg" rotate={-5} />
+        <h1 className="text-2xl font-bold">
           {dictionary.errors.notFoundTitle}
         </h1>
         <p className="text-branch-muted">{dictionary.errors.notFoundBody}</p>

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { Maximize2, Minimize2 } from 'lucide-react'
 
 import { ConfirmDialog } from '@/components/admin/confirm-dialog'
 import { ImageField } from '@/components/admin/image-field'
@@ -9,7 +10,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { homeSlideFormSchema } from '@/lib/forms/entities'
-import type { ImageAsset } from '@/lib/schemas'
+import {
+  type ImageAsset,
+  type ImageFit,
+  imageFitClass,
+} from '@/lib/schemas'
+import { cn } from '@/lib/utils'
 import {
   type AdminHomeSlide,
   adminCreateHomeSlide,
@@ -46,6 +52,10 @@ function AdminHomeSlides() {
   const [linkPath, setLinkPath] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setSlides(loaded.slides)
+  }, [loaded.slides])
 
   async function run(action: () => Promise<unknown>, message: string) {
     setBusy(true)
@@ -112,6 +122,30 @@ function AdminHomeSlides() {
       setSlides(previous)
       setError('Ordinea nu a putut fi salvată.')
     }
+  }
+
+  function handleSlideFitChange(slide: AdminHomeSlide, nextFit: ImageFit) {
+    const nextImage: ImageAsset = { ...slide.image, fit: nextFit }
+    setSlides((prev) =>
+      prev.map((s) => (s.id === slide.id ? { ...s, image: nextImage } : s)),
+    )
+    void run(
+      () =>
+        adminUpdateHomeSlide({
+          data: {
+            id: slide.id,
+            values: {
+              image: nextImage,
+              captionRo: slide.captionRo,
+              captionEn: slide.captionEn,
+              linkPath: slide.linkPath,
+              displayOrder: slide.displayOrder,
+              isActive: slide.isActive,
+            },
+          },
+        }),
+      'Slide-ul nu a putut fi actualizat.',
+    )
   }
 
   return (
@@ -183,76 +217,118 @@ function AdminHomeSlides() {
           getKey={(s) => s.id}
           getLabel={(s) => s.captionRo ?? 'slide'}
           onReorder={handleReorder}
-          renderItem={(slide) => (
-            <div className="flex flex-wrap items-center gap-3">
-              <img
-                src={slide.image.url}
-                alt=""
-                width={slide.image.width}
-                height={slide.image.height}
-                className="h-12 w-16 rounded image-fit"
-              />
-              <span className="text-sm">{slide.captionRo ?? '—'}</span>
-              {slide.linkPath ? (
-                <span className="text-muted-foreground font-mono text-2xs">
-                  → {slide.linkPath}
-                </span>
-              ) : null}
+          renderItem={(slide) => {
+            const currentFit: ImageFit = slide.image.fit ?? 'contain'
+            return (
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="border-border bg-branch-surface aspect-[4/3] w-24 shrink-0 overflow-hidden rounded border">
+                  <img
+                    src={slide.image.url}
+                    alt=""
+                    width={slide.image.width}
+                    height={slide.image.height}
+                    className={cn(
+                      'h-full w-full transition-all duration-150',
+                      imageFitClass(slide.image),
+                    )}
+                  />
+                </div>
+                <span className="text-sm">{slide.captionRo ?? '—'}</span>
+                {slide.linkPath ? (
+                  <span className="text-muted-foreground font-mono text-2xs">
+                    → {slide.linkPath}
+                  </span>
+                ) : null}
 
-              <div className="ml-auto flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id={`slide-active-${slide.id}`}
-                    checked={slide.isActive}
-                    disabled={busy}
-                    onCheckedChange={(checked) =>
-                      void run(
-                        () =>
-                          adminUpdateHomeSlide({
-                            data: {
-                              id: slide.id,
-                              values: {
-                                image: slide.image,
-                                captionRo: slide.captionRo,
-                                captionEn: slide.captionEn,
-                                linkPath: slide.linkPath,
-                                displayOrder: slide.displayOrder,
-                                isActive: checked,
+                <div className="ml-auto flex flex-wrap items-center gap-3">
+                  <div
+                    role="group"
+                    aria-label="Mod de încadrare slide"
+                    className="flex items-center gap-1"
+                  >
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={busy}
+                      variant={currentFit === 'contain' ? 'default' : 'outline'}
+                      aria-pressed={currentFit === 'contain'}
+                      onClick={() => handleSlideFitChange(slide, 'contain')}
+                      className="h-7 px-2 text-2xs"
+                    >
+                      <Minimize2 aria-hidden="true" className="size-3" />
+                      Contain
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={busy}
+                      variant={currentFit === 'cover' ? 'default' : 'outline'}
+                      aria-pressed={currentFit === 'cover'}
+                      onClick={() => handleSlideFitChange(slide, 'cover')}
+                      className="h-7 px-2 text-2xs"
+                    >
+                      <Maximize2 aria-hidden="true" className="size-3" />
+                      Cover
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id={`slide-active-${slide.id}`}
+                      checked={slide.isActive}
+                      disabled={busy}
+                      onCheckedChange={(checked) =>
+                        void run(
+                          () =>
+                            adminUpdateHomeSlide({
+                              data: {
+                                id: slide.id,
+                                values: {
+                                  image: slide.image,
+                                  captionRo: slide.captionRo,
+                                  captionEn: slide.captionEn,
+                                  linkPath: slide.linkPath,
+                                  displayOrder: slide.displayOrder,
+                                  isActive: checked,
+                                },
                               },
-                            },
-                          }),
-                        'Slide-ul nu a putut fi actualizat.',
+                            }),
+                          'Slide-ul nu a putut fi actualizat.',
+                        )
+                      }
+                    />
+                    <Label
+                      htmlFor={`slide-active-${slide.id}`}
+                      className="text-xs"
+                    >
+                      activ
+                    </Label>
+                  </div>
+
+                  <ConfirmDialog
+                    trigger={
+                      <button
+                        type="button"
+                        className="text-destructive text-xs underline"
+                      >
+                        Șterge
+                      </button>
+                    }
+                    title="Ștergi slide-ul?"
+                    description="Slide-ul dispare de pe pagina principală. Acțiunea nu poate fi anulată."
+                    confirmLabel="Șterge"
+                    disabled={busy}
+                    onConfirm={() =>
+                      void run(
+                        () => adminDeleteHomeSlide({ data: { id: slide.id } }),
+                        'Slide-ul nu a putut fi șters.',
                       )
                     }
                   />
-                  <Label htmlFor={`slide-active-${slide.id}`} className="text-xs">
-                    activ
-                  </Label>
                 </div>
-
-                <ConfirmDialog
-                  trigger={
-                    <button
-                      type="button"
-                      className="text-destructive text-xs underline"
-                    >
-                      Șterge
-                    </button>
-                  }
-                  title="Ștergi slide-ul?"
-                  description="Slide-ul dispare de pe pagina principală. Acțiunea nu poate fi anulată."
-                  confirmLabel="Șterge"
-                  disabled={busy}
-                  onConfirm={() =>
-                    void run(
-                      () => adminDeleteHomeSlide({ data: { id: slide.id } }),
-                      'Slide-ul nu a putut fi șters.',
-                    )
-                  }
-                />
               </div>
-            </div>
-          )}
+            )
+          }}
         />
       )}
     </div>

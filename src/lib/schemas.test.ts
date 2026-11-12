@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 
-import { galleryWithMax, imageSchema, imageUrlSchema } from './schemas'
+import {
+  galleryWithMax,
+  imageFitClass,
+  imageSchema,
+  imageUrlSchema,
+} from './schemas'
 
 const VALID_IMAGE = {
   url: '/uploads/team/andrei-beef.webp',
@@ -54,6 +59,21 @@ describe('imageSchema', () => {
     expect(imageSchema.safeParse(VALID_IMAGE).success).toBe(true)
   })
 
+  test('accepts optional fit values contain and cover', () => {
+    expect(
+      imageSchema.safeParse({ ...VALID_IMAGE, fit: 'contain' }).success,
+    ).toBe(true)
+    expect(
+      imageSchema.safeParse({ ...VALID_IMAGE, fit: 'cover' }).success,
+    ).toBe(true)
+  })
+
+  test('rejects invalid fit values', () => {
+    expect(
+      imageSchema.safeParse({ ...VALID_IMAGE, fit: 'stretch' }).success,
+    ).toBe(false)
+  })
+
   test('still requires Romanian alt text — §7.7', () => {
     expect(
       imageSchema.safeParse({ ...VALID_IMAGE, alt: { ro: '' } }).success,
@@ -66,6 +86,21 @@ describe('imageSchema', () => {
     expect(
       imageSchema.safeParse({ ...VALID_IMAGE, width: 0 }).success,
     ).toBe(false)
+  })
+})
+
+describe('imageFitClass', () => {
+  test('returns image-fit-contain by default when fit is omitted or null', () => {
+    expect(imageFitClass(undefined)).toBe('image-fit-contain')
+    expect(imageFitClass(null)).toBe('image-fit-contain')
+    expect(imageFitClass({})).toBe('image-fit-contain')
+    expect(imageFitClass({ fit: 'contain' })).toBe('image-fit-contain')
+  })
+
+  test('returns image-fit-cover when fit is cover or defaultFit is cover', () => {
+    expect(imageFitClass({ fit: 'cover' })).toBe('image-fit-cover')
+    expect(imageFitClass({}, 'cover')).toBe('image-fit-cover')
+    expect(imageFitClass({ fit: 'contain' }, 'cover')).toBe('image-fit-contain')
   })
 })
 
@@ -86,3 +121,4 @@ describe('galleryWithMax', () => {
     expect(galleryWithMax(10).safeParse([]).success).toBe(true)
   })
 })
+

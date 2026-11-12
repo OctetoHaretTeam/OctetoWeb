@@ -41,3 +41,7 @@ graphify-out/
 # They are the only copy of local content, so keep them — just not in git.
 db-backups/
 .env*
+
+# Teamwork agent workspace metadata
+.agents/
+PROJECT.md

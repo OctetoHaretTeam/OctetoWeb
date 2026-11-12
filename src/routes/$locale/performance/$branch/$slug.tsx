@@ -3,12 +3,16 @@ import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 
 import { BranchTheme } from '@/components/branch-theme'
 import { FallbackNote } from '@/components/localized-text'
+import { OntonSticker, ontonPoseForSeed } from '@/components/onton'
 import { getDictionary } from '@/i18n/dictionaries'
 import { formatDate, formatNumber, toIsoDate } from '@/i18n/format'
 import { bilingual, getLocalized } from '@/i18n/localized'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
 import { BRANCH_SLUGS, branchFromSlug } from '@/lib/branch'
+import { imageFitClass } from '@/lib/schemas'
+import { buildPageMeta } from '@/lib/site'
+import { cn } from '@/lib/utils'
 import { getPerformanceEntry } from '@/server/performance'
 
 /**
@@ -32,21 +36,31 @@ export const Route = createFileRoute('/$locale/performance/$branch/$slug')({
   head: ({ params, loaderData }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
     const dictionary = getDictionary(locale)
-    if (!loaderData) return { meta: [{ title: dictionary.nav.performance }] }
+    if (!loaderData) {
+      return {
+        meta: buildPageMeta({
+          title: `${dictionary.nav.performance} — ${dictionary.site.name}`,
+          description: dictionary.site.tagline,
+          locale,
+          pathname: `/${locale}/performance/${params.branch}/${params.slug}`,
+        }),
+      }
+    }
 
     const title = getLocalized(bilingual(loaderData, 'title'), locale)
     const summary = getLocalized(bilingual(loaderData, 'summary'), locale)
     const heading = title?.value ?? dictionary.nav.performance
 
     return {
-      meta: [
-        { title: `${heading} — ${dictionary.site.name}` },
-        { name: 'description', content: summary?.value ?? '' },
-        { property: 'og:title', content: heading },
-        ...(loaderData.coverImage
-          ? [{ property: 'og:image', content: loaderData.coverImage.url }]
-          : []),
-      ],
+      meta: buildPageMeta({
+        title: `${heading} — ${dictionary.site.name} (${dictionary.site.teamNumber})`,
+        description: summary?.value ?? dictionary.site.tagline,
+        locale,
+        pathname: `/${locale}/performance/${params.branch}/${loaderData.slug}`,
+        image: loaderData.coverImage?.url,
+        imageAlt: heading,
+        type: 'article',
+      }),
     }
   },
   component: EntryDetail,
@@ -62,6 +76,7 @@ function EntryDetail() {
   const title = getLocalized(bilingual(entry, 'title'), locale)
   const body = entry.bodyHtml[locale] ?? entry.bodyHtml.ro
   const isFallback = entry.bodyHtml[locale] === null
+  const pose = ontonPoseForSeed(entry.slug)
 
   const metrics = entry.metrics
   const hasMetrics =
@@ -84,25 +99,34 @@ function EntryDetail() {
             : dictionary.nav.performanceNonTech}
         </Link>
 
-        <header className="space-y-2">
-          <p className="branch-label text-branch-muted">{entry.category}</p>
-          <h1 className="text-3xl font-semibold">{title?.value}</h1>
-          <p className="text-branch-muted text-sm">
-            <time dateTime={toIsoDate(entry.date)}>
-              {formatDate(entry.date, locale)}
-            </time>
-            {entry.seasonSlug ? (
-              <>
-                {' · '}
-                <Link
-                  to="/$locale/seasons/$slug"
-                  params={{ locale, slug: entry.seasonSlug }}
-                >
-                  {entry.seasonName}
-                </Link>
-              </>
-            ) : null}
-          </p>
+        <header className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2">
+            <p className="branch-label text-branch-muted">{entry.category}</p>
+            <h1 className="text-3xl font-bold sm:text-4xl">{title?.value}</h1>
+            <p className="text-branch-muted text-sm">
+              <time dateTime={toIsoDate(entry.date)}>
+                {formatDate(entry.date, locale)}
+              </time>
+              {entry.seasonSlug ? (
+                <>
+                  {' · '}
+                  <Link
+                    to="/$locale/seasons/$slug"
+                    params={{ locale, slug: entry.seasonSlug }}
+                  >
+                    {entry.seasonName}
+                  </Link>
+                </>
+              ) : null}
+            </p>
+          </div>
+          <OntonSticker
+            pose={pose}
+            locale={locale}
+            size="md"
+            rotate={5}
+            floating
+          />
         </header>
 
         {entry.coverImage ? (
@@ -113,12 +137,15 @@ function EntryDetail() {
             height={entry.coverImage.height}
             fetchPriority="high"
             decoding="async"
-            className="w-full rounded-md"
+            className={cn(
+              'zine-card aspect-[4/3] w-full rounded-xl',
+              imageFitClass(entry.coverImage),
+            )}
           />
         ) : null}
 
         {hasMetrics ? (
-          <dl className="border-branch-border grid grid-cols-2 gap-4 rounded-md border p-4 sm:grid-cols-3">
+          <dl className="zine-card grid grid-cols-2 gap-4 rounded-xl p-4 sm:grid-cols-3 -rotate-1">
             {metrics.peopleReached !== undefined ? (
               <Metric
                 label={dictionary.meta.peopleReached}
@@ -140,7 +167,7 @@ function EntryDetail() {
           </dl>
         ) : null}
 
-        <div>
+        <div className="zine-card rounded-2xl p-6">
           <div
             className="prose-body max-w-measure"
             lang={isFallback ? 'ro' : undefined}
@@ -150,9 +177,14 @@ function EntryDetail() {
         </div>
 
         {entry.gallery.length > 0 ? (
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {entry.gallery.map((image) => (
-              <li key={image.url}>
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {entry.gallery.map((image, idx) => (
+              <li
+                key={image.url}
+                style={{
+                  transform: `rotate(${idx % 2 === 0 ? -1.2 : 1.2}deg)`,
+                }}
+              >
                 <img
                   src={image.url}
                   alt={getLocalized(image.alt, locale)?.value ?? ''}
@@ -160,7 +192,10 @@ function EntryDetail() {
                   height={image.height}
                   loading="lazy"
                   decoding="async"
-                  className="w-full rounded-md"
+                  className={cn(
+                    'zine-card aspect-[4/3] w-full rounded-xl',
+                    imageFitClass(image),
+                  )}
                 />
               </li>
             ))}
@@ -186,7 +221,8 @@ function EntryNotFound() {
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-measure space-y-4 px-4 py-16 sm:px-6">
-        <h1 className="text-2xl font-semibold">
+        <OntonSticker pose="huh" locale={locale} size="lg" rotate={-6} />
+        <h1 className="text-2xl font-bold">
           {dictionary.errors.notFoundTitle}
         </h1>
         <p className="text-branch-muted">{dictionary.errors.notFoundBody}</p>

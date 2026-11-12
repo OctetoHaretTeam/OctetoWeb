@@ -50,13 +50,38 @@ export const imageUrlSchema = z
     'Adresa imaginii trebuie să fie o cale din site sau o adresă http(s).',
   )
 
+export const IMAGE_FIT_VALUES = ['contain', 'cover'] as const
+export const imageFitSchema = z.enum(IMAGE_FIT_VALUES)
+export type ImageFit = z.infer<typeof imageFitSchema>
+
 export const imageSchema = z.object({
   url: imageUrlSchema,
   alt: altTextSchema,
   width: z.int().positive(),
   height: z.int().positive(),
   blurhash: z.string().min(1).optional(),
+  /**
+   * How the photo fits its aspect-ratio frame:
+   * - `'contain'` ("shrink to fill"): shows the whole image without cropping,
+   *   filling any remaining space with the branch surface mat.
+   * - `'cover'` ("fill the space"): scales and crops the image to fill the
+   *   entire frame edge-to-edge.
+   * Optional so existing database rows without `fit` remain valid.
+   */
+  fit: imageFitSchema.optional(),
 })
+
+/**
+ * Returns the CSS utility class (`image-fit-contain` or `image-fit-cover`)
+ * for an `ImageAsset`.
+ */
+export function imageFitClass(
+  image: { fit?: ImageFit | null } | null | undefined,
+  defaultFit: ImageFit = 'contain',
+): string {
+  const fit = image?.fit ?? defaultFit
+  return fit === 'cover' ? 'image-fit-cover' : 'image-fit-contain'
+}
 
 export const gallerySchema = z.array(imageSchema)
 
