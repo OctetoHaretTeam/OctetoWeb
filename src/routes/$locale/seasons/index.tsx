@@ -79,12 +79,16 @@ function SeasonIndex() {
                 <li
                   key={season.slug}
                   style={{ transform: `rotate(${tilt}deg)` }}
-                  className="transition-transform duration-200 hover:rotate-0"
+                  className="relative transition-transform duration-200 hover:rotate-0"
                 >
+                  <span
+                    aria-hidden="true"
+                    className="masking-tape pointer-events-none absolute -top-2.5 left-1/2 z-10 h-5 w-20 -translate-x-1/2"
+                  />
                   <Link
                     to="/$locale/seasons/$slug"
                     params={{ locale, slug: season.slug }}
-                    className="zine-card-paper masking-tape group block rounded-2xl p-4 no-underline"
+                    className="zine-card-paper group block rounded-2xl p-4 no-underline"
                   >
                     {season.coverImage ? (
                       <img
@@ -107,7 +111,7 @@ function SeasonIndex() {
                           aria-hidden="true"
                           width={fallbackSpec.width}
                           height={fallbackSpec.height}
-                          loading="lazy"
+                          loading={index < 2 ? 'eager' : 'lazy'}
                           decoding="async"
                           className="onton-sticker-shadow h-32 w-32 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
                         />

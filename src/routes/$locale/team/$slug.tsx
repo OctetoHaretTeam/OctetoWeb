@@ -205,7 +205,7 @@ function ProfileError() {
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto flex w-full max-w-measure flex-col items-center space-y-4 px-4 py-16 text-center sm:px-6">
-        <OntonSticker pose="arson" locale={locale} size="lg" />
+        <OntonSticker pose="watahel" locale={locale} size="lg" />
         <h1 className="text-2xl font-semibold">
           {dictionary.errors.serverTitle}
         </h1>

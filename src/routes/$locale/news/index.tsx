@@ -69,7 +69,11 @@ function NewsIndex() {
         </header>
 
         {posts.length === 0 ? (
-          <div className="zine-card-paper masking-tape relative flex flex-wrap items-center gap-6 rounded-2xl p-6 -rotate-1">
+          <div className="zine-card-paper relative flex flex-wrap items-center gap-6 rounded-2xl p-6 -rotate-1">
+            <span
+              aria-hidden="true"
+              className="masking-tape pointer-events-none absolute -top-2.5 left-1/2 z-10 h-5 w-20 -translate-x-1/2"
+            />
             <OntonSticker pose="huh" locale={locale} size="md" rotate={5} />
             <p className="text-branch-muted">{dictionary.empty.news}</p>
           </div>
@@ -86,12 +90,16 @@ function NewsIndex() {
                 <li
                   key={post.slug}
                   style={{ transform: `rotate(${tilt}deg)` }}
-                  className="transition-transform duration-200 hover:rotate-0"
+                  className="relative transition-transform duration-200 hover:rotate-0"
                 >
+                  <span
+                    aria-hidden="true"
+                    className="masking-tape pointer-events-none absolute -top-2.5 left-1/2 z-10 h-5 w-20 -translate-x-1/2"
+                  />
                   <Link
                     to="/$locale/news/$slug"
                     params={{ locale, slug: post.slug }}
-                    className="zine-card-paper masking-tape group block rounded-2xl p-4 no-underline"
+                    className="zine-card-paper group block rounded-2xl p-4 no-underline"
                   >
                     {post.coverImage ? (
                       <img
@@ -117,7 +125,7 @@ function NewsIndex() {
                           aria-hidden="true"
                           width={fallbackSpec.width}
                           height={fallbackSpec.height}
-                          loading="lazy"
+                          loading={index < 2 ? 'eager' : 'lazy'}
                           decoding="async"
                           className="onton-sticker-shadow h-32 w-32 object-contain"
                         />

@@ -89,7 +89,7 @@ function BranchIndex() {
         {entries.length === 0 ? (
           <div className="zine-card flex flex-wrap items-center gap-6 rounded-2xl p-6 -rotate-1">
             <OntonSticker
-              pose={branch === 'tech' ? 'arson' : 'huh'}
+              pose="huh"
               locale={locale}
               size="md"
               rotate={-4}

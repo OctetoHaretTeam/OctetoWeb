@@ -113,7 +113,11 @@ function SeasonDetail() {
           />
         ) : null}
 
-        <div className="zine-card-paper masking-tape relative rounded-2xl p-6 sm:p-8 -rotate-0.5">
+        <div className="zine-card-paper relative rounded-2xl p-6 sm:p-8 -rotate-0.5">
+          <span
+            aria-hidden="true"
+            className="masking-tape pointer-events-none absolute -top-2.5 left-12 z-10 h-5 w-24 -rotate-2"
+          />
           <div
             className="prose-body max-w-measure"
             lang={isFallback ? 'ro' : undefined}
@@ -136,15 +140,7 @@ function SeasonDetail() {
 
         {season.awards.length > 0 ? (
           <section className="space-y-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-bold">{dictionary.meta.awards}</h2>
-              <OntonSticker
-                pose="high"
-                locale={locale}
-                size="sm"
-                rotate={-6}
-              />
-            </div>
+            <h2 className="text-2xl font-bold">{dictionary.meta.awards}</h2>
             <ul className="grid gap-4 sm:grid-cols-2">
               {season.awards.map((award, idx) => {
                 const name = getLocalized(bilingual(award, 'name'), locale)
@@ -153,11 +149,15 @@ function SeasonDetail() {
                 return (
                   <li
                     key={award.id}
-                    className="zine-card-paper masking-tape-gold relative rounded-2xl p-5"
+                    className="zine-card-paper relative rounded-2xl p-5"
                     style={{
                       transform: `rotate(${idx % 2 === 0 ? -1.1 : 1.2}deg)`,
                     }}
                   >
+                    <span
+                      aria-hidden="true"
+                      className="masking-tape-gold pointer-events-none absolute -top-2.5 left-1/2 z-10 h-5 w-20 -translate-x-1/2 rotate-2"
+                    />
                     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <h3 className="font-display text-lg font-bold">
                         {name?.value}
