@@ -65,9 +65,9 @@ export function TornSection({
           preserveAspectRatio="none"
           aria-hidden="true"
           focusable="false"
-          /* Sits above the previous section and is painted in this section's
-             own ground colour, so the sheet reads as lying on top of it. */
-          className="pointer-events-none absolute inset-x-0 -top-[var(--tear)] z-10 h-[var(--tear)] w-full [--tear:2.1rem] drop-shadow-[0_-3px_3px_rgba(10,12,9,0.28)]"
+          /* Sits above the previous section and overlaps 2px into this section
+             so subpixel viewport scaling never leaves a dark seam hairline. */
+          className="pointer-events-none absolute inset-x-0 top-[2px] z-10 h-[var(--tear)] w-full -translate-y-full [--tear:2.1rem] drop-shadow-[0_-6px_3px_rgba(10,12,9,0.25)]"
         >
           {/* The fill covers the whole shape so the section's ground colour
               paints behind the tear. */}

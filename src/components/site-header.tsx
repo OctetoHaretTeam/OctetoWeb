@@ -31,10 +31,10 @@ export function SiteHeader() {
   return (
     <header
       data-branch="tech"
-      className="border-branch-border bg-branch-ground relative border-b-2 border-dashed lg:sticky lg:top-0 lg:z-50"
+      className="bg-branch-ground relative shadow-[0_6px_20px_rgba(10,12,9,0.42)] lg:sticky lg:top-0 lg:z-50"
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <div className="flex items-center justify-between gap-4 py-3">
+        <div className="flex items-center justify-between gap-4 py-2.5">
           <div className="flex items-center gap-3">
             <Link
               to="/$locale"
@@ -85,7 +85,7 @@ function SectionNav({
   return (
     <nav
       aria-label={dictionary.nav.home}
-      className={`items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
+      className={`items-center gap-1.5 overflow-x-auto px-1 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
     >
       {NAV.map((item) => (
         <Link

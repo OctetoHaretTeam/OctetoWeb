@@ -236,7 +236,7 @@ function PerformanceOverview() {
       </div>
 
       {entries.length === 0 ? (
-        <BranchTheme branch="non_tech" className="border-branch-border border-t">
+        <BranchTheme branch="non_tech">
           <div className="mx-auto max-w-measure px-4 py-10 sm:px-6">
             <p className="text-branch-muted">{dictionary.empty.performance}</p>
           </div>

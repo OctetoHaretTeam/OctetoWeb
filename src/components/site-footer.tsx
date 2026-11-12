@@ -97,7 +97,7 @@ export function SiteFooter({ info }: { info: ContactInfo }) {
           </div>
         </div>
 
-        <div className="border-branch-border mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-dashed pt-4 text-xs">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 pt-2 text-xs">
           <div className="text-signal flex items-center gap-2 font-mono">
             <OctetBits octetIndex={0b10100101} />
           </div>

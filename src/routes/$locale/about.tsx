@@ -93,7 +93,11 @@ function About() {
             />
           </header>
 
-          <div className="zine-card-paper masking-tape relative rounded-2xl p-6 sm:p-8 -rotate-0.5">
+          <div className="zine-card-paper relative rounded-2xl p-6 sm:p-8 -rotate-0.5">
+            <span
+              aria-hidden="true"
+              className="masking-tape pointer-events-none absolute -top-2.5 left-12 z-10 h-5 w-24 -rotate-2"
+            />
             <div
               className="prose-body max-w-measure"
               lang={isFallback ? 'ro' : undefined}

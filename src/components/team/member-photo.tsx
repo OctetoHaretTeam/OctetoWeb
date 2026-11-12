@@ -10,14 +10,14 @@ import { cn } from '@/lib/utils'
 
 export function MemberPhoto({
   image,
-  displayName,
+  displayName: _displayName,
   locale,
   seed,
   priority = false,
   className,
 }: {
   image: ImageAsset | null
-  displayName: string
+  displayName?: string
   locale: Locale
   /** Stable per member — the slug, so the tear never changes. */
   seed: string
@@ -70,20 +70,8 @@ export function MemberPhoto({
             decoding="async"
             className="onton-sticker-shadow max-h-[82%] max-w-[82%] object-contain transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
           />
-          <span
-            aria-hidden="true"
-            className="bg-ink text-paper font-display absolute right-3 bottom-3 rounded-full border-2 border-current px-2.5 py-0.5 text-sm font-black -rotate-6"
-          >
-            {firstInitial(displayName)}
-          </span>
         </div>
       )}
     </PaperCutout>
   )
-}
-
-/** First initial of the name the site is allowed to show. */
-function firstInitial(displayName: string): string {
-  const first = displayName.trim().split(/\s+/)[0] ?? ''
-  return Array.from(first)[0]?.toLocaleUpperCase('ro-MD') ?? '·'
 }

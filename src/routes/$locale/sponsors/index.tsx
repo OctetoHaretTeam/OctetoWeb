@@ -62,7 +62,11 @@ function SponsorWall() {
         </header>
 
         {sponsors.length === 0 ? (
-          <div className="zine-card-paper masking-tape relative flex flex-wrap items-center gap-5 rounded-2xl p-6 -rotate-1">
+          <div className="zine-card-paper relative flex flex-wrap items-center gap-5 rounded-2xl p-6 -rotate-1">
+            <span
+              aria-hidden="true"
+              className="masking-tape pointer-events-none absolute -top-2.5 left-1/2 z-10 h-5 w-20 -translate-x-1/2 -rotate-2"
+            />
             <OntonSticker
               pose="muchacho"
               locale={locale}
@@ -83,11 +87,6 @@ function SponsorWall() {
 
               const cardContent = (
                 <>
-                  <span
-                    aria-hidden="true"
-                    className="bg-gold absolute inset-x-0 top-0 h-1.5 rounded-t-xl opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-                  />
-
                   <div
                     className={cn(
                       'ring-branch-border/40 bg-paper relative flex h-24 w-full items-center justify-center overflow-hidden rounded-lg shadow-inner ring-1 transition-transform duration-300 group-hover:scale-102',
@@ -108,8 +107,8 @@ function SponsorWall() {
                     />
                   </div>
 
-                  <div className="border-branch-border mt-3 space-y-1 border-t pt-3">
-                    <div className="flex items-center justify-between">
+                  <div className="mt-3 space-y-1 pt-1">
+                    <div className="flex items-center justify-between gap-2">
                       <p className="text-ink font-display text-lg font-bold">
                         {sponsor.name}
                       </p>
@@ -134,8 +133,12 @@ function SponsorWall() {
                 <li
                   key={sponsor.id}
                   style={{ transform: `rotate(${tilt}deg)` }}
-                  className="zine-card-paper masking-tape-gold group relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:rotate-0"
+                  className="zine-card-paper group relative rounded-2xl p-5 transition-all duration-300 hover:rotate-0"
                 >
+                  <span
+                    aria-hidden="true"
+                    className="masking-tape-gold pointer-events-none absolute -top-2.5 left-1/2 z-10 h-5 w-20 -translate-x-1/2 rotate-1"
+                  />
                   {sponsor.websiteUrl ? (
                     <a
                       href={sponsor.websiteUrl}
@@ -154,7 +157,11 @@ function SponsorWall() {
           </ul>
         )}
 
-        <aside className="zine-card-paper masking-tape-gold relative flex flex-col justify-between gap-6 rounded-2xl p-6 sm:flex-row sm:items-center sm:p-8 rotate-0.5">
+        <aside className="zine-card-paper relative flex flex-col justify-between gap-6 rounded-2xl p-6 sm:flex-row sm:items-center sm:p-8 rotate-0.5">
+          <span
+            aria-hidden="true"
+            className="masking-tape-gold pointer-events-none absolute -top-2.5 left-12 z-10 h-5 w-24 -rotate-2"
+          />
           <div className="space-y-2">
             <h2 className="text-2xl font-bold">
               {dictionary.sponsorship.title}

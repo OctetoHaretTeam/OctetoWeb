@@ -38,7 +38,11 @@ function UnknownCode() {
       className="flex min-h-screen items-center"
     >
       <div className="mx-auto w-full max-w-xl px-4 py-16 sm:px-6">
-        <div className="zine-card-paper masking-tape relative space-y-5 rounded-2xl p-6 sm:p-8 -rotate-1">
+        <div className="zine-card-paper relative space-y-5 rounded-2xl p-6 sm:p-8 -rotate-1">
+          <span
+            aria-hidden="true"
+            className="masking-tape pointer-events-none absolute -top-2.5 left-1/2 z-10 h-5 w-24 -translate-x-1/2 rotate-1"
+          />
           <OntonSticker
             pose="watahel"
             locale={locale}

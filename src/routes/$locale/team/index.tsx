@@ -70,15 +70,15 @@ function TeamPage() {
         {grouped.length === 0 ? (
           <EmptyRoster message={dictionary.empty.team} locale={locale} />
         ) : (
-          <div className="grid gap-x-10 gap-y-12 lg:grid-cols-[repeat(auto-fit,minmax(16rem,1fr))] lg:items-start">
+          <div className="space-y-12">
             {grouped.map((group, groupIndex) => (
-              <section key={group.branch} className="space-y-5">
+              <section key={group.branch} className="space-y-6">
                 <div className="flex items-center gap-2">
                   <h2 className="zine-btn bg-paper text-ink inline-block px-3.5 py-1 text-base font-black -rotate-1">
                     {branchLabel(group.branch, dictionary)}
                   </h2>
                 </div>
-                <ul className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))]">
+                <ul className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                   {group.members.map((member, index) => (
                     <MemberCard
                       key={member.slug}

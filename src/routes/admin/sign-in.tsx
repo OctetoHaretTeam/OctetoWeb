@@ -41,7 +41,11 @@ function SignIn() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-4">
-      <div className="zine-card-paper masking-tape relative flex flex-col gap-5 rounded-2xl p-6 sm:p-8 -rotate-1">
+      <div className="zine-card-paper relative flex flex-col gap-5 rounded-2xl p-6 sm:p-8 -rotate-1">
+        <span
+          aria-hidden="true"
+          className="masking-tape pointer-events-none absolute -top-2.5 left-1/2 z-10 h-5 w-24 -translate-x-1/2 rotate-1"
+        />
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-1">
             <p className="font-mono text-2xs uppercase text-muted-foreground">

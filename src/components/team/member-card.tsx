@@ -42,7 +42,7 @@ export function MemberCard({
   const tilt = TILTS[hashSeed(member.slug) % TILTS.length]
 
   return (
-    <li className={`transition-transform duration-200 hover:z-10 hover:rotate-0 hover:-translate-y-1.5 ${tilt}`}>
+    <li className={`mx-auto w-full max-w-60 transition-transform duration-200 hover:z-10 hover:rotate-0 hover:-translate-y-1.5 ${tilt}`}>
       <Link
         to="/$locale/team/$slug"
         params={{ locale, slug: member.slug }}
@@ -56,15 +56,15 @@ export function MemberCard({
           priority={priority}
         />
         <div className="zine-card-paper mt-2.5 space-y-1 p-3 lg:mt-3">
-          <p className="font-display text-ink truncate text-base font-black group-hover:underline lg:text-lg">
+          <p className="font-display text-ink text-base leading-snug font-black break-words group-hover:underline sm:text-lg">
             {member.displayName}
           </p>
           {role ? (
-            <p className="font-hand text-ink/85 truncate text-lg leading-tight font-bold">
+            <p className="font-hand text-ink/85 text-base leading-tight font-bold break-words sm:text-lg">
               {role.value}
             </p>
           ) : null}
-          <div className="flex flex-wrap items-center justify-between gap-1 pt-1">
+          <div className="flex flex-wrap items-center justify-between gap-1.5 pt-1">
             <span className="bg-gold text-ink rounded-full border border-black px-2 py-0.5 font-mono text-2xs font-bold uppercase">
               {branchLabel(member.branch, dictionary)}
             </span>

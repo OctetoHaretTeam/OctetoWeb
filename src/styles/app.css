@@ -171,10 +171,8 @@ body {
 
 /* Masking tape strip that pins cards */
 @utility masking-tape {
-  background-color: rgba(233, 228, 214, 0.86);
-  border-top: 1px dashed rgba(10, 12, 9, 0.22);
-  border-bottom: 1px dashed rgba(10, 12, 9, 0.22);
-  box-shadow: 0 2px 4px rgba(10, 12, 9, 0.18);
+  background-color: rgba(233, 228, 214, 0.88);
+  box-shadow: 0 2px 4px rgba(10, 12, 9, 0.16);
   clip-path: polygon(
     3% 0%, 97% 2%, 100% 18%, 98% 39%, 100% 62%, 97% 84%, 99% 100%,
     2% 98%, 0% 80%, 3% 58%, 0% 35%, 2% 14%
@@ -182,10 +180,8 @@ body {
 }
 
 @utility masking-tape-gold {
-  background-color: rgba(205, 160, 220, 0.85);
-  border-top: 1px dashed rgba(10, 12, 9, 0.25);
-  border-bottom: 1px dashed rgba(10, 12, 9, 0.25);
-  box-shadow: 0 2px 4px rgba(10, 12, 9, 0.2);
+  background-color: rgba(205, 160, 220, 0.88);
+  box-shadow: 0 2px 4px rgba(10, 12, 9, 0.18);
   clip-path: polygon(
     2% 2%, 98% 0%, 100% 22%, 97% 45%, 100% 68%, 98% 88%, 99% 100%,
     1% 99%, 3% 78%, 0% 54%, 2% 30%, 0% 10%
