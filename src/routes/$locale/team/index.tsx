@@ -59,15 +59,12 @@ function TeamPage() {
             {dictionary.nav.team}
           </h1>
 
-          <div className="flex items-center gap-4">
-            <OntonSticker
-              pose="squish"
-              locale={locale}
-              size="md"
-              rotate={-5}
-            />
-            <OntonSticker pose="ball" locale={locale} size="sm" rotate={6} />
-          </div>
+          <OntonSticker
+            pose="squish"
+            locale={locale}
+            size="md"
+            rotate={-5}
+          />
         </header>
 
         {grouped.length === 0 ? (

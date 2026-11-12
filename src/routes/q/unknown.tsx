@@ -39,16 +39,13 @@ function UnknownCode() {
     >
       <div className="mx-auto w-full max-w-xl px-4 py-16 sm:px-6">
         <div className="zine-card-paper masking-tape relative space-y-5 rounded-2xl p-6 sm:p-8 -rotate-1">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <OntonSticker
-              pose="watahel"
-              locale={locale}
-              size="lg"
-              rotate={-6}
-              floating
-            />
-            <OntonSticker pose="huh" locale={locale} size="md" rotate={8} />
-          </div>
+          <OntonSticker
+            pose="watahel"
+            locale={locale}
+            size="lg"
+            rotate={-6}
+            floating
+          />
 
           <p className="branch-label text-branch-muted">
             {dictionary.site.teamNumber}

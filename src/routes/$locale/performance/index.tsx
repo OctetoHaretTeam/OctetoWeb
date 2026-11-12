@@ -91,7 +91,7 @@ function PerformanceOverview() {
                   </h1>
                 </div>
                 <OntonSticker
-                  pose="arson"
+                  pose="demolisher"
                   locale={locale}
                   size="md"
                   rotate={-6}

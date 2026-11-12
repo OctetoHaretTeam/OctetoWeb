@@ -1,6 +1,5 @@
 import { Link, Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
-import { OntonSticker } from '@/components/onton'
 import { getAdminSession } from '@/server/auth'
 
 /**
@@ -50,14 +49,11 @@ function AuthedLayout() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
       <header className="border-border flex flex-wrap items-center justify-between gap-4 border-b pb-4">
-        <div className="flex items-center gap-3">
-          <OntonSticker pose="cofe" locale="ro" size="xs" rotate={-6} />
-          <div>
-            <p className="font-mono text-2xs uppercase text-muted-foreground">
-              OctetoHaret
-            </p>
-            <p className="font-display text-lg font-bold">Administrare</p>
-          </div>
+        <div>
+          <p className="font-mono text-2xs uppercase text-muted-foreground">
+            OctetoHaret
+          </p>
+          <p className="font-display text-lg font-bold">Administrare</p>
         </div>
 
         <div className="flex items-center gap-3">

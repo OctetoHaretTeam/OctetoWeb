@@ -51,17 +51,6 @@ export function SiteHeader() {
                 </span>
               </span>
             </Link>
-
-            <img
-              src="/onton/onton-french.webp"
-              alt=""
-              aria-hidden="true"
-              width={640}
-              height={468}
-              loading="lazy"
-              decoding="async"
-              className="onton-sticker-shadow hidden h-9 w-auto -rotate-6 transition-transform duration-200 hover:rotate-6 hover:scale-110 md:block"
-            />
           </div>
 
           <div className="flex items-center gap-3">

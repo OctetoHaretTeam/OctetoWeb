@@ -1,6 +1,5 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
-import { OntonMascotDock } from '@/components/onton'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { getDictionary } from '@/i18n/dictionaries'
@@ -131,7 +130,6 @@ function LocaleLayout() {
         <Outlet />
       </div>
       <SiteFooter info={contact} />
-      <OntonMascotDock locale={locale} />
     </div>
   )
 }

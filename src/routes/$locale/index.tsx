@@ -9,12 +9,7 @@ import {
   heroSlideCaption,
   type HeroSlide,
 } from '@/components/hero-slideshow'
-import {
-  ONTON_POSES,
-  OctetBits,
-  OntonSticker,
-  type OntonPose,
-} from '@/components/onton'
+import { OctetBits, OntonSticker } from '@/components/onton'
 import { TornSection } from '@/components/torn-section'
 import { getDictionary } from '@/i18n/dictionaries'
 import {
@@ -157,26 +152,9 @@ function Home() {
       {awards.length > 0 ? (
         <TornSection branch="non_tech" seed="awards">
           <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-14 sm:px-6">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="font-display text-3xl font-black -rotate-1">
-                {dictionary.meta.awards}
-              </h2>
-
-              <div className="flex items-center gap-3">
-                <OntonSticker
-                  pose="muchacho"
-                  locale={locale}
-                  size="sm"
-                  rotate={-6}
-                />
-                <OntonSticker
-                  pose="squish"
-                  locale={locale}
-                  size="sm"
-                  rotate={6}
-                />
-              </div>
-            </div>
+            <h2 className="font-display text-3xl font-black -rotate-1">
+              {dictionary.meta.awards}
+            </h2>
 
             <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {awards.map((item, idx) => {
@@ -219,45 +197,31 @@ function Home() {
 
       {/* ── STATS ROW ───────────────────────────────────────────────────── */}
       <TornSection branch="tech" seed="stats">
-        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-14 sm:px-6">
-          <div className="flex justify-end gap-4">
-            <OntonSticker pose="arson" locale={locale} size="xs" rotate={-5} />
-            <OntonSticker
-              pose="cai-verzi"
-              locale={locale}
-              size="xs"
-              rotate={4}
-            />
-          </div>
-
+        <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             <Stat
               label={dictionary.meta.seasons}
               value={stats.seasons}
               locale={locale}
               tilt="-rotate-2"
-              pose="blob"
             />
             <Stat
               label={dictionary.meta.awards}
               value={stats.awards}
               locale={locale}
               tilt="rotate-1"
-              pose="muchacho"
             />
             <Stat
               label={dictionary.meta.members}
               value={stats.members}
               locale={locale}
               tilt="-rotate-1"
-              pose="squish"
             />
             <Stat
               label={dictionary.nav.performanceNonTech}
               value={stats.outreachEvents}
               locale={locale}
               tilt="rotate-2"
-              pose="french"
             />
             <Stat
               label={dictionary.meta.peopleReached}
@@ -265,14 +229,12 @@ function Home() {
               locale={locale}
               compact
               tilt="-rotate-2"
-              pose="ball"
             />
             <Stat
               label={dictionary.nav.sponsors}
               value={stats.sponsors}
               locale={locale}
               tilt="rotate-1"
-              pose="cofe"
             />
           </dl>
         </div>
@@ -287,21 +249,13 @@ function Home() {
                 {dictionary.nav.news}
               </h2>
 
-              <div className="flex items-center gap-3">
-                <OntonSticker
-                  pose="high"
-                  locale={locale}
-                  size="sm"
-                  rotate={-4}
-                />
-                <Link
-                  to="/$locale/news"
-                  params={{ locale }}
-                  className="zine-btn bg-paper text-ink px-4 py-2 text-sm font-bold no-underline rotate-1"
-                >
-                  {dictionary.actions.viewAll}
-                </Link>
-              </div>
+              <Link
+                to="/$locale/news"
+                params={{ locale }}
+                className="zine-btn bg-paper text-ink px-4 py-2 text-sm font-bold no-underline rotate-1"
+              >
+                {dictionary.actions.viewAll}
+              </Link>
             </div>
 
             <ul className="grid gap-6 sm:grid-cols-3">
@@ -422,38 +376,20 @@ function Stat({
   locale,
   compact = false,
   tilt = 'rotate-0',
-  pose,
 }: {
   label: string
   value: number
   locale: Locale
   compact?: boolean
   tilt?: string
-  pose: OntonPose
 }) {
-  const spec = ONTON_POSES[pose]
-
   return (
     <div
       className={`zine-card bg-carbon relative flex flex-col justify-between p-4 transition-transform hover:rotate-0 hover:-translate-y-1 ${tilt}`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <dd className="font-display text-signal text-3xl font-black sm:text-4xl">
-          {compact ? formatCompact(value, locale) : formatNumber(value, locale)}
-        </dd>
-        {spec ? (
-          <img
-            src={spec.src}
-            alt=""
-            aria-hidden="true"
-            width={64}
-            height={64}
-            loading="lazy"
-            decoding="async"
-            className="onton-sticker-shadow h-9 w-9 object-contain"
-          />
-        ) : null}
-      </div>
+      <dd className="font-display text-signal text-3xl font-black sm:text-4xl">
+        {compact ? formatCompact(value, locale) : formatNumber(value, locale)}
+      </dd>
       <dt className="branch-label text-branch-text/85 mt-2">{label}</dt>
     </div>
   )
@@ -465,7 +401,7 @@ function HomeError() {
   return (
     <BranchTheme branch="tech" as="main" className="min-h-screen">
       <div className="mx-auto flex w-full max-w-measure flex-col items-center space-y-4 px-4 py-16 text-center sm:px-6">
-        <OntonSticker pose="arson" locale={locale} size="lg" />
+        <OntonSticker pose="watahel" locale={locale} size="lg" />
         <h1 className="text-2xl font-semibold">
           {dictionary.errors.serverTitle}
         </h1>

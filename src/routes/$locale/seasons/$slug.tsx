@@ -136,15 +136,7 @@ function SeasonDetail() {
 
         {season.awards.length > 0 ? (
           <section className="space-y-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-bold">{dictionary.meta.awards}</h2>
-              <OntonSticker
-                pose="high"
-                locale={locale}
-                size="sm"
-                rotate={-6}
-              />
-            </div>
+            <h2 className="text-2xl font-bold">{dictionary.meta.awards}</h2>
             <ul className="grid gap-4 sm:grid-cols-2">
               {season.awards.map((award, idx) => {
                 const name = getLocalized(bilingual(award, 'name'), locale)

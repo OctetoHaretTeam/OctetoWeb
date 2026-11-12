@@ -55,17 +55,10 @@ function SponsorWall() {
   return (
     <BranchTheme branch="non_tech" as="main" className="min-h-screen">
       <div className="mx-auto w-full max-w-5xl space-y-10 px-4 py-10 sm:px-6">
-        <header className="flex flex-wrap items-center justify-between gap-6">
+        <header>
           <h1 className="text-3xl font-bold sm:text-4xl">
             {dictionary.nav.sponsors}
           </h1>
-          <OntonSticker
-            pose="french"
-            locale={locale}
-            size="lg"
-            rotate={6}
-            floating
-          />
         </header>
 
         {sponsors.length === 0 ? (

@@ -9,7 +9,6 @@ export type OntonPose =
   | 'ball'
   | 'french'
   | 'muchacho'
-  | 'arson'
   | 'cofe'
   | 'watahel'
   | 'huh'
@@ -44,12 +43,6 @@ export const ONTON_POSES: Record<OntonPose, OntonSpec> = {
     src: '/onton/onton-muchacho.webp',
     width: 640,
     height: 555,
-  },
-  arson: {
-    id: 'arson',
-    src: '/onton/onton-arson.webp',
-    width: 599,
-    height: 640,
   },
   cofe: {
     id: 'cofe',
@@ -202,7 +195,7 @@ export function OntonSticker({
  * Purely visual floating mascot companion in the bottom-right corner.
  *
  * Syncs its default pose with the active route and silently wiggles + cycles
- * through all 12 mascot poses on click — with zero speech bubbles or text.
+ * through all mascot poses on click — with zero speech bubbles or text.
  */
 export function OntonMascotDock({
   className,
@@ -268,7 +261,7 @@ export function OntonMascotDock({
 }
 
 function defaultPoseForPath(pathname: string): OntonPose {
-  if (pathname.includes('/performance/tech')) return 'arson'
+  if (pathname.includes('/performance/tech')) return 'demolisher'
   if (pathname.includes('/performance/non-tech')) return 'french'
   if (pathname.includes('/performance')) return 'demolisher'
   if (pathname.includes('/team')) return 'squish'
