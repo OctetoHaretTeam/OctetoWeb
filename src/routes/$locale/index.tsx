@@ -74,7 +74,7 @@ function Home() {
       >
         {hero ? null : <HeroMark />}
 
-        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:py-20">
+        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-10 px-4 pt-12 pb-16 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:pt-20 lg:pb-24">
           <div className="relative z-10 space-y-6">
             <div className="inline-flex flex-wrap items-center gap-3">
               <p className="bg-signal text-ink zine-btn inline-flex items-center gap-2 px-3 py-1 font-mono text-xs font-bold uppercase -rotate-2">
@@ -151,7 +151,7 @@ function Home() {
       {/* ── AWARDS STRIP ────────────────────────────────────────────────── */}
       {awards.length > 0 ? (
         <TornSection branch="non_tech" seed="awards">
-          <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-14 sm:px-6">
+          <div className="mx-auto w-full max-w-6xl space-y-6 px-4 pt-10 pb-18 sm:px-6">
             <h2 className="font-display text-3xl font-black -rotate-1">
               {dictionary.meta.awards}
             </h2>
@@ -197,7 +197,7 @@ function Home() {
 
       {/* ── STATS ROW ───────────────────────────────────────────────────── */}
       <TornSection branch="tech" seed="stats">
-        <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
+        <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-18 sm:px-6">
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             <Stat
               label={dictionary.meta.seasons}
@@ -243,7 +243,7 @@ function Home() {
       {/* ── NEWS ────────────────────────────────────────────────────────── */}
       {news.length > 0 ? (
         <TornSection branch="non_tech" seed="news">
-          <div className="mx-auto w-full max-w-6xl space-y-8 px-4 py-14 sm:px-6">
+          <div className="mx-auto w-full max-w-6xl space-y-8 px-4 pt-10 pb-18 sm:px-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <h2 className="font-display text-3xl font-black -rotate-1">
                 {dictionary.nav.news}
@@ -310,7 +310,7 @@ function Home() {
 
       {/* ── SPONSORS & PITCH CTA ────────────────────────────────────────── */}
       <TornSection branch="tech" seed="sponsors">
-        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-14 sm:px-6">
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 pt-10 pb-18 sm:px-6">
           {sponsors.length > 0 ? (
             <>
               <h2 className="branch-label text-branch-muted">
