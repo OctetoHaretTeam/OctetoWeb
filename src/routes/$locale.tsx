@@ -70,7 +70,7 @@ export const Route = createFileRoute('/$locale')({
         { property: 'og:site_name', content: dictionary.site.name },
         { property: 'og:type', content: 'website' },
         { property: 'og:url', content: absoluteUrl(pathname) },
-        { property: 'og:image', content: absoluteUrl('/logo.webp') },
+        { property: 'og:image', content: absoluteUrl('/og-image.png') },
         { property: 'og:image:alt', content: 'OctetoHaret — FTC #25474' },
         { property: 'og:locale', content: OG_LOCALES[locale] },
         {
@@ -78,7 +78,7 @@ export const Route = createFileRoute('/$locale')({
           content: OG_LOCALES[otherLocale(locale)],
         },
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:image', content: absoluteUrl('/logo.webp') },
+        { name: 'twitter:image', content: absoluteUrl('/og-image.png') },
       ],
       links: [
         { rel: 'canonical', href: absoluteUrl(pathname) },

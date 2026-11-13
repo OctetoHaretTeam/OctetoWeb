@@ -13,9 +13,9 @@ export const BRAND_PALETTE = {
   ink: '#0a0c09',
   carbon: '#141811',
   slate: '#232a20',
-  sage: '#7c8a6b',
+  sage: '#c2d971',
   paper: '#e9e4d6',
-  signal: '#a3c7a8',
+  signal: '#c2d971',
   gold: '#cda0dc',
   violet: '#e0aad6',
 } as const

@@ -10,8 +10,8 @@ import {
 } from './site'
 
 describe('site URL & absoluteUrl', () => {
-  test('DEFAULT_SITE_URL points to https://octeto.md', () => {
-    expect(DEFAULT_SITE_URL).toBe('https://octeto.md')
+  test('DEFAULT_SITE_URL points to https://octetoharet.com', () => {
+    expect(DEFAULT_SITE_URL).toBe('https://octetoharet.com')
   })
 
   test('resolves site-relative paths with or without leading slash', () => {
@@ -62,7 +62,7 @@ describe('buildPageMeta', () => {
     })
   })
 
-  test('falls back to /logo.webp when image is omitted or null', () => {
+  test('falls back to /og-image.png when image is omitted or null', () => {
     const meta = buildPageMeta({
       title: 'Despre — OctetoHaret',
       description: 'Despre noi',
@@ -72,7 +72,7 @@ describe('buildPageMeta', () => {
 
     expect(meta).toContainEqual({
       property: 'og:image',
-      content: `${SITE_URL}/logo.webp`,
+      content: `${SITE_URL}/og-image.png`,
     })
   })
 })

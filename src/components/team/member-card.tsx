@@ -42,7 +42,7 @@ export function MemberCard({
   const tilt = TILTS[hashSeed(member.slug) % TILTS.length]
 
   return (
-    <li className={`mx-auto w-full max-w-60 transition-transform duration-200 hover:z-10 hover:rotate-0 hover:-translate-y-1.5 ${tilt}`}>
+    <li className={`mx-auto w-full max-w-sm transition-transform duration-200 hover:z-10 hover:rotate-0 hover:-translate-y-1.5 ${tilt}`}>
       <Link
         to="/$locale/team/$slug"
         params={{ locale, slug: member.slug }}
@@ -55,12 +55,12 @@ export function MemberCard({
           seed={member.slug}
           priority={priority}
         />
-        <div className="zine-card-paper mt-2.5 space-y-1 p-3 lg:mt-3">
-          <p className="font-display text-ink text-base leading-snug font-black break-words group-hover:underline sm:text-lg">
+        <div className="zine-card-paper mt-2.5 space-y-1 p-2.5 sm:p-3 lg:mt-3">
+          <p className="font-display text-ink text-sm leading-snug font-black break-words group-hover:underline sm:text-[15px]">
             {member.displayName}
           </p>
           {role ? (
-            <p className="font-hand text-ink/85 text-base leading-tight font-bold break-words sm:text-lg">
+            <p className="font-hand text-ink/85 text-sm leading-tight font-bold break-words sm:text-[15px]">
               {role.value}
             </p>
           ) : null}

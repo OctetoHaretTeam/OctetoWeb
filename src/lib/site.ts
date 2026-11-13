@@ -8,7 +8,7 @@ import type { Locale } from '@/i18n/locale'
  * `VITE_SITE_URL` is intentionally public — it is the site's own address, and
  * the client needs it to build these tags. Never give a secret a VITE_ prefix.
  */
-export const DEFAULT_SITE_URL = 'https://octeto.md'
+export const DEFAULT_SITE_URL = 'https://octetoharet.com'
 
 const rawSiteUrl =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SITE_URL) ||
@@ -27,8 +27,8 @@ export function absoluteUrl(path: string): string {
 }
 
 export const SEO_KEYWORDS: Record<Locale, string> = {
-  ro: 'OctetoHaret, Octeto Haret, Octeto, 25474, #25474, FTC 25474, FTC #25474, Team 25474, FIRST Tech Challenge 25474, FIRST Tech Challenge Moldova, robotica Chisinau, IPLT Spiru Haret, Liceul Teoretic Spiru Haret Chisinau, Connect Award FTC Moldova',
-  en: 'OctetoHaret, Octeto Haret, Octeto, 25474, #25474, FTC 25474, FTC #25474, Team 25474, FIRST Tech Challenge 25474, FIRST Tech Challenge Moldova, robotics Chisinau Moldova, IPLT Spiru Haret, Spiru Haret High School Chisinau, Connect Award FTC Moldova',
+  ro: 'OctetoHaret, Octeto Haret, Octeto, octeto25474, Octeto 25474, octetoharet.com, 25474, #25474, FTC 25474, FTC #25474, Team 25474, FIRST Tech Challenge 25474, FIRST Tech Challenge Moldova, robotica Chisinau, IPLT Spiru Haret, Liceul Teoretic Spiru Haret Chisinau, Connect Award FTC Moldova',
+  en: 'OctetoHaret, Octeto Haret, Octeto, octeto25474, Octeto 25474, octetoharet.com, 25474, #25474, FTC 25474, FTC #25474, Team 25474, FIRST Tech Challenge 25474, FIRST Tech Challenge Moldova, robotics Chisinau Moldova, IPLT Spiru Haret, Spiru Haret High School Chisinau, Connect Award FTC Moldova',
 }
 
 export type PageMetaOptions = {
@@ -57,7 +57,7 @@ export function buildPageMeta({
   type = 'website',
   keywords,
 }: PageMetaOptions): Array<Record<string, string>> {
-  const resolvedImage = absoluteUrl(image || '/logo.webp')
+  const resolvedImage = absoluteUrl(image || '/og-image.png')
   const meta: Array<Record<string, string>> = [
     { title },
     { name: 'description', content: description },
@@ -108,12 +108,20 @@ export function buildSiteJsonLd(locale: Locale): Record<string, unknown> {
           '#25474',
           '25474',
           'OctetoHaret #25474',
+          'octeto25474',
+          'Octeto 25474',
+          'Octeto #25474',
         ],
         identifier: '25474',
         description,
         url: SITE_URL,
-        logo: absoluteUrl('/logo.webp'),
-        image: absoluteUrl('/logo.webp'),
+        logo: {
+          '@type': 'ImageObject',
+          url: absoluteUrl('/icon-512x512.png'),
+          width: 512,
+          height: 512,
+        },
+        image: absoluteUrl('/icon-512x512.png'),
         foundingDate: '2024-01',
         sport: 'FIRST Tech Challenge Robotics',
         address: {
@@ -146,6 +154,8 @@ export function buildSiteJsonLd(locale: Locale): Record<string, unknown> {
           'FTC 25474',
           'FTC #25474',
           '25474',
+          'octeto25474',
+          'octetoharet.com',
         ],
         url: SITE_URL,
         inLanguage: ['ro-MD', 'en'],

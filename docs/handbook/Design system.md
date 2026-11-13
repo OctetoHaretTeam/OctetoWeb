@@ -9,9 +9,9 @@ hardcode a hex in a component.**
 --color-ink     #0a0c09   base background
 --color-carbon  #141811   elevated surface
 --color-slate   #232a20   borders, dividers
---color-sage    #7c8a6b   kraft backdrop — non-tech canvas
+--color-sage    #c2d971   kraft backdrop — non-tech canvas
 --color-paper   #e9e4d6   cutouts, cards, body text on dark
---color-signal  #a3c7a8   interactive ONLY
+--color-signal  #c2d971   interactive ONLY
 --color-gold    #cda0dc   achievement ONLY
 --color-violet  #8b5cf6   logo gradient only
 ```

@@ -17,8 +17,31 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
-      { rel: 'icon', type: 'image/webp', href: '/logo.webp' },
-      { rel: 'apple-touch-icon', href: '/logo.webp' },
+      { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '48x48',
+        href: '/favicon-48x48.png',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '96x96',
+        href: '/favicon-96x96.png',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '192x192',
+        href: '/icon-192x192.png',
+      },
+      {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: '/apple-touch-icon.png',
+      },
+      { rel: 'manifest', href: '/site.webmanifest' },
     ],
   }),
   shellComponent: RootDocument,

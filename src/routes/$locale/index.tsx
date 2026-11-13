@@ -28,7 +28,7 @@ import { getHomeData } from '@/server/home'
 
 export const Route = createFileRoute('/$locale/')({
   loader: () => getHomeData(),
-  head: ({ params, loaderData }) => {
+  head: ({ params }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
     const dictionary = getDictionary(locale)
     const title =
@@ -46,7 +46,6 @@ export const Route = createFileRoute('/$locale/')({
         description,
         locale,
         pathname: `/${locale}`,
-        image: loaderData?.slides?.[0]?.image.url,
       }),
     }
   },
@@ -74,7 +73,7 @@ function Home() {
       >
         {hero ? null : <HeroMark />}
 
-        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:py-20">
+        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-10 px-4 pt-12 pb-16 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:pt-20 lg:pb-24">
           <div className="relative z-10 space-y-6">
             <div className="inline-flex flex-wrap items-center gap-3">
               <p className="bg-signal text-ink zine-btn inline-flex items-center gap-2 px-3 py-1 font-mono text-xs font-bold uppercase -rotate-2">
@@ -151,7 +150,7 @@ function Home() {
       {/* ── AWARDS STRIP ────────────────────────────────────────────────── */}
       {awards.length > 0 ? (
         <TornSection branch="non_tech" seed="awards">
-          <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-14 sm:px-6">
+          <div className="mx-auto w-full max-w-6xl space-y-6 px-4 pt-10 pb-18 sm:px-6">
             <h2 className="font-display text-3xl font-black -rotate-1">
               {dictionary.meta.awards}
             </h2>
@@ -197,7 +196,7 @@ function Home() {
 
       {/* ── STATS ROW ───────────────────────────────────────────────────── */}
       <TornSection branch="tech" seed="stats">
-        <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
+        <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-18 sm:px-6">
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             <Stat
               label={dictionary.meta.seasons}
@@ -243,7 +242,7 @@ function Home() {
       {/* ── NEWS ────────────────────────────────────────────────────────── */}
       {news.length > 0 ? (
         <TornSection branch="non_tech" seed="news">
-          <div className="mx-auto w-full max-w-6xl space-y-8 px-4 py-14 sm:px-6">
+          <div className="mx-auto w-full max-w-6xl space-y-8 px-4 pt-10 pb-18 sm:px-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <h2 className="font-display text-3xl font-black -rotate-1">
                 {dictionary.nav.news}
@@ -310,29 +309,41 @@ function Home() {
 
       {/* ── SPONSORS & PITCH CTA ────────────────────────────────────────── */}
       <TornSection branch="tech" seed="sponsors">
-        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-14 sm:px-6">
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 pt-10 pb-18 sm:px-6">
           {sponsors.length > 0 ? (
             <>
               <h2 className="branch-label text-branch-muted">
                 {dictionary.nav.sponsors}
               </h2>
-              <ul className="flex flex-wrap items-center gap-6">
+              <ul className="flex flex-wrap items-center gap-3">
                 {sponsors.map((item) => {
                   const logo = item.logoDark ?? item.logo
+                  const badgeTone = item.logoDark
+                    ? 'bg-carbon border-slate'
+                    : 'bg-sage border-slate'
                   return (
                     <li key={item.id}>
-                      <img
-                        src={logo.url}
-                        alt={item.name}
-                        width={logo.width}
-                        height={logo.height}
-                        loading="lazy"
-                        decoding="async"
+                      <Link
+                        to="/$locale/sponsors"
+                        params={{ locale }}
                         className={cn(
-                          'h-10 w-24 rounded-xs',
-                          imageFitClass(logo, 'contain'),
+                          'inline-flex h-12 w-28 items-center justify-center rounded-xl border px-3 py-1.5 transition-transform duration-200 hover:-translate-y-0.5',
+                          badgeTone,
                         )}
-                      />
+                      >
+                        <img
+                          src={logo.url}
+                          alt={item.name}
+                          width={logo.width}
+                          height={logo.height}
+                          loading="lazy"
+                          decoding="async"
+                          className={cn(
+                            'h-full w-full !bg-transparent drop-shadow-[0_1px_1px_rgba(10,12,9,0.28)]',
+                            imageFitClass(logo, 'contain'),
+                          )}
+                        />
+                      </Link>
                     </li>
                   )
                 })}

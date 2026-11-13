@@ -20,13 +20,13 @@
   --color-ink: #0a0c09; /* base background, faintly green-tinted black */
   --color-carbon: #141811; /* elevated surface */
   --color-slate: #232a20; /* borders, dividers */
-  --color-sage: #7c8a6b; /* kraft backdrop — non-tech canvas */
+  --color-sage: #c2d971; /* kraft backdrop — non-tech canvas */
   --color-paper: #e9e4d6; /* cutout edges, cards, body text on dark */
   /* Interactive ONLY. Eyeballed from a pasted swatch, not a colour-picked
      file — replace with the exact value if a precise one becomes available.
      Was #afd46a (a yellow-green, read from the logo artwork); the team asked
      for this cooler sage-mint instead. */
-  --color-signal: #a3c7a8;
+  --color-signal: #c2d971;
   /* Awards, sponsors, emphasis. Eyeballed from a pasted swatch, same caveat
      as signal above. Was #efb428 (gold) — the team asked for this purple
      instead, so the CSS variable name is now a historical identifier rather

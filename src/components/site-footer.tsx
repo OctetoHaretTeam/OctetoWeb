@@ -25,7 +25,7 @@ export function SiteFooter({ info }: { info: ContactInfo }) {
 
   return (
     <TornSection branch="tech" seed="site-footer" as="footer" outlined>
-      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 pt-7 pb-11 sm:px-6">
         <div className="space-y-4">
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
             <h2 className="font-display text-2xl font-black -rotate-1">

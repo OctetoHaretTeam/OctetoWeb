@@ -122,6 +122,7 @@ export const en: Dictionary = {
 
   hero: {
     goToSlide: 'Go to slide',
+    slidesLabel: 'Photo slides',
   },
 
   sponsorship: {
