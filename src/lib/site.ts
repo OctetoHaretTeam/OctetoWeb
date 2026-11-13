@@ -57,7 +57,7 @@ export function buildPageMeta({
   type = 'website',
   keywords,
 }: PageMetaOptions): Array<Record<string, string>> {
-  const resolvedImage = absoluteUrl(image || '/logo.webp')
+  const resolvedImage = absoluteUrl(image || '/og-image.png')
   const meta: Array<Record<string, string>> = [
     { title },
     { name: 'description', content: description },

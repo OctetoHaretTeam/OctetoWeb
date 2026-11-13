@@ -28,7 +28,7 @@ import { getHomeData } from '@/server/home'
 
 export const Route = createFileRoute('/$locale/')({
   loader: () => getHomeData(),
-  head: ({ params, loaderData }) => {
+  head: ({ params }) => {
     const locale = isLocale(params.locale) ? params.locale : DEFAULT_LOCALE
     const dictionary = getDictionary(locale)
     const title =
@@ -46,7 +46,6 @@ export const Route = createFileRoute('/$locale/')({
         description,
         locale,
         pathname: `/${locale}`,
-        image: loaderData?.slides?.[0]?.image.url,
       }),
     }
   },
