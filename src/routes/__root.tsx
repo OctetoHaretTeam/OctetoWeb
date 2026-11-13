@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import { Analytics } from '@vercel/analytics/react'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 
@@ -43,6 +44,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         {children}
         <Scripts />
+        <Analytics />
       </body>
     </html>
   )
