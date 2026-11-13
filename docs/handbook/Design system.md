@@ -11,7 +11,7 @@ hardcode a hex in a component.**
 --color-slate   #232a20   borders, dividers
 --color-sage    #c2d971   kraft backdrop — non-tech canvas
 --color-paper   #e9e4d6   cutouts, cards, body text on dark
---color-signal  #a3c7a8   interactive ONLY
+--color-signal  #c2d971   interactive ONLY
 --color-gold    #cda0dc   achievement ONLY
 --color-violet  #8b5cf6   logo gradient only
 ```

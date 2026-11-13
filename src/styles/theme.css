@@ -26,7 +26,7 @@
      file — replace with the exact value if a precise one becomes available.
      Was #afd46a (a yellow-green, read from the logo artwork); the team asked
      for this cooler sage-mint instead. */
-  --color-signal: #a3c7a8;
+  --color-signal: #c2d971;
   /* Awards, sponsors, emphasis. Eyeballed from a pasted swatch, same caveat
      as signal above. Was #efb428 (gold) — the team asked for this purple
      instead, so the CSS variable name is now a historical identifier rather
