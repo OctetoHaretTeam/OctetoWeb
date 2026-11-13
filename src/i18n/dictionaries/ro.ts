@@ -131,6 +131,7 @@ export const ro = {
 
   hero: {
     goToSlide: 'Mergi la diapozitivul',
+    slidesLabel: 'Galerie foto',
   },
 
   sponsorship: {
