@@ -1,8 +1,10 @@
 import { Link } from '@tanstack/react-router'
+import { useMemo } from 'react'
 
 import { LanguageSwitch } from '@/components/language-switch'
 import { SiteLogo } from '@/components/site-logo'
 import { useDictionary, useLocale } from '@/i18n/use-locale'
+import { tornEdgeSvgCurvePath, tornEdgeSvgPath } from '@/lib/torn-edge'
 
 /**
  * Site header — CLAUDE.md §11.
@@ -28,10 +30,20 @@ export function SiteHeader() {
   const locale = useLocale()
   const dictionary = useDictionary()
 
+  const fillPath = useMemo(
+    () => tornEdgeSvgPath({ seed: 'site-header', amplitude: 3.8, segments: 76 }),
+    [],
+  )
+  const curvePath = useMemo(
+    () =>
+      tornEdgeSvgCurvePath({ seed: 'site-header', amplitude: 3.8, segments: 76 }),
+    [],
+  )
+
   return (
     <header
       data-branch="tech"
-      className="bg-branch-ground relative shadow-[0_6px_20px_rgba(10,12,9,0.42)] lg:sticky lg:top-0 lg:z-50"
+      className="bg-branch-ground relative z-40 lg:sticky lg:top-0 lg:z-50"
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <div className="flex items-center justify-between gap-4 py-2.5">
@@ -69,6 +81,29 @@ export function SiteHeader() {
           className="-mx-4 flex flex-nowrap px-4 py-2 sm:hidden"
         />
       </div>
+
+      <svg
+        viewBox="0 0 100 10"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
+        className="pointer-events-none absolute inset-x-0 bottom-[2px] z-10 h-[var(--tear)] w-full translate-y-full [--tear:1.35rem] drop-shadow-[0_6px_4px_rgba(10,12,9,0.32)]"
+      >
+        <g transform="translate(0 10) scale(1 -1)">
+          <path d={fillPath} fill="var(--branch-ground)" />
+          {curvePath ? (
+            <path
+              d={curvePath}
+              fill="none"
+              stroke="var(--branch-muted)"
+              strokeOpacity={0.75}
+              strokeWidth={1.5}
+              strokeDasharray="4 3"
+              vectorEffect="non-scaling-stroke"
+            />
+          ) : null}
+        </g>
+      </svg>
     </header>
   )
 }
