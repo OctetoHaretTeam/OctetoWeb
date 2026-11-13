@@ -115,8 +115,13 @@ export function buildSiteJsonLd(locale: Locale): Record<string, unknown> {
         identifier: '25474',
         description,
         url: SITE_URL,
-        logo: absoluteUrl('/logo.webp'),
-        image: absoluteUrl('/logo.webp'),
+        logo: {
+          '@type': 'ImageObject',
+          url: absoluteUrl('/icon-512x512.png'),
+          width: 512,
+          height: 512,
+        },
+        image: absoluteUrl('/icon-512x512.png'),
         foundingDate: '2024-01',
         sport: 'FIRST Tech Challenge Robotics',
         address: {
