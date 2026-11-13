@@ -4,7 +4,7 @@ import { SITE_URL } from '@/lib/site'
 
 /**
  * Dynamic `/robots.txt` endpoint — emits crawler rules and points `Sitemap:`
- * at the active `SITE_URL` (`https://octeto.md` by default, or `VITE_SITE_URL`).
+ * at the active `SITE_URL` (`https://octetoharet.com` by default, or `VITE_SITE_URL`).
  */
 export const Route = createFileRoute('/robots.txt')({
   server: {
