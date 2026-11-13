@@ -276,7 +276,7 @@ a component.**
   --color-ink:     #0A0C09;  /\* base background, faintly green-tinted black \*/
   --color-carbon:  #141811;  /\* elevated surface \*/
   --color-slate:   #232A20;  /\* borders, dividers \*/
-  --color-sage:    #7C8A6B;  /\* kraft backdrop — non-tech canvas \*/
+  --color-sage:    #C2D971;  /\* kraft backdrop — non-tech canvas \*/
   --color-paper:   #E9E4D6;  /\* cutout edges, cards, body text on dark \*/
   --color-signal:  #A3C7A8;  /\* interactive ONLY \*/
   --color-gold:    #CDA0DC;  /\* awards, sponsors, emphasis \*/

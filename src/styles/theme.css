@@ -20,7 +20,7 @@
   --color-ink: #0a0c09; /* base background, faintly green-tinted black */
   --color-carbon: #141811; /* elevated surface */
   --color-slate: #232a20; /* borders, dividers */
-  --color-sage: #7c8a6b; /* kraft backdrop — non-tech canvas */
+  --color-sage: #c2d971; /* kraft backdrop — non-tech canvas */
   --color-paper: #e9e4d6; /* cutout edges, cards, body text on dark */
   /* Interactive ONLY. Eyeballed from a pasted swatch, not a colour-picked
      file — replace with the exact value if a precise one becomes available.
